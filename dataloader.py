@@ -1,59 +1,75 @@
 import torch
-from torch.utils import data
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
+import numpy as np
 import os
 
-from torch.utils.data.datapipes import datapipe
-
-##### CONSTANTS #####
-BATCH_SIZE = 32
-#####################
 class Custom_Dataset(Dataset):
-    def __init__(self, dataset) -> None:
+    def __init__(self, dataset, dataset_configs):
         super().__init__()
+        self.num_channels = dataset_configs.input_channels
 
-        #* Load samples and labels
-        #* While target labels are not used in training, it is required in measuring performance
+        # Load samples
         x_data = dataset["samples"]
-        x_data = x_data.unsqueeze(1) #? Adding input channel
-        y_data = dataset["labels"]
 
+        # Load labels
+        y_data = dataset.get("labels")
+        if y_data is not None and isinstance(y_data, np.ndarray):
+            y_data = torch.from_numpy(y_data)
+        
+        # Convert to torch tensor
+        if isinstance(x_data, np.ndarray):
+            x_data = torch.from_numpy(x_data)
+        
+        # Check samples dimensions.
+        # The dimension of the data is expected to be (N, C, L)
+        # where N is the #samples, C: #channels, and L is the sequence length
+        if len(x_data.shape) == 2:
+            x_data = x_data.unsqueeze(1)
+        elif len(x_data.shape) == 3 and x_data.shape[1] != self.num_channels:
+            x_data = x_data.transpose(1, 2)
+
+        # Normalize data
+        if dataset_configs.normalize:
+            data_mean = torch.mean(x_data, dim=(0, 2))
+            data_std = torch.std(x_data, dim=(0, 2))
+            self.transform = transforms.Normalize(mean=data_mean, std=data_std)
+        else:
+            self.transform = None
         self.x_data = x_data.float()
-        self.y_data = y_data.long()
+        self.y_data = y_data.long() if y_data is not None else None
         self.len = x_data.shape[0]
-
+         
 
     def __getitem__(self, index):
         x = self.x_data[index]
-        y = self.y_data[index]
+        if self.transform:
+            x = self.transform(self.x_data[index].reshape(self.num_channels, -1, 1)).reshape(self.x_data[index].shape)
+        y = self.y_data[index] if self.y_data is not None else None
         return x, y
 
     def __len__(self):
         return self.len
 
-def load_scenarios(data_path, scenario):
-    #? Scenario here will be in the form (S, T1, T2, T3, ...)
-    train_loaders = {}
-    test_loaders = {}
+def create_dataloader(data_path, domain_id, configs, dtype):
+    # loading dataset file from path
+    dataset_file = torch.load(os.path.join(data_path, f"{dtype}_{domain_id}.pt"))
 
-    for time_step, domain in enumerate(scenario):
-        train_loaders[time_step], test_loaders[time_step] = create_dataloader(data_path, domain)
+    # Loading datasets
+    dataset = Custom_Dataset(dataset_file, configs)
 
-    return train_loaders, test_loaders
+    if dtype == "test":  # you don't need to shuffle or drop last batch while testing
+        shuffle  = False    
+        drop_last = False
+    else:
+        shuffle = configs.shuffle
+        drop_last = configs.drop_last
 
-def create_dataloader(data_path, domain_name):
-    train_files = torch.load(os.path.join(data_path, f"train_{domain_name}.pt"))
-    train_set = Custom_Dataset(train_files)
+    # Dataloaders
+    data_loader = DataLoader(dataset=dataset, 
+                             batch_size=configs.train_params["batch_size"],
+                             shuffle=shuffle, 
+                             drop_last=drop_last, 
+                             num_workers=0)
 
-    test_files = torch.load(os.path.join(data_path, f"test_{domain_name}.pt"))
-    test_set = Custom_Dataset(test_files)
-
-    train_loader = DataLoader(dataset=train_set,
-                                batch_size=BATCH_SIZE,
-                                shuffle=True)
-
-    test_loader = DataLoader(dataset=test_set,
-                                batch_size=BATCH_SIZE,
-                                shuffle=False)
-
-    return train_loader, test_loader
+    return data_loader

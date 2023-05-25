@@ -1,5 +1,6 @@
 import torch
 from collections import defaultdict
+import os
 
 from algorithms.BaseModel import BaseModel
 
@@ -10,6 +11,8 @@ class DeepCoral(BaseModel):
         #* Losses
         self.coral_loss = CORAL()
 
+        self.algo_name = "DeepCoral"
+
     def update(self, dataloader, timestep): #* Update function updates the classifier and the feature extractor
         best_loss = float('inf')
         
@@ -18,7 +21,7 @@ class DeepCoral(BaseModel):
         for epoch in range(self.configs.hparams["N_epochs"]):
             losses = defaultdict(float)
             for (src_x, src_y), (trg_x, _) in zip(dataloader[0], dataloader[timestep]):
-                src_x, src_y, trg_x = src_x.to(self.device), src_y.to(self.device), trg_x.to(self.device)
+                src_x, src_y, trg_x = src_x.to(self.configs.device), src_y.to(self.configs.device), trg_x.to(self.configs.device)
 
                 #* Zero gradient
                 self.feature_optimiser.zero_grad()
@@ -55,58 +58,8 @@ class DeepCoral(BaseModel):
             #* Saves the model with the best total loss
             if losses["loss"] < best_loss:
                 best_loss = losses["loss"]
-                torch.save(self.feature_extractor.state_dict(), f"{self.configs.saved_models_path}/feature_extractor_{timestep}.pt")
-                torch.save(self.classifier.state_dict(), f"{self.configs.saved_models_path}/classifier_{timestep}.pt")
-
-        return epoch_losses
-
-
-
-    #* Adapt function keeps the classifier constant
-    #! Should only be called after training source model
-    def adapt(self, dataloader, timestep):
-        best_loss = float('inf')
-
-        source_feature_extractor, _ = self.load_source_model() #* Loading source model
-        
-        epoch_losses = defaultdict(list) #* y axis datas to be plotted
-
-        for epoch in range(self.configs.hparams["N_epochs"]):
-            losses = defaultdict(float)
-            for (src_x, _), (trg_x, _) in zip(dataloader[0], dataloader[timestep]):
-                src_x, trg_x = src_x.to(self.device), trg_x.to(self.device)
-
-                #* Zero gradient
-                self.feature_optimiser.zero_grad()
-
-                #* Forward pass
-                src_feat = source_feature_extractor(src_x)
-                trg_feat = self.feature_extractor(trg_x)
-
-                #* Compute loss
-                loss = self.coral_loss(src_feat, trg_feat)
-
-                #* Backpropagation
-                loss.backward()
-
-                #* Update parameters
-                self.feature_optimiser.step()
-
-                #* Record the loss value
-                losses["loss"] += loss.item() / len(dataloader[0])
-
-
-            #* Learning rate scheduler
-            self.feature_lr_sched.step()
-
-            #* Save the losses of the current epoch
-            for key in losses:
-                epoch_losses[key].append(losses[key])
-
-            #* Saves the model with the best total loss
-            if losses["loss"] < best_loss:
-                best_loss = losses["loss"]
-                torch.save(self.feature_extractor.state_dict(), f"{self.configs.saved_models_path}/feature_extractor_{timestep}.pt")
+                torch.save(self.feature_extractor.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, f"feature_extractor_{timestep}.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, f"classifier_{timestep}.pt"))
 
         return epoch_losses
 

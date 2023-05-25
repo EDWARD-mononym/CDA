@@ -5,31 +5,30 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
 
         self.conv_block1 = nn.Sequential(
-            nn.Conv1d(configs.CNN_params["input_channel"], configs.CNN_params["hidden_channel_1"], kernel_size=configs.CNN_params["kernel_1_size"],
-                      stride=configs.CNN_params["stride_1"], bias=False, padding=(configs.CNN_params["kernel_1_size"] // 2)),
-            nn.BatchNorm1d(configs.CNN_params["hidden_channel_1"]),
+            nn.Conv1d(configs.input_channels, configs.mid_channels, kernel_size=configs.kernel_size,
+                      stride=configs.stride, bias=False, padding=(configs.kernel_size // 2)),
+            nn.BatchNorm1d(configs.mid_channels),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1),
-            nn.Dropout(configs.CNN_params["dropout"])
+            nn.Dropout(configs.dropout)
         )
 
         self.conv_block2 = nn.Sequential(
-            nn.Conv1d(configs.CNN_params["hidden_channel_1"], configs.CNN_params["hidden_channel_2"], kernel_size=configs.CNN_params["kernel_2_size"], 
-                      stride=configs.CNN_params["stride_2"], bias=False, padding=(configs.CNN_params["kernel_2_size"] // 2)),
-            nn.BatchNorm1d(configs.CNN_params["hidden_channel_2"]),
+            nn.Conv1d(configs.mid_channels, configs.mid_channels * 2, kernel_size=8, stride=1, bias=False, padding=4),
+            nn.BatchNorm1d(configs.mid_channels * 2),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1)
         )
 
         self.conv_block3 = nn.Sequential(
-            nn.Conv1d(configs.CNN_params["hidden_channel_2"], configs.CNN_params["output_channel"], configs.CNN_params["kernel_3_size"], 
-                      stride=configs.CNN_params["stride_3"], bias=False, padding=(configs.CNN_params["kernel_3_size"] // 2)),
-            nn.BatchNorm1d(configs.CNN_params["output_channel"]),
+            nn.Conv1d(configs.mid_channels * 2, configs.final_out_channels, kernel_size=8, stride=1, bias=False,
+                      padding=4),
+            nn.BatchNorm1d(configs.final_out_channels),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1),
         )
 
-        self.adaptive_pool = nn.AdaptiveAvgPool1d(configs.CNN_params["feature_len"])
+        self.adaptive_pool = nn.AdaptiveAvgPool1d(configs.features_len)
 
     def forward(self, x_in):
         x = self.conv_block1(x_in)

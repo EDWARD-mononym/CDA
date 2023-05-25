@@ -4,3 +4,5 @@
 Data_preproc/
 __pycache__/
 .python-version
+Data/
+logs/

@@ -1,6 +1,7 @@
 import torch
-from torch.utils.data import ConcatDataset, DataLoader
+from torch.utils.data import DataLoader, Dataset # ConcatDataset
 from collections import defaultdict
+import os
 
 from algorithms.BaseModel import BaseModel
 from dataloader import Custom_Dataset, BATCH_SIZE
@@ -11,10 +12,9 @@ class IdealModel (BaseModel):
 
     def train(self, dataloaders):
         #* Combine dataset of all 
-        dataset_list = [dl.dataset for dl in dataloaders]
-        combined_dataset = ConcatDataset(dataset_list)
-        modified_dataset = Custom_Dataset(combined_dataset)
-        combined_dataloader = DataLoader(dataset=modified_dataset,
+        dataset_list = [dataloaders[timestep].dataset for timestep in dataloaders]
+        concat_dataset = ConcatDataset(dataset_list)
+        combined_dataloader = DataLoader(dataset=concat_dataset,
                                          batch_size=BATCH_SIZE,
                                          shuffle=True)
 
@@ -58,7 +58,24 @@ class IdealModel (BaseModel):
             #* Saves the model with the best total loss
             if losses["loss"] < best_loss:
                 best_loss = losses["loss"]
-                torch.save(self.feature_extractor.state_dict(), f"{self.configs.saved_models_path}/feature_extractor_ideal.pt")
-                torch.save(self.classifier.state_dict(), f"{self.configs.saved_models_path}/classifier_ideal.pt")
+                torch.save(self.feature_extractor.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, f"feature_extractor_0.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, f"classifier_0.pt"))
 
         return epoch_losses
+
+class ConcatDataset(Dataset):
+    def __init__(self, datasets):
+        self.datasets = datasets
+        self.lengths = [len(dataset) for dataset in datasets]
+        self.cumulative_lengths = torch.tensor(self.lengths).cumsum(dim=0).tolist()
+
+    def __getitem__(self, index):
+        index = int(index)  # Ensure that index is an integer
+        for i, cum_len in enumerate(self.cumulative_lengths):
+            if index < cum_len:
+                if i > 0:
+                    index -= self.cumulative_lengths[i - 1]
+                return self.datasets[i][index]
+
+    def __len__(self):
+        return self.cumulative_lengths[-1]
