@@ -2,7 +2,7 @@ class HHAR():
     def __init__(self):
         super().__init__()
         self.train_params = {
-            'N_epochs': 200,
+            'N_epochs': 100,
             'batch_size': 32,
             'weight_decay': 1e-4,
             'step_size': 50,

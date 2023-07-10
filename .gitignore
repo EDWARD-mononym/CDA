@@ -6,3 +6,8 @@ __pycache__/
 .python-version
 Data/
 logs/
+models/
+Trained_models/
+wandb/
+wandb.py
+dataloader/FD/data

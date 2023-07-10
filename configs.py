@@ -10,6 +10,7 @@ class Config:
         self.shuffle = dataset_config_class.shuffle
         self.drop_last = dataset_config_class.drop_last
         self.normalize = dataset_config_class.normalize
+        self.backbone = dataset_config_class.backbone
 
         #* model configs
         self.input_channels = dataset_config_class.input_channels
@@ -33,7 +34,7 @@ class Config:
         self.alg_hparams = hparam_class.alg_hparams[algo_name]
 
         ###### EXPERIMENT CONFIGS ######
-        self.num_runs = 3
+        self.num_runs = 1
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
         else:

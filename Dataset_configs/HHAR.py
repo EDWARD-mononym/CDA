@@ -2,9 +2,10 @@ class HHAR(object):  ## HHAR dataset, SAMSUNG device.
     def __init__(self):
         super(HHAR, self).__init__()
         self.sequence_len = 128
-        self.scenarios = [(0, 1, 2, 3, 4, 5, 6, 7, 8),
-                          (1, 3, 5, 7, 0, 8, 6, 4, 2),
-                          (8, 5, 3, 1, 2, 4, 7, 6, 0)]
+        self.scenarios = [(8, 7, 2, 1, 3),
+                          (0, 2, 1, 3, 4),
+                          (0, 8, 7, 6, 5),
+                          (5, 1, 2, 7, 6)]
         self.class_names = ['bike', 'sit', 'stand', 'walk', 'stairs_up', 'stairs_down']
         self.num_classes = 6
         self.shuffle = True

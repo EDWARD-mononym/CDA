@@ -1,16 +1,21 @@
-import torch
 from collections import defaultdict
+import importlib.util
 import os
+import pandas as pd
+import torch
 
-from architecture.CNN import CNN
 from architecture.classifier import Classifier
 
 class BaseModel(torch.nn.Module):
     def __init__(self, configs):
         super().__init__()
 
-        #* Architectures & Backbone
-        self.feature_extractor = CNN(configs)
+        #* Getting feature extractor
+        feature_extractor_module = importlib.import_module(f"architecture.{configs.backbone}")
+        feature_extractor_class = getattr(feature_extractor_module, configs.backbone)
+        self.feature_extractor = feature_extractor_class(configs)
+
+        #* Initialising classifier
         self.classifier = Classifier(configs)
 
         #* Optimisers
@@ -39,10 +44,12 @@ class BaseModel(torch.nn.Module):
         #* Losses
         self.task_loss = torch.nn.CrossEntropyLoss()
 
+        #* Utils
         self.configs = configs
         self.algo_name = "Source"
+        self.epoch_performance = pd.DataFrame(columns=['Domain', 'Epoch Number', 'Average acc'])
 
-    def train_source(self, src_loader):
+    def train_source(self, src_loader, source_id, save_path, test_loader=None):
         best_loss = float('inf')
 
         epoch_losses = defaultdict(list) #* y axis datas to be plotted
@@ -82,22 +89,47 @@ class BaseModel(torch.nn.Module):
             #* Saves the model with the best total loss
             if losses["loss"] < best_loss:
                 best_loss = losses["loss"]
-                # torch.save(self.feature_extractor.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, "feature_extractor_0.pt"))
-                # torch.save(self.classifier.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, "classifier_0.pt"))
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"feature_extractor_{source_id}.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"classifier_{source_id}.pt"))
+
+            #* If the test_loader was given, test the performance of current epoch on the test domain
+            if test_loader and (epoch+1) % 10 == 0:
+                self.evaluate(test_loader, epoch, source_id)
+
 
         return epoch_losses
 
-    def load_source_model(self):
-        #* Initialise models
-        source_feature_extractor = CNN(self.configs)
-        source_classifier = Classifier(self.configs)
+    def evaluate (self, test_loader, epoch, current_domain):
+        #? Measure the performance of the current model
+        #? Called right after an epoch
 
-        #* Load state dicts
-        source_feature_extractor.load_state_dict(torch.load(os.path.join(self.configs.saved_models_path, self.algo_name, "feature_extractor_0.pt")))
-        source_classifier.load_state_dict(torch.load(os.path.join(self.configs.saved_models_path, self.algo_name, "classifier_0.pt")))
+        feature_extractor = self.feature_extractor.to(self.configs.device)
+        classifier = self.classifier.to(self.configs.device)
 
-        #* Set to evaluation mode
-        source_feature_extractor.eval()
-        source_classifier.eval()
+        #* Eval mode
+        feature_extractor.eval()
+        classifier.eval()
 
-        return source_feature_extractor, source_classifier
+        acc_list = []
+
+        with torch.no_grad():
+            for x, y in test_loader:
+                x = x.float().to(self.configs.device)
+                y = y.view((-1)).long().to(self.configs.device)
+
+                #* Forward pass
+                features = feature_extractor(x)
+                predict_logits = classifier(features)
+                pred = predict_logits.argmax(dim=1)
+
+                #* Compute accuracy
+                acc = torch.eq(pred, y).sum().item() / len(y)
+                acc_list.append(acc)
+
+        avg_acc = torch.tensor(acc_list).mean().item() #* Average accuracy
+
+        df = pd.DataFrame({'Domain': current_domain,
+                           'Epoch Number': epoch,
+                           'Average acc': avg_acc}, index=[len(self.epoch_performance)])
+
+        self.epoch_performance = pd.concat([self.epoch_performance, df], axis=0)

@@ -1,7 +1,7 @@
-import torch
 from collections import defaultdict
-import os
 import numpy as np
+import os
+import torch
 
 from algorithms.BaseModel import BaseModel
 from architecture.discriminator import Discriminator
@@ -32,16 +32,17 @@ class DANN(BaseModel):
 
         self.algo_name = "DANN"
 
-    def update(self, src_loader, trg_loader, timestep):
-
-        #* Set to train
-        self.feature_extractor.train()
-        self.classifier.train()
+    def update(self, src_loader, trg_loader, target_id, save_path, test_loader=None):
 
         best_loss = float('inf')
         epoch_losses = defaultdict(list) #* y axis datas to be plotted
 
         for epoch in range(self.configs.train_params["N_epochs"]):
+
+            #* Set to train
+            self.feature_extractor.train()
+            self.classifier.train()
+
             joint_loader = enumerate(zip(src_loader, trg_loader))
             losses = defaultdict(float) #* To record losses
             for step, ((src_x, src_y), (trg_x, _)) in joint_loader:
@@ -49,6 +50,8 @@ class DANN(BaseModel):
 
                 p = float(step + epoch * len(src_loader)) / self.configs.train_params["N_epochs"] + 1 / len(src_loader)
                 alpha = 2. / (1. + np.exp(-10 * p)) - 1
+
+                
 
                 #* Zero gradient
                 self.feature_optimiser.zero_grad()
@@ -105,8 +108,12 @@ class DANN(BaseModel):
             #* Saves the model with the best total loss
             if losses["loss"] < best_loss:
                 best_loss = losses["loss"]
-                # torch.save(self.feature_extractor.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, f"feature_extractor_{timestep}.pt"))
-                # torch.save(self.classifier.state_dict(), os.path.join(self.configs.saved_models_path, self.algo_name, f"classifier_{timestep}.pt"))
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"feature_extractor_{target_id}.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"classifier_{target_id}.pt"))
+
+            #* If the test_loader was given, test the performance of current epoch on the test domain
+            if test_loader and (epoch+1) % 10 == 0:
+                self.evaluate(test_loader, epoch, target_id)
 
 class ReverseLayerF(torch.autograd.Function):
     @staticmethod
