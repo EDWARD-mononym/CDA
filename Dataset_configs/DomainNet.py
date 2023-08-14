@@ -11,15 +11,15 @@ class DomainNet(object):
         self.backbone = "ResNet50"
 
         #* model configs
-        self.input_channels = 1
+        self.input_channels = 3
         self.kernel_size = 5
         self.stride = 1
         self.dropout = 0.5
 
         #* CNN and RESNET features
         self.mid_channels = 64
-        self.final_out_channels = 2048
-        self.features_len = 1
+        self.final_out_channels = 1
+        self.features_len = 2048
 
         #* TCN features
         self.tcn_layers = [75,150]
@@ -36,3 +36,7 @@ class DomainNet(object):
         self.disc_hid_dim = 64
         self.DSKN_disc_hid = 128
         self.hidden_dim = 500
+
+        #* MLP
+        self.mlp_width = 256
+        self.mlp_depth = 4

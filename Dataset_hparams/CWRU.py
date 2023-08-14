@@ -1,4 +1,4 @@
-class FD():
+class CWRU():
     def __init__(self):
         super().__init__()
         self.train_params = {
@@ -72,10 +72,10 @@ class FD():
                 "src_cls_loss_wt": 2.038458138479581,
                 "weight_decay": 0.0001
             },
-            "DeepCoral": {
-                "coral_weight": 5.9357031653707475,
+            "Deep_Coral": {
+                "coral_wt": 5.9357031653707475,
                 "learning_rate": 0.0005,
-                "task_weight": 0.43859323168654,
+                "src_cls_loss_wt": 0.43859323168654,
                 "weight_decay": 0.0001
             },
             "MMDA": {

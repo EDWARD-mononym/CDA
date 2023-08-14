@@ -5,13 +5,14 @@ import torch
 
 from algorithms.BaseModel import BaseModel
 from architecture.discriminator import Discriminator
+from architecture.MLP import MLP
 
 class DANN(BaseModel):
     def __init__(self, configs):
         super().__init__(configs)
 
         #* Architectures & Backbone
-        self.discriminator = Discriminator(configs)
+        self.discriminator = MLP(configs)
 
         #* Optimisers
         self.discriminator_optimiser = torch.optim.Adam(

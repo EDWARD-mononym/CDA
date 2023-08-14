@@ -1,11 +1,15 @@
-class FD(object): 
+class CWRU(object): 
     def __init__(self):
-        super(FD, self).__init__()
+        super(CWRU, self).__init__()
         self.sequence_len = 1
-        self.scenarios = [("PB_Artificial", "CWRU_FE", "CWRU_DE", "PB_Real"), 
-                          ("CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE")]
-        self.class_names = ['Healthy', 'Inner', 'Outer']
-        self.num_classes = 3
+        self.scenarios = [("FE_7", "DE_21", "FE_21", "DE_14", "FE_14", "DE_7"),
+                          ("DE_14", "FE_21", "DE_21", "DE_7", "FE_14", "FE_7"),
+                          ("FE_14", "DE_14", "DE_7", "FE_21", "FE_7", "DE_21"),
+                          ("DE_21", "FE_14", "FE_21", "DE_14", "FE_7", "DE_7"),
+                          ("FE_21", "FE_7", "DE_21", "DE_7", "FE_14", "DE_14"),
+                          ("DE_7", "FE_14", "FE_7", "DE_14", "FE_21", "DE_21")]
+        self.class_names = ['Healthy', 'Inner', 'Ball', 'Outer']
+        self.num_classes = 4
         self.shuffle = True
         self.drop_last = True
         self.normalize = True
@@ -37,7 +41,3 @@ class FD(object):
         self.disc_hid_dim = 64
         self.DSKN_disc_hid = 128
         self.hidden_dim = 500
-
-        #* MLP
-        self.mlp_width = 256
-        self.mlp_depth = 4

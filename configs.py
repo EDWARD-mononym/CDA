@@ -28,6 +28,9 @@ class Config:
         self.DSKN_disc_hid = dataset_config_class.DSKN_disc_hid
         self.hidden_dim = dataset_config_class.hidden_dim
 
+        #* MLP
+        self.mlp_width = dataset_config_class.mlp_width
+        self.mlp_depth = dataset_config_class.mlp_depth
 
         ###### HPARAM CONFIGS ######
         self.train_params = hparam_class.train_params
