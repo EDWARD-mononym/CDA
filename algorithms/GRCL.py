@@ -138,9 +138,20 @@ class GRCL(BaseModel):
 
             #* Update feature extractor
             #! too slow
-            parameters_vector = torch.cat([param.view(-1) for param in self.feature_extractor.parameters()])
-            gradients_vector = torch.cat([grad.view(-1) for grad in g_optimal])
-            parameters_vector.grad = gradients_vector
+            # parameters_vector = torch.cat([param.view(-1) for param in self.feature_extractor.parameters()])
+            # gradients_vector = torch.cat([grad.view(-1) for grad in g_optimal])
+            # parameters_vector.grad = gradients_vector
+
+            #! too slow (bcus of zip?)
+            # for param, grad in zip(self.feature_extractor.parameters(), g_optimal):
+            #     # param.grad = grad.clone()
+            #     param.grad.copy_(grad)
+
+            params = list(self.feature_extractor.parameters())
+            for i in range(len(params)):
+                if params[i].grad is not None:
+                    params[i].grad.copy_(g_optimal[i])
+
 
             self.feature_optimiser.step()
 
@@ -149,7 +160,7 @@ class GRCL(BaseModel):
             print(f"Time taken: {end - start}")
 
 
-    def get_grad(self): 
+    def get_grad(self): #! Need to double check
         num_parameters = sum(p.numel() for p in self.feature_extractor.parameters())
         gradient_vector = torch.empty(num_parameters, device=self.configs.device)
 
