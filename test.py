@@ -1,34 +1,34 @@
-import cvxopt
+from torch.utils.data import DataLoader
 import torch
-import time
 
-def quadratic_optimization(Q, c):
-    # Convert PyTorch tensors to NumPy arrays
-    Q = Q.numpy()
-    c = c.numpy()
+# Custom Dataset Definition
+class CustomDataset(torch.utils.data.Dataset):
+    def __init__(self, data):
+        self.data = data
 
-    # Create CVXOPT matrices
-    Q = cvxopt.matrix(Q)
-    c = cvxopt.matrix(c)
-    
-    # Solve the quadratic problem
-    sol = cvxopt.solvers.qp(Q, c)
-    
-    # Convert the result back to a PyTorch tensor
-    result = torch.tensor(sol['x'])
-    return result.squeeze()  # Ensure the result is a 1D tensor
+    def __getitem__(self, index):
+        return self.data[index]
 
-# Define the problem size
-size = 23508032
+    def __setitem__(self, index, value):
+        self.data[index] = value
 
-# Create a diagonal matrix Q and vector c
-Q = torch.diag(torch.ones(size) * 0.5)
-c = torch.ones(size)
+    def __len__(self):
+        return len(self.data)
 
-# Measure the time taken to solve the problem
-start_time = time.time()
-result = quadratic_optimization(Q, c)
-elapsed_time = time.time() - start_time
+# Transformation Function Definition
+def transform(x):
+    return x * 2  # Example transformation
 
-# Return the shape of the result and the time taken
-print(result.shape, elapsed_time)
+# Create dataset and DataLoader
+data = torch.Tensor([1, 2, 3, 4])
+dataset = CustomDataset(data)
+dataloader = DataLoader(dataset, batch_size=4)
+
+# Apply transformation
+for i, x in enumerate(dataloader):
+    y = transform(x)
+    dataloader.dataset[i] = y
+
+# Check if the data in DataLoader has been transformed
+transformed_data = [item.numpy()[0] for item in dataloader]
+print(transformed_data)

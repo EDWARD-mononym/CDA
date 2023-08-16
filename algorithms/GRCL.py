@@ -1,4 +1,5 @@
 from collections import defaultdict
+import heapq
 import itertools
 import numpy as np
 import os
@@ -34,8 +35,8 @@ class GRCL(BaseModel):
         ])
 
         #* Optimizer
-        self.u = torch.ones([2,1], requires_grad=True, device=configs.device)
-        self.u_optimizer = torch.optim.LBFGS([self.u])
+        self.v = torch.ones([2,1], requires_grad=True, device=configs.device)
+        self.v_optimizer = torch.optim.LBFGS([self.v])
 
         #* Memory
         self.M = torch.utils.data.DataLoader(EmptyDataset(), batch_size=configs.train_params["batch_size"]) #? Stores episodic target memory
@@ -43,18 +44,32 @@ class GRCL(BaseModel):
         self.CombinedLoader = torch.utils.data.DataLoader(EmptyDataset(), batch_size=configs.train_params["batch_size"]) #? Stores the loader we use which includes source, memory & target
 
         self.contrastive_loss = InfoNCE_loss
-        self.KMean = KMeans(configs.num_classes, configs.features_len, device=configs.device)
+        self.KMean = KMeans(configs.alg_hparams["K"], configs.features_len * configs.final_out_channels, device=configs.device)
 
     def update(self, src_loader, trg_loader, target_id, save_path, test_loader=None):
 
         best_loss = float('inf')
         epoch_losses = defaultdict(list) #* y axis datas to be plotted
 
-
         for epoch in range(self.configs.train_params["N_epochs"]):
 
             loss = self.train_epoch(src_loader, trg_loader, target_id, save_path, test_loader)
 
+            #* Learning rate scheduler
+            self.feature_lr_sched.step()
+
+            #* Saves the model with the best total loss
+            if loss < best_loss:
+                best_loss = loss
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"feature_extractor_{target_id}.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"classifier_{target_id}.pt"))
+
+            #* If the test_loader was given, test the performance of current epoch on the test domain
+            if test_loader and (epoch+1) % 10 == 0:
+                self.evaluate(test_loader, epoch, target_id)
+
+        self.UpdateMem(trg_loader) # Saves top predictors from this target domain into memory
+        print("Success")
 
     def train_epoch(self, src_loader, trg_loader, target_id, save_path, test_loader=None):
 
@@ -63,6 +78,8 @@ class GRCL(BaseModel):
         self.g.train()
 
         self.CombinedLoader = combine_dataloaders(src_loader, self.M, trg_loader, batch_size=self.configs.train_params["batch_size"])
+
+        losses = defaultdict(float) #* To record losses
 
         #? if M is still empty, use a dataloader which returns None instead
         if len(self.M) == 0:
@@ -76,8 +93,6 @@ class GRCL(BaseModel):
 
         #* Loop through the joint dataset
         for step, ((src_x, src_y), (mem_x, mem_y), (trg_x, _)) in joint_loader:
-
-            start = time.time()
 
             src_x, src_y, trg_x = src_x.to(self.configs.device), src_y.to(self.configs.device), trg_x.to(self.configs.device)
 
@@ -119,6 +134,7 @@ class GRCL(BaseModel):
             #* Memory classification loss
             if mem_x is None: # This means that m is empty and we're still on our first target domain
                 g_dm = g_s #? Duplicate constraint which is equivalent to removing target memory constraint
+                mem_loss = torch.zeros(1)
 
             else:
                 mem_x, mem_y = mem_x.to(self.configs.device), mem_y.to(self.configs.device)
@@ -137,27 +153,18 @@ class GRCL(BaseModel):
             g_optimal = (self.G.t() @ u_optimal).squeeze() + g_t 
 
             #* Update feature extractor
-            #! too slow
-            # parameters_vector = torch.cat([param.view(-1) for param in self.feature_extractor.parameters()])
-            # gradients_vector = torch.cat([grad.view(-1) for grad in g_optimal])
-            # parameters_vector.grad = gradients_vector
-
-            #! too slow (bcus of zip?)
-            # for param, grad in zip(self.feature_extractor.parameters(), g_optimal):
-            #     # param.grad = grad.clone()
-            #     param.grad.copy_(grad)
 
             params = list(self.feature_extractor.parameters())
             for i in range(len(params)):
                 if params[i].grad is not None:
                     params[i].grad.copy_(g_optimal[i])
 
-
             self.feature_optimiser.step()
 
-            end = time.time()
+            #* Record total src + prev target loss
+            losses["loss"] += (src_loss.item() + mem_loss.item()) / self.configs.train_params["batch_size"]
 
-            print(f"Time taken: {end - start}")
+        return losses["loss"]
 
 
     def get_grad(self): #! Need to double check
@@ -175,13 +182,40 @@ class GRCL(BaseModel):
 
 
     def UpdateMem(self, domain_loader):
-        combined_loader = combine_dataloaders(self.M, domain_loader) #! This is not correct because we need to only select the top 1024
+        # Optimize & label centroids
+        joint_loader = combine_dataloaders(self.M, domain_loader, batch_size=self.configs.train_params["batch_size"])
+        self.KMean.optimize(joint_loader, self.feature_extractor, self.classifier)
 
-    def BuildFeatureBank(self, combined_loader): #? Initialise the feature bank
+        #* Store the top 1024 data and pseudo labels
+        top_data = []
+        for x, _ in domain_loader:
+            x = x.to(self.configs.device)
+            with torch.no_grad():
+                feature = self.feature_extractor(x)
+                pred = self.classifier(feature)
+            pseudo_labels = self.KMean.generate_pseudolabel(feature)
+            logits = pred[torch.arange(len(x)), pseudo_labels] #? confidence level
+
+            # Add the data and pseudo labels to the heap, along with the corresponding logits
+            for data, p_label, logit in zip(x, pseudo_labels, logits):
+                heapq.heappush(top_data, (logit.item(), (data, p_label))) #? Save logit, (data, label) into a list
+
+                # If the heap size exceeds 1024, remove the smallest element
+                if len(top_data) > self.configs.alg_hparams["memory"]:
+                    heapq.heappop(top_data) #? Remove the element with lowest logit
+
+        # Extract the data and pseudo labels, discarding the logit values
+        top_data = [item[1] for item in top_data] #? Remove logit so that final list is (data, label)
+        top_dataset = MemoryDataset(top_data)
+
+        #* Combine new target domain into memory
+        combined_dataset = torch.utils.data.ConcatDataset([self.M.dataset, top_dataset])
+        self.M = torch.utils.data.DataLoader(combined_dataset, batch_size=self.configs.train_params["batch_size"], shuffle=True)
+
+
+    def BuildFeatureBank(self, domain_loader): #? Initialise the feature bank
         new_b = None
-        for x,_ in combined_loader:
-            feature = self.feature_extractor(x)
-            encoded_feature = self.g(feature)
+        joint_loader = combine_dataloaders(self.M, domain_loader, batch_size=self.configs.train_params["batch_size"])
 
     def UpdateKey(self):
         pass
@@ -189,27 +223,20 @@ class GRCL(BaseModel):
     def optimise(self, g_t, g_s, g_dm):
         self.G = torch.cat([torch.neg(g_s).unsqueeze(0), torch.neg(g_dm).unsqueeze(0)], dim=0)
         self.g_t = g_t
-        self.u_optimizer.step(self.closure)
-        return self.u.detach()
+        self.v_optimizer.step(self.closure)
+        return self.v.detach()
 
     def closure(self):
-        self.u_optimizer.zero_grad()
-        loss =  self.objective(self.u)
+        self.v_optimizer.zero_grad()
+        loss =  self.objective(self.v)
         loss.backward()
         return loss
 
-    def objective(self, u):
+    def objective(self, v):
+        u = torch.exp(v)
         term1 = 0.5 * u.t() @ self.G @ self.G.t() @ u
         term2 = self.g_t @ self.G.t() @ u
         return term1 - term2
-
-
-    # @staticmethod
-    # def objective(v, G, g_t):
-    #     u = torch.exp(v) #? Enforce u > 0 by minimising v where u = exp(v)
-    #     term1 = 0.5 * u.t() @ G @ G.t() @ u
-    #     term2 = g_t @ G.t() @ u
-    #     return term1 - term2
 
 ###### Used class & functions ######
 
@@ -232,3 +259,13 @@ class NoneDataset(torch.utils.data.Dataset):
 
 def none_collate(batch):
     return None, None
+
+class MemoryDataset(torch.utils.data.Dataset):
+    def __init__(self, top_data):
+        self.data = top_data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        return self.data[index][0], self.data[index][1]

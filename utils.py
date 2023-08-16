@@ -20,30 +20,37 @@ class KMeans:
         self.n_features = n_features
         self.device = device
         self.centroids = torch.randn(n_clusters, n_features, device=device, requires_grad=True)
+        self.centroid_labels = torch.zeros(n_clusters, dtype=torch.long)
         self.optimizer = torch.optim.Adam([self.centroids], lr=0.01)
 
-    def __call__(self, x):
+    def __call__(self, feature):
         # Compute pairwise distances between data and centroids
-        distances = torch.cdist(x, self.centroids)
+        distances = torch.cdist(feature, self.centroids)
         
         # Assign each data point to the closest centroid
         cluster_assignments = torch.argmin(distances, dim=1)
         
         return cluster_assignments
 
-    def optimize(self, dataloader, epochs=40):
+    def generate_pseudolabel(self, feature):
+        cluster_assignments = self(feature)
+        return self.centroid_labels[cluster_assignments]
+
+    def optimize(self, dataloader, feature_extractor, classifier, epochs=40):
         for epoch in range(epochs):
             cluster_counts = torch.zeros(self.n_clusters, device=self.device)
 
             # Optimise centroids
-            for x in dataloader:
+            for x, _ in dataloader:
                 x = x.to(self.device)
+
+                feature = feature_extractor(x)
 
                 # Reset the gradients
                 self.optimizer.zero_grad()
 
                 # Compute pairwise distances
-                distances = torch.cdist(x, self.centroids)
+                distances = torch.cdist(feature, self.centroids)
 
                 # Compute loss
                 loss = torch.min(distances, dim=1)[0].mean()
@@ -55,7 +62,7 @@ class KMeans:
                 self.optimizer.step()
 
                 # Update cluster counts
-                cluster_assignments = self(x)
+                cluster_assignments = self(feature)
                 cluster_counts += torch.bincount(cluster_assignments, minlength=self.n_clusters)
 
             # Handle empty clusters
@@ -69,6 +76,9 @@ class KMeans:
 
                     # Use its centroid with a small random perturbation as the new centroid for the empty cluster
                     self.centroids[i] = self.centroids[non_empty_cluster] + 0.01 * torch.randn_like(self.centroids[non_empty_cluster])
+
+        #* Labeling the centroids
+        self.centroid_labels = torch.argmax(classifier(self.centroids), dim=1)
 
 def combine_dataloaders(*dataloaders, batch_size = 64):
     # Combine datasets

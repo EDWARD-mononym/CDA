@@ -89,6 +89,6 @@ class DomainNet():
             'CoTMix': {'learning_rate': 0.001, 'mix_ratio': 0.52, 'temporal_shift': 14,
                        'src_cls_weight': 0.8, 'src_supCon_weight': 0.1, 'trg_cont_weight': 0.1,
                        'trg_entropy_weight': 0.05},
-            'GRCL': {'tau': 0.07, 'learning_rate': 0.0005}
+            'GRCL': {'tau': 0.07, 'learning_rate': 0.0005, 'K': 3450, 'memory': 1024}
 
         }
