@@ -62,14 +62,14 @@ class Experiment():
                 src_loader = self.get_loader(scenario[0], "train")
                 test_loader = self.get_loader(scenario[1], "test")
 
-                # #* Train source model
-                # if plot:
-                #     self.algorithm_train_source(self.algorithm, src_loader, scenario[0], self.save_path, test_loader)
-                # else:
-                #     self.algorithm_train_source_plotless(self.algorithm, src_loader, scenario[0], self.save_path)
+                #* Train source model
+                if plot:
+                    self.algorithm_train_source(self.algorithm, src_loader, scenario[0], self.save_path, test_loader)
+                else:
+                    self.algorithm_train_source_plotless(self.algorithm, src_loader, scenario[0], self.save_path)
 
-                # #* Performance of source model & Save
-                # self.evaluate_model(scenario, scenario[0], run_id)
+                #* Performance of source model & Save
+                self.evaluate_model(scenario, scenario[0], run_id)
 
                 for target_id in scenario[1:]:
                     trg_loader = self.get_loader(target_id, "train")                 

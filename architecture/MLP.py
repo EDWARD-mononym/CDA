@@ -4,10 +4,10 @@ import torch.nn.functional as F
 
 # Define the 2-layer MLP g(z)
 class MLP(nn.Module):
-    def __init__(self, configs, in_dim=2048, hidden_dim=2048, out_dim=128):
+    def __init__(self, configs):
         super(MLP, self).__init__()
-        self.linear1 = nn.Linear(in_dim, hidden_dim)
-        self.linear2 = nn.Linear(hidden_dim, out_dim)
+        self.linear1 = nn.Linear(configs.features_len, configs.features_len)
+        self.linear2 = nn.Linear(configs.features_len, configs.alg_hparams['len_encoded'])
 
     def forward(self, x):
         x = F.relu(self.linear1(x))

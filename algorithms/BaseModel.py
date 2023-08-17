@@ -14,6 +14,7 @@ class BaseModel(torch.nn.Module):
         feature_extractor_module = importlib.import_module(f"architecture.{configs.backbone}")
         feature_extractor_class = getattr(feature_extractor_module, configs.backbone)
         self.feature_extractor = feature_extractor_class(configs)
+        self.feature_extractor_class = feature_extractor_class
 
         #* Initialising classifier
         self.classifier = Classifier(configs)
@@ -55,6 +56,7 @@ class BaseModel(torch.nn.Module):
         epoch_losses = defaultdict(list) #* y axis datas to be plotted
 
         for epoch in range(self.configs.train_params["N_epochs"]):
+            print(f"training on {source_id} epoch: {epoch + 1}/{self.configs.train_params['N_epochs']}")
             losses = defaultdict(float)
             for x, y in src_loader:
                 x, y = x.to(self.configs.device), y.to(self.configs.device)

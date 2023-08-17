@@ -1,18 +1,15 @@
 from collections import defaultdict
 import heapq
 import itertools
-import numpy as np
 import os
 import torch
-import torch.nn.functional as F
 from torchvision import transforms
+from tqdm import tqdm
 
 from algorithms.BaseModel import BaseModel
 from architecture.MLP import MLP
 from architecture.Losses import InfoNCE_loss
 from utils import KMeans, combine_dataloaders
-
-import time
 
 class GRCL(BaseModel):
     def __init__(self, configs):
@@ -41,7 +38,6 @@ class GRCL(BaseModel):
         #* Memory
         self.M = torch.utils.data.DataLoader(EmptyDataset(), batch_size=configs.train_params["batch_size"]) #? Stores episodic target memory
         self.B = torch.utils.data.DataLoader(EmptyDataset(), batch_size=configs.train_params["batch_size"]) #? Stores encoded features 
-        self.CombinedLoader = torch.utils.data.DataLoader(EmptyDataset(), batch_size=configs.train_params["batch_size"]) #? Stores the loader we use which includes source, memory & target
 
         self.contrastive_loss = InfoNCE_loss
         self.KMean = KMeans(configs.alg_hparams["K"], configs.features_len * configs.final_out_channels, device=configs.device)
@@ -51,9 +47,14 @@ class GRCL(BaseModel):
         best_loss = float('inf')
         epoch_losses = defaultdict(list) #* y axis datas to be plotted
 
+        combined_domain = combine_dataloaders(src_loader, self.M, trg_loader) # D_{s} U M U D_{t}
+        self.BuildFeatureBank(combined_domain)
+
         for epoch in range(self.configs.train_params["N_epochs"]):
 
-            loss = self.train_epoch(src_loader, trg_loader, target_id, save_path, test_loader)
+            print(f"training on {target_id} epoch: {epoch + 1}/{self.configs.train_params['N_epochs']}")
+
+            loss = self.train_epoch(src_loader)
 
             #* Learning rate scheduler
             self.feature_lr_sched.step()
@@ -69,30 +70,26 @@ class GRCL(BaseModel):
                 self.evaluate(test_loader, epoch, target_id)
 
         self.UpdateMem(trg_loader) # Saves top predictors from this target domain into memory
-        print("Success")
 
-    def train_epoch(self, src_loader, trg_loader, target_id, save_path, test_loader=None):
+    def train_epoch(self, src_loader):
 
         #* Set to train
         self.feature_extractor.train()
         self.g.train()
 
-        self.CombinedLoader = combine_dataloaders(src_loader, self.M, trg_loader, batch_size=self.configs.train_params["batch_size"])
-
         losses = defaultdict(float) #* To record losses
 
-        #? if M is still empty, use a dataloader which returns None instead
         if len(self.M) == 0:
             NoneDataLoader = torch.utils.data.DataLoader(NoneDataset(self.configs.train_params["batch_size"]), 
                                                          batch_size=self.configs.train_params["batch_size"],
                                                          collate_fn = none_collate)
-            joint_loader = enumerate(zip(itertools.cycle(src_loader), NoneDataLoader, self.CombinedLoader))
+            joint_loader = enumerate(zip(itertools.cycle(src_loader), itertools.cycle(NoneDataLoader), self.B_loader))
 
         else:
-            joint_loader = enumerate(zip(itertools.cycle(src_loader), self.M, self.CombinedLoader))
+            joint_loader = enumerate(zip(itertools.cycle(src_loader), itertools.cycle(self.M), self.B_loader))
 
         #* Loop through the joint dataset
-        for step, ((src_x, src_y), (mem_x, mem_y), (trg_x, _)) in joint_loader:
+        for step, ((src_x, src_y), (mem_x, mem_y), (trg_x, _, idx)) in joint_loader:
 
             src_x, src_y, trg_x = src_x.to(self.configs.device), src_y.to(self.configs.device), trg_x.to(self.configs.device)
 
@@ -113,6 +110,8 @@ class GRCL(BaseModel):
             contrast_loss.backward()
             self.g_optimiser.step()
             g_t = self.get_grad()
+
+            self.UpdateKey(trg_x, idx)
 
             # Reset gradient
             self.feature_optimiser.zero_grad()
@@ -166,8 +165,7 @@ class GRCL(BaseModel):
 
         return losses["loss"]
 
-
-    def get_grad(self): #! Need to double check
+    def get_grad(self):
         num_parameters = sum(p.numel() for p in self.feature_extractor.parameters())
         gradient_vector = torch.empty(num_parameters, device=self.configs.device)
 
@@ -213,12 +211,17 @@ class GRCL(BaseModel):
         self.M = torch.utils.data.DataLoader(combined_dataset, batch_size=self.configs.train_params["batch_size"], shuffle=True)
 
 
-    def BuildFeatureBank(self, domain_loader): #? Initialise the feature bank
-        new_b = None
-        joint_loader = combine_dataloaders(self.M, domain_loader, batch_size=self.configs.train_params["batch_size"])
+    def BuildFeatureBank(self, joint_loader): #? Initialise the feature bank with previously trained feature extractor & encoder
+        print("Initialising feature bank")
+        custom_sampler = CustomRandomSampler(joint_loader.dataset)
+        dataloader_with_custom_sampler = torch.utils.data.DataLoader(joint_loader.dataset, batch_size=self.configs.train_params["batch_size"], sampler=custom_sampler)
+        self.B = FeatureBankDataset(dataloader_with_custom_sampler, self.g, self.feature_extractor, self.configs)
+        self.B_loader = torch.utils.data.DataLoader(self.B, batch_size=self.configs.alg_hparams['n_negative'], shuffle=True)
 
-    def UpdateKey(self):
-        pass
+    def UpdateKey(self, x, idx):
+        new_k = self.g(self.feature_extractor(x))
+        updated_k = self.configs.alg_hparams['momentum']*self.B.k[idx] -(1-self.configs.alg_hparams['momentum'])*new_k
+        self.B.update_key(updated_k, idx)
 
     def optimise(self, g_t, g_s, g_dm):
         self.G = torch.cat([torch.neg(g_s).unsqueeze(0), torch.neg(g_dm).unsqueeze(0)], dim=0)
@@ -269,3 +272,34 @@ class MemoryDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         return self.data[index][0], self.data[index][1]
+
+class FeatureBankDataset(torch.utils.data.Dataset):
+    def __init__(self, dataloader, g, feature_extractor, config):
+        self.data = dataloader.dataset
+        
+        # Initialize tensor to store transformed values
+        self.k = torch.zeros((len(self.data), config.alg_hparams['len_encoded']))
+        
+        with torch.no_grad():
+            # Iterate through the dataset and apply the transformation
+            for idx, (x, _) in tqdm(enumerate(self.data), total=len(self.data)):
+                x = x.unsqueeze(0)
+                x = x.to(config.device)
+                self.k[idx] = g(feature_extractor((x)))
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        sample, = self.data[idx]  # Corrected unpacking
+        k = self.k[idx]
+
+        return sample, k, idx  # Return both data and index
+
+    def update_key(self, new_value, idx):
+        self.k[idx] = new_value
+
+class CustomRandomSampler(torch.utils.data.RandomSampler):
+    def __iter__(self):
+        self.indices = list(super().__iter__())
+        return iter(self.indices)
