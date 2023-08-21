@@ -111,7 +111,7 @@ class GRCL(BaseModel):
             self.g_optimiser.step()
             g_t = self.get_grad()
 
-            self.UpdateKey(trg_x, idx)
+            self.UpdateKey()
 
             # Reset gradient
             self.feature_optimiser.zero_grad()
@@ -218,10 +218,8 @@ class GRCL(BaseModel):
         self.B = FeatureBankDataset(dataloader_with_custom_sampler, self.g, self.feature_extractor, self.configs)
         self.B_loader = torch.utils.data.DataLoader(self.B, batch_size=self.configs.alg_hparams['n_negative'], shuffle=True)
 
-    def UpdateKey(self, x, idx):
-        new_k = self.g(self.feature_extractor(x))
-        updated_k = self.configs.alg_hparams['momentum']*self.B.k[idx] -(1-self.configs.alg_hparams['momentum'])*new_k
-        self.B.update_key(updated_k, idx)
+    def UpdateKey(self):
+        self.B.update_key(self.g, self.feature_extractor, self.configs)
 
     def optimise(self, g_t, g_s, g_dm):
         self.G = torch.cat([torch.neg(g_s).unsqueeze(0), torch.neg(g_dm).unsqueeze(0)], dim=0)
@@ -278,7 +276,7 @@ class FeatureBankDataset(torch.utils.data.Dataset):
         self.data = dataloader.dataset
         
         # Initialize tensor to store transformed values
-        self.k = torch.zeros((len(self.data), config.alg_hparams['len_encoded']))
+        self.k = torch.zeros(len(self.data), config.alg_hparams['len_encoded'], device = config.device)
         
         with torch.no_grad():
             # Iterate through the dataset and apply the transformation
@@ -291,13 +289,22 @@ class FeatureBankDataset(torch.utils.data.Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        sample, = self.data[idx]  # Corrected unpacking
+        sample, _ = self.data[idx]  # Corrected unpacking
         k = self.k[idx]
 
         return sample, k, idx  # Return both data and index
 
-    def update_key(self, new_value, idx):
-        self.k[idx] = new_value
+    def update_key(self, g, feature_extractor, config):
+        new_k = torch.zeros(len(self.data), config.alg_hparams['len_encoded'], device = config.device)
+
+        with torch.no_grad():
+            # Iterate through the dataset and apply the transformation
+            for idx, (x, _) in tqdm(enumerate(self.data), total=len(self.data)):
+                x = x.unsqueeze(0)
+                x = x.to(config.device)
+                new_k[idx] = g(feature_extractor((x)))
+
+        self.k = config.alg_hparams['momentum']*self.k -(1-config.alg_hparams['momentum'])*new_k
 
 class CustomRandomSampler(torch.utils.data.RandomSampler):
     def __iter__(self):

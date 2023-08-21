@@ -53,7 +53,7 @@ def load_caltech():
 
         with os.scandir(object_dir) as entries:
             temp_file_names = [str(object_dir + '/' + entry.name) for entry in entries if entry.is_file()]
-            temp_labels = [office_labels[object_name] for _ in temp_file_names]
+            temp_labels = [caltech_labels[object_name] for _ in temp_file_names]
             file_names.extend(temp_file_names)
             labels.extend(temp_labels)
 
