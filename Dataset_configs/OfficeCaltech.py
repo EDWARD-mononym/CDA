@@ -8,7 +8,7 @@ class OfficeCaltech(object):
         self.shuffle = True
         self.drop_last = True
         self.normalize = True
-        self.backbone = "ResNet50"
+        self.backbone = "ResNet18"
 
         #* model configs
         self.input_channels = 3
