@@ -15,7 +15,7 @@ class GRCL(BaseModel):
     def __init__(self, configs):
         super().__init__(configs)
 
-        #* Feature encoder
+        #* Projection layer
         self.g = MLP(configs)
         self.g_optimiser = torch.optim.Adam(
             self.g.parameters(),
@@ -47,7 +47,7 @@ class GRCL(BaseModel):
         best_loss = float('inf')
         epoch_losses = defaultdict(list) #* y axis datas to be plotted
 
-        combined_domain = combine_dataloaders(src_loader, self.M, trg_loader) # D_{s} U M U D_{t}
+        combined_domain = combine_dataloaders(src_loader, self.M, trg_loader) #? D_{s} U M U D_{t}
         self.BuildFeatureBank(combined_domain)
 
         for epoch in range(self.configs.train_params["N_epochs"]):

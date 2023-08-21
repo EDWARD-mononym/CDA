@@ -227,7 +227,7 @@ class Experiment():
         self.result_table.to_csv(os.path.join(self.log_path, f"{scenario}_{run_id}.csv"), index = True)
         print(self.result_table)
         
-
+    
 if __name__ == "__main__":
-    experiment = Experiment("GRCL", "DomainNet")
+    experiment = Experiment("GRCL", "OfficeCaltech")
     experiment.main(plot=False)
