@@ -2,7 +2,7 @@ class FD():
     def __init__(self):
         super().__init__()
         self.train_params = {
-            'N_epochs': 100,
+            'N_epochs': 240,
             'batch_size': 32,
             'weight_decay': 1e-4,
             'step_size': 50,
