@@ -2,8 +2,7 @@ class FD(object):
     def __init__(self):
         super(FD, self).__init__()
         self.sequence_len = 1
-        self.scenarios = [("PB_Artificial", "CWRU_FE", "CWRU_DE", "PB_Real"), 
-                          ("CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE")]
+        self.scenarios = [("MFPT", "CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE")]
         self.class_names = ['Healthy', 'Inner', 'Outer']
         self.num_classes = 3
         self.shuffle = True

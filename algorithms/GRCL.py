@@ -299,7 +299,7 @@ class FeatureBankDataset(torch.utils.data.Dataset):
 
         with torch.no_grad():
             # Iterate through the dataset and apply the transformation
-            for idx, (x, _) in tqdm(enumerate(self.data), total=len(self.data)):
+            for idx, (x, _) in enumerate(self.data):
                 x = x.unsqueeze(0)
                 x = x.to(config.device)
                 new_k[idx] = g(feature_extractor((x)))

@@ -40,6 +40,8 @@ class DANN(BaseModel):
 
         for epoch in range(self.configs.train_params["N_epochs"]):
 
+            print(f"training on {target_id} epoch: {epoch + 1}/{self.configs.train_params['N_epochs']}")
+
             #* Set to train
             self.feature_extractor.train()
             self.classifier.train()

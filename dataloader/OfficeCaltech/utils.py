@@ -57,9 +57,6 @@ def load_caltech():
             file_names.extend(temp_file_names)
             labels.extend(temp_labels)
 
-    print(file_names)
-    print(labels)
-
     #* Split data into training and testing sets
     test_size = 0.2  
     train_file_names, test_file_names, train_labels, test_labels = train_test_split(file_names, labels, test_size=test_size, random_state=42)
