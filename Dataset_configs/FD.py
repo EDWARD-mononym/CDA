@@ -5,7 +5,8 @@ class FD(object):
         self.scenarios = [("MFPT", "CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE"), 
                           ("CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE", "MFPT"),
                           ("PB_Real", "PB_Artificial", "MFPT", "CWRU_DE", "CWRU_FE"),
-                          ("PB_Real", "MFPT", "CWRU_DE", "CWRU_FE", "PB_Artificial")]
+                          ("PB_Artificial", "MFPT", "CWRU_DE", "CWRU_FE", "PB_Real"),
+                          ("CWRU_FE", "CWRU_DE", "PB_Artificial", "PB_Real", "MFPT")]
         self.class_names = ['Healthy', 'Inner', 'Outer']
         self.num_classes = 3
         self.shuffle = True
