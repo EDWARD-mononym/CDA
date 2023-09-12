@@ -16,7 +16,7 @@ configs = {
                        "kernel_size": 3,
                        "stride": 1,
                        "dropout": 0.5,
-                       "hidden_layers": 5},
+                       "hidden_layers": 3},
     
     "ClassifierConfig": {"Classifier": "Classifier"},
 
