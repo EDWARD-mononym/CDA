@@ -52,7 +52,7 @@ def main(args = args):
             writer.close()
 
             #* Load the best model & test acc
-            feature_extractor, classifier = load_best_model(configs, target_id, device)
+            feature_extractor, classifier = load_best_model(configs, scenario, target_id, device)
             target_accs = test_all_domain(configs["Dataset"]["Dataset_Name"], scenario, feature_extractor, classifier, device)
             result_matrix.update(target_id, target_accs)
 
