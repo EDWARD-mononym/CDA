@@ -39,6 +39,9 @@ def main(args = args):
 
     for scenario in configs["Dataset"]["Scenarios"]:
         feature_extractor, classifier = load_source_model(configs, scenario, device)
+        feature_extractor.to(device)
+        classifier.to(device)
+
         #* Test source model acc & save
         result_matrix = Acc_matrix(scenario)
         source_accs = test_all_domain(configs["Dataset"]["Dataset_Name"], scenario, feature_extractor, classifier, device)
@@ -52,6 +55,9 @@ def main(args = args):
 
             #* Load the best model & test acc
             feature_extractor, classifier = load_best_model(configs, target_id)
+            feature_extractor.to(device)
+            classifier.to(device)
+            
             target_accs = test_all_domain(configs["Dataset"]["Dataset_Name"], scenario, feature_extractor, classifier, device)
             result_matrix.update(target_id, target_accs)
 
