@@ -20,7 +20,7 @@ configs = {
     
     "ClassifierConfig": {"Classifier": "Classifier"},
 
-    "TrainingConfigs": {"n_epoch": 200},
+    "TrainingConfigs": {"n_epoch": 1},
 
     "OptimiserConfig": {"lr": 0.0005, "momentum": 0.9}
 }
