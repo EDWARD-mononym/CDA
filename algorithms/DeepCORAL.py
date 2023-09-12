@@ -8,7 +8,7 @@ from utils.model_testing import test_domain, test_all_domain
 
 def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
               feature_extractor_optimiser,  classifier_optimiser, n_epoch, save_path, target_name, device, datasetname, scenario, writer):
-    best_acc = 0
+    best_acc = 0.0
 
     for epoch in range(n_epoch):
         print(f"Adapting to {target_name}")
@@ -20,6 +20,7 @@ def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
         # Test & Save best model
         acc_dict = test_all_domain(datasetname, scenario, feature_extractor, classifier, device)
 
+        print(acc_dict)
         if acc_dict[target_name] > best_acc:
             torch.save(feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
             torch.save(classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
