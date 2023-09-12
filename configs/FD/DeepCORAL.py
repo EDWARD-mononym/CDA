@@ -11,7 +11,7 @@ configs = {
     "AdaptationConfig": {"Method": "DeepCORAL"},
 
     "BackboneConfig": {"Backbone": "CNN",
-                       "feature_length": 1024,
+                       "feature_length": 5,
                        "hidden_channels": 64,
                        "kernel_size": 3,
                        "stride": 1,
