@@ -65,7 +65,7 @@ def create_dataloader(data_path, domain_id, dtype):
 
     # Dataloaders
     data_loader = DataLoader(dataset=dataset, 
-                             batch_size=256,
+                             batch_size=128,
                              shuffle=shuffle, 
                              drop_last=drop_last, 
                              num_workers=0)
