@@ -18,7 +18,7 @@ def adapt(feature_extractor, classifier, target_name, scenario, configs, device,
                                            lr=configs["OptimiserConfig"]["lr"],
                                            momentum=configs["OptimiserConfig"]["momentum"])
 
-    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]/{scenario}}')
+    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}/{scenario}')
     Path(save_folder).mkdir(parents=True, exist_ok=True)
 
     #* Adaptation
