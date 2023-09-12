@@ -25,7 +25,7 @@ def adapt(feature_extractor, classifier, target_name, scenario, configs, device,
     if configs["AdaptationConfig"]["Method"] == "DeepCORAL":
         imported_algo = importlib.import_module(f"algorithms.DeepCORAL")
         DeepCORAL = getattr(imported_algo, "DeepCORAL") #? These two lines are equivalent to "from algorithms.DeepCORAL import DeepCORAL"
-        DeepCORAL(src_loader, train_trg_loader, test_trg_loader, 
+        DeepCORAL(src_loader, train_trg_loader, 
             feature_extractor, classifier, feature_extractor_optimiser, classifier_optimiser, 
             configs["TrainingConfigs"]["n_epoch"], save_folder, target_name, device, 
             configs["Dataset"]["Dataset_Name"], scenario, writer)

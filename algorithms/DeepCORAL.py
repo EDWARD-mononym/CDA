@@ -6,7 +6,7 @@ from utils.model_testing import test_domain, test_all_domain
 
 #? https://arxiv.org/abs/1607.01719
 
-def DeepCORAL(src_loader, trg_loader, test_loader, feature_extractor, classifier,
+def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
               feature_extractor_optimiser,  classifier_optimiser, n_epoch, save_path, target_name, device, datasetname, scenario, writer):
     best_acc = 0
 
