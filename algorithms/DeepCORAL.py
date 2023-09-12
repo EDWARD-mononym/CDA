@@ -2,7 +2,7 @@ from itertools import cycle
 import os
 import torch
 
-from utils.model_testing import test_domain, test_all_domain
+from utils.model_testing import test_all_domain
 
 #? https://arxiv.org/abs/1607.01719
 

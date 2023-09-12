@@ -25,7 +25,7 @@ def test_all_domain(datasetname, scenario, feature_extractor, classifier, device
     for domain in scenario:
         testloader = get_loader(datasetname, domain, "test")
         acc = test_domain(testloader, feature_extractor, classifier, device)
-        acc_dict["domain"] = acc
+        acc_dict[domain] = acc
     return acc_dict
 
 class Acc_matrix():
