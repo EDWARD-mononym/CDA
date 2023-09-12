@@ -10,8 +10,8 @@ def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
               feature_extractor_optimiser,  classifier_optimiser, n_epoch, save_path, target_name, device, datasetname, scenario, writer):
     best_acc = 0.0
 
+    print(f"Adapting to {target_name}")
     for epoch in range(n_epoch):
-        print(f"Adapting to {target_name}")
         print(f"Epoch: {epoch}/{n_epoch}")
         # Adaptation
         epoch_train(src_loader, trg_loader, feature_extractor, classifier,

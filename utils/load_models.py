@@ -33,7 +33,7 @@ def load_source_model(configs, scenario, device):
 
     return feature_extractor, classifier
 
-def load_best_model(configs, target_name, device):
+def load_best_model(configs, scenario, target_name, device):
     #* Import the feature extractor & classifier 
     backbone_name, classifier_name = configs["BackboneConfig"]["Backbone"], configs["ClassifierConfig"]["Classifier"]
     imported_backbone = importlib.import_module(f"architecture.{backbone_name}")
@@ -46,7 +46,7 @@ def load_best_model(configs, target_name, device):
     classifier = classifier_class(configs)
 
     #* Load state dict
-    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}')
+    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]/{scenario}}')
     feature_extractor.load_state_dict(torch.load(os.path.join(save_folder, f"{target_name}_feature.pt")))
     classifier.load_state_dict(torch.load(os.path.join(save_folder, f"{target_name}_classifier.pt")))
 
