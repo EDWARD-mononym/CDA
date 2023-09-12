@@ -1,7 +1,6 @@
 configs = {
     "Dataset":{"Dataset_Name": "FD",
-               "Scenarios": [("MFPT", "CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE"), 
-                             ("CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE", "MFPT"), 
+               "Scenarios": [("CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE", "MFPT"), 
                              ("PB_Real", "PB_Artificial", "MFPT", "CWRU_DE", "CWRU_FE"), 
                              ("PB_Artificial", "MFPT", "CWRU_DE", "CWRU_FE", "PB_Real"), 
                              ("CWRU_FE", "CWRU_DE", "PB_Artificial", "PB_Real", "MFPT")],
