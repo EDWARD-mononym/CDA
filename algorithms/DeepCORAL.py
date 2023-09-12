@@ -20,7 +20,6 @@ def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
         # Test & Save best model
         acc_dict = test_all_domain(datasetname, scenario, feature_extractor, classifier, device)
 
-        print(acc_dict)
         if acc_dict[target_name] > best_acc:
             torch.save(feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
             torch.save(classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
