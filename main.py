@@ -1,6 +1,8 @@
 import argparse
 import importlib
+import numpy as np
 import os
+import random
 import time
 import torch
 
@@ -61,6 +63,13 @@ def main(args = args):
         result_matrix.acc_matrix.to_csv(os.path.join(save_folder, f"{scenario}.csv"))
 
 if __name__ == "__main__":
+    seed = 42
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+
     start = time.time()
     main(args)
     end = time.time()
