@@ -1,92 +1,78 @@
-import torch
-from collections import defaultdict
+from itertools import cycle
 import os
+import torch
 
-from algorithms.BaseModel import BaseModel
+from utils.model_testing import test_domain, test_all_domain
 
-class DeepCoral(BaseModel):
-    def __init__(self, configs):
-        super().__init__(configs)
+#? https://arxiv.org/abs/1607.01719
 
-        #* Losses
-        self.coral_loss = CORAL()
+def DeepCORAL(src_loader, trg_loader, test_loader, feature_extractor, classifier,
+              feature_extractor_optimiser,  classifier_optimiser, n_epoch, save_path, target_name, device, datasetname, scenario, writer):
+    best_acc = 0
 
-        self.algo_name = "DeepCoral"
+    feature_extractor.to(device)
+    classifier.to(device)
+    for epoch in range(n_epoch):
+        print(f"Adapting to {target_name}")
+        print(f"Epoch: {epoch}/{n_epoch}")
+        # Adaptation
+        epoch_train(src_loader, trg_loader, feature_extractor, classifier,
+              feature_extractor_optimiser, classifier_optimiser, device)
 
-    def update(self, src_loader, trg_loader, target_id, save_path, test_loader=None):
+        # Test & Save best model
+        acc_dict = test_all_domain(datasetname, scenario, feature_extractor, classifier, device)
 
-        best_loss = float('inf')
-        epoch_losses = defaultdict(list) #* y axis datas to be plotted
+        if acc_dict[target_name] > best_acc:
+            torch.save(feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
+            torch.save(classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
 
-        for epoch in range(self.configs.train_params["N_epochs"]):
+        # Log the accuracy of each epoch
+        for domain in acc_dict:
+            writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
 
-            #* Set to train
-            self.feature_extractor.train()
-            self.classifier.train()
+def epoch_train(src_loader, trg_loader, feature_extractor, classifier,
+              feature_extractor_optimiser, classifier_optimiser, device):
+    feature_extractor.train()
+    classifier.train()
 
-            joint_loader = enumerate(zip(src_loader, trg_loader))
-            losses = defaultdict(float)
-            for step, ((src_x, src_y), (trg_x, _)) in joint_loader:
-                src_x, src_y, trg_x = src_x.to(self.configs.device), src_y.to(self.configs.device), trg_x.to(self.configs.device)
+    combined_loader = zip(cycle(src_loader), trg_loader)
 
-                #* Zero gradient
-                self.feature_optimiser.zero_grad()
-                self.classifier.zero_grad()
+    for step, (source, target) in enumerate(combined_loader):
+        src_x, src_y, trg_x = source[0], source[1], target[0]
+        src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
 
-                #* Forward pass
-                src_feat = self.feature_extractor(src_x)
-                src_pred = self.classifier(src_feat)
-                trg_feat = self.feature_extractor(trg_x)
+        #* Zero grads
+        feature_extractor_optimiser.zero_grad()
+        classifier_optimiser.zero_grad()
 
-                #* Compute loss
-                task_loss = self.task_loss(src_pred, src_y)
-                coral_loss = self.coral_loss(src_feat, trg_feat)
-                loss = self.configs.alg_hparams['coral_weight'] * coral_loss + self.configs.alg_hparams['task_weight'] * task_loss
+        #* Forward pass
+        src_feat = feature_extractor(src_x)
+        src_pred = classifier(src_feat)
+        trg_feat = feature_extractor(trg_x)
 
-                #* Backpropagation
-                loss.backward()
-                self.feature_optimiser.step()
-                self.classifier_optimiser.step()
+        #* Compute loss
+        classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
+        coral_loss = CORAL(src_feat, trg_feat)
+        loss = classification_loss + coral_loss
+        loss.backward()
 
-                #* Record loss values
-                losses["loss"] += loss.item() / len(src_loader)
+        #* Step
+        feature_extractor_optimiser.step()
+        classifier_optimiser.step()
 
-            #* Learning rate scheduler
-            self.feature_lr_sched.step()
-            self.classifier_lr_sched.step()
+def CORAL(source, target):
+    d = source.data.shape[1]
 
-            #* Save the losses of the current epoch
-            for key in losses:
-                epoch_losses[key].append(losses[key])
+    # source covariance
+    xm = torch.mean(source, 0, keepdim=True) - source
+    xc = xm.t() @ xm
 
-            #* Saves the model with the best total loss
-            if losses["loss"] < best_loss:
-                best_loss = losses["loss"]
-                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"feature_extractor_{target_id}.pt"))
-                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"classifier_{target_id}.pt"))
+    # target covariance
+    xmt = torch.mean(target, 0, keepdim=True) - target
+    xct = xmt.t() @ xmt
 
-            #* If the test_loader was given, test the performance of current epoch on the test domain
-            if test_loader and (epoch+1) % 10 == 0:
-                self.evaluate(test_loader, epoch, target_id)
+    # frobenius norm between source and target
+    loss = torch.mean(torch.mul((xc - xct), (xc - xct)))
+    loss = loss/(4*d*d)
 
-        return epoch_losses
-
-class CORAL(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, source, target):
-        d = source.size(1)
-
-        # source covariance
-        xm = torch.mean(source, 0, keepdim=True) - source
-        xc = xm.t() @ xm
-
-        # target covariance
-        xmt = torch.mean(target, 0, keepdim=True) - target
-        xct = xmt.t() @ xmt
-
-        # frobenius norm between source and target
-        loss = torch.mean(torch.mul((xc - xct), (xc - xct)))
-        loss = loss / (4 * d * d)
-        return loss
+    return loss
