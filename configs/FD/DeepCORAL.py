@@ -17,7 +17,7 @@ configs = {
                        "dropout": 0.5,
                        "hidden_layers": 5},
     
-    "ClassifierConfig": {"Classifier": "Classifier"},
+    "ClassifierConfig": {"Classifier": "Classifier", "input_size": 64*5},
 
     "TrainingConfigs": {"n_epoch": 100},
 

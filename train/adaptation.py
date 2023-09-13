@@ -30,6 +30,17 @@ def adapt(feature_extractor, classifier, target_name, scenario, configs, device,
             configs["TrainingConfigs"]["n_epoch"], save_folder, target_name, device, 
             configs["Dataset"]["Dataset_Name"], scenario, writer)
 
+    elif configs["AdaptationConfig"]["Method"] == "DANN":
+        imported_algo = importlib.import_module(f"algorithms.DANN")
+        DANN = getattr(imported_algo, "DANN")
+        Discriminator = getattr(imported_algo, "Discriminator")
+
+        domain_discriminator = Discriminator(configs)
+        domain_discriminator_optimiser = torch.optim.Adam(domain_discriminator.parameters(), lr=1e-3)
+        DANN(src_loader, train_trg_loader, feature_extractor, classifier, domain_discriminator,
+         feature_extractor_optimiser,  classifier_optimiser, domain_discriminator_optimiser,
+         configs["TrainingConfigs"]["n_epoch"], save_folder, target_name, device, configs["Dataset"]["Dataset_Name"], scenario, writer)
+
     else:
         print(f'{configs["AdaptationConfig"]["Method"]} has not been implemented')
         raise NotImplementedError
