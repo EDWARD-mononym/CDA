@@ -14,14 +14,14 @@ class CNN(nn.Module):
         )
 
         self.conv_block2 = nn.Sequential(
-            nn.Conv1d(configs["BackboneConfig"]["hidden_channels"], configs["BackboneConfig"]["hidden_channels"]*2, kernel_size=8, stride=1, bias=False, padding=4),
-            nn.BatchNorm1d(configs["BackboneConfig"]["hidden_channels"]*2),
+            nn.Conv1d(configs["BackboneConfig"]["hidden_channels"], configs["BackboneConfig"]["hidden_channels"]*1, kernel_size=8, stride=1, bias=False, padding=4),
+            nn.BatchNorm1d(configs["BackboneConfig"]["hidden_channels"]*1),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1)
         )
 
         self.conv_block3 = nn.Sequential(
-            nn.Conv1d(configs["BackboneConfig"]["hidden_channels"]*2, configs["BackboneConfig"]["output_channels"], kernel_size=8, stride=1, bias=False,
+            nn.Conv1d(configs["BackboneConfig"]["hidden_channels"]*1, configs["BackboneConfig"]["output_channels"], kernel_size=8, stride=1, bias=False,
                       padding=4),
             nn.BatchNorm1d(configs["BackboneConfig"]["output_channels"]),
             nn.ReLU(),

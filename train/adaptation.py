@@ -23,7 +23,7 @@ def adapt(feature_extractor, classifier, target_name, scenario, configs, device,
             lr=configs["OptimiserConfig"]["lr"],
             weight_decay=configs["OptimiserConfig"]["weight_decay"]
         )
-        
+
     fe_lr_scheduler = StepLR(feature_extractor_optimiser, step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
     classifier_lr_scheduler = StepLR(feature_extractor_optimiser, step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
 
@@ -45,10 +45,10 @@ def adapt(feature_extractor, classifier, target_name, scenario, configs, device,
         DANN = getattr(imported_algo, "DANN")
         Discriminator = getattr(imported_algo, "Discriminator")
 
-        domain_discriminator = Discriminator(configs)
+        domain_discriminator = Discriminator(configs).to(device)
         domain_discriminator_optimiser = torch.optim.Adam(domain_discriminator.parameters(), lr=1e-3)
         DANN(src_loader, train_trg_loader, feature_extractor, classifier, domain_discriminator,
-         feature_extractor_optimiser,  classifier_optimiser, domain_discriminator_optimiser,
+         feature_extractor_optimiser,  classifier_optimiser, domain_discriminator_optimiser, fe_lr_scheduler, classifier_lr_scheduler,
          configs["TrainingConfigs"]["n_epoch"], save_folder, target_name, device, configs["Dataset"]["Dataset_Name"], scenario, writer)
 
     else:

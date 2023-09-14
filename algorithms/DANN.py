@@ -10,7 +10,7 @@ from utils.model_testing import test_all_domain
 #? https://github.com/fungtion/DANN/tree/master
 
 def DANN(src_loader, trg_loader, feature_extractor, classifier, discriminator,
-         feature_extractor_optimiser,  classifier_optimiser, discriminator_optimiser,
+         feature_extractor_optimiser,  classifier_optimiser, discriminator_optimiser, fe_lr_scheduler, classifier_lr_scheduler,
          n_epoch, save_path, target_name, device, datasetname, scenario, writer):
     best_acc = -1.0
 
@@ -33,6 +33,10 @@ def DANN(src_loader, trg_loader, feature_extractor, classifier, discriminator,
         for domain in acc_dict:
             writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
 
+        # Adjust Learning Rate
+        fe_lr_scheduler.step()
+        classifier_lr_scheduler.step()
+
 def epoch_train(src_loader, trg_loader, feature_extractor, classifier, discriminator,
                 feature_extractor_optimiser,  classifier_optimiser, discriminator_optimiser, 
                 epoch, n_epoch, device):
@@ -41,7 +45,7 @@ def epoch_train(src_loader, trg_loader, feature_extractor, classifier, discrimin
     discriminator.train()
     combined_loader = zip(cycle(src_loader), trg_loader)
 
-    for step, (source, target) in combined_loader:
+    for step, (source, target) in enumerate(combined_loader):
         src_x, src_y, trg_x = source[0], source[1], target[0]
         src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
 
@@ -56,20 +60,27 @@ def epoch_train(src_loader, trg_loader, feature_extractor, classifier, discrimin
         classifier_optimiser.zero_grad()
         discriminator_optimiser.zero_grad()
 
-        #* Source
+        #* Forward pass
         src_feature = feature_extractor(src_x)
-        src_reverse_feature = feature_extractor.apply(src_feature, alpha)
         src_output = classifier(src_feature)
-        src_domain_output = discriminator(src_reverse_feature)
+        trg_feat = feature_extractor(trg_x)
 
-        src_classification_loss = loss_class(src_output, src_y)
-        src_domain_loss = loss_domain(src_domain_output, src_domain_label)
+        #* Task classification
+        src_cls_loss = loss_class(src_output.squeeze(), src_y)
 
-        #* Target
-        trg_domain_output = discriminator(ReverseLayerF.apply(feature_extractor(trg_x), alpha))
-        trg_domain_loss = loss_domain(trg_domain_output, trg_domain_labels)
+        #* Domain classification
+        # Source
+        src_feat_reversed = ReverseLayerF.apply(src_feature, alpha)
+        src_domain_pred = discriminator(src_feat_reversed)
+        src_domain_loss = loss_domain(src_domain_pred, src_domain_label)
 
-        loss = src_classification_loss + src_domain_loss + trg_domain_loss
+        # Target
+        trg_feat_reversed = ReverseLayerF.apply(trg_feat, alpha)
+        trg_domain_pred = discriminator(trg_feat_reversed)
+        trg_domain_loss = loss_domain(trg_domain_pred, trg_domain_labels)
+
+        domain_loss = src_domain_loss + trg_domain_loss
+        loss = src_cls_loss + domain_loss
         loss.backward()
 
         feature_extractor_optimiser.step()

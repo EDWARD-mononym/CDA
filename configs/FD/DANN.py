@@ -6,7 +6,7 @@ configs = {
                "num_class": 3,
                "input_channel": 1},
 
-    "AdaptationConfig": {"Method": "DeepCORAL"},
+    "AdaptationConfig": {"Method": "DANN"},
 
     "BackboneConfig": {"Backbone": "CNN",
                        "feature_length": 5,

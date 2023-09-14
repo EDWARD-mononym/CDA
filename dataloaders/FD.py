@@ -65,7 +65,7 @@ def create_dataloader(data_path, domain_id, dtype):
 
     # Dataloaders
     data_loader = DataLoader(dataset=dataset, 
-                             batch_size=32,
+                             batch_size=256,
                              shuffle=shuffle, 
                              drop_last=drop_last, 
                              num_workers=0)
@@ -102,3 +102,22 @@ two_test = create_dataloader(datasetpath, "two",  dtype="test")
 
 three_train = create_dataloader(datasetpath, "three", dtype="train")
 three_test = create_dataloader(datasetpath, "three",  dtype="test")
+
+# Modified CWRU domains
+DE_7_train = create_dataloader(datasetpath, "DE_7", dtype="train")
+DE_7_test = create_dataloader(datasetpath, "DE_7",  dtype="test")
+
+DE_14_train = create_dataloader(datasetpath, "DE_14", dtype="train")
+DE_14_test = create_dataloader(datasetpath, "DE_14",  dtype="test")
+
+DE_21_train = create_dataloader(datasetpath, "DE_21", dtype="train")
+DE_21_test = create_dataloader(datasetpath, "DE_21",  dtype="test")
+
+FE_7_train = create_dataloader(datasetpath, "FE_7", dtype="train")
+FE_7_test = create_dataloader(datasetpath, "FE_7",  dtype="test")
+
+FE_14_train = create_dataloader(datasetpath, "FE_14", dtype="train")
+FE_14_test = create_dataloader(datasetpath, "FE_14",  dtype="test")
+
+FE_21_train = create_dataloader(datasetpath, "FE_21", dtype="train")
+FE_21_test = create_dataloader(datasetpath, "FE_21",  dtype="test")
