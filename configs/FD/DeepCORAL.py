@@ -1,9 +1,6 @@
 configs = {
     "Dataset":{"Dataset_Name": "FD",
-               "Scenarios": [("CWRU_DE", "PB_Real", "PB_Artificial", "CWRU_FE", "MFPT"), 
-                             ("PB_Real", "PB_Artificial", "MFPT", "CWRU_DE", "CWRU_FE"), 
-                             ("PB_Artificial", "MFPT", "CWRU_DE", "CWRU_FE", "PB_Real"), 
-                             ("CWRU_FE", "CWRU_DE", "PB_Artificial", "PB_Real", "MFPT")],
+               "Scenarios": [("zero", "one", "two", "three")],
                "num_class": 3,
                "input_channel": 1},
 
@@ -15,7 +12,7 @@ configs = {
                        "kernel_size": 3,
                        "stride": 1,
                        "dropout": 0.5,
-                       "hidden_layers": 5},
+                       "hidden_layers": 2},
     
     "ClassifierConfig": {"Classifier": "Classifier", "input_size": 64*5},
 

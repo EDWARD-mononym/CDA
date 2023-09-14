@@ -89,3 +89,16 @@ PB_Real_test = create_dataloader(datasetpath, "PB_Real",  dtype="test")
 
 MFPT_train = create_dataloader(datasetpath, "MFPT", dtype="train")
 MFPT_test = create_dataloader(datasetpath, "MFPT", dtype="test")
+
+# Conventional CWRU domains
+zero_train = create_dataloader(datasetpath, "zero", dtype="train")
+zero_test = create_dataloader(datasetpath, "zero",  dtype="test")
+
+one_train = create_dataloader(datasetpath, "one", dtype="train")
+one_test = create_dataloader(datasetpath, "one",  dtype="test")
+
+two_train = create_dataloader(datasetpath, "two", dtype="train")
+two_test = create_dataloader(datasetpath, "two",  dtype="test")
+
+three_train = create_dataloader(datasetpath, "three", dtype="train")
+three_test = create_dataloader(datasetpath, "three",  dtype="test")
