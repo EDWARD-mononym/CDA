@@ -1,7 +1,7 @@
 configs = {
     "Dataset":{"Dataset_Name": "FD",
                "Scenarios": [("zero", "one", "two", "three")],
-               "num_class": 3,
+               "num_class": 4,
                "input_channel": 1},
 
     "AdaptationConfig": {"Method": "DeepCORAL"},
