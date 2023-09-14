@@ -1,5 +1,6 @@
 import os
 import torch
+from torch.optim.lr_scheduler import StepLR
 
 from utils.get_loaders import get_loader
 from utils.model_testing import test_domain
@@ -9,14 +10,20 @@ def source_train(feature_extractor, classifier, source_name, configs, save_path,
     train_loader = get_loader(configs["Dataset"]["Dataset_Name"], source_name, "train")
     test_loader = get_loader(configs["Dataset"]["Dataset_Name"], source_name, "test") # To save the best model
 
-    feature_extractor_optimiser = torch.optim.SGD(feature_extractor.parameters(), 
-                                                  lr=configs["OptimiserConfig"]["lr"],
-                                                  momentum=configs["OptimiserConfig"]["momentum"])
-    classifier_optimiser = torch.optim.SGD(classifier.parameters(), 
-                                           lr=configs["OptimiserConfig"]["lr"],
-                                           momentum=configs["OptimiserConfig"]["momentum"])
-    task_loss = torch.nn.CrossEntropyLoss()
+    feature_extractor_optimiser = torch.optim.Adam(
+            feature_extractor.parameters(),
+            lr=configs["OptimiserConfig"]["lr"],
+            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+        )
+    classifier_optimiser = torch.optim.Adam(
+            feature_extractor.parameters(),
+            lr=configs["OptimiserConfig"]["lr"],
+            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+        )
+    fe_lr_scheduler = StepLR(feature_extractor_optimiser, step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+    classifier_lr_scheduler = StepLR(classifier_optimiser, step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
 
+    task_loss = torch.nn.CrossEntropyLoss()
     #* Training
     best_acc = 0
     print(f"Training source model (source: {source_name})")
@@ -54,5 +61,9 @@ def source_train(feature_extractor, classifier, source_name, configs, save_path,
         if epoch_acc > best_acc:
             torch.save(feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
             torch.save(classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
+
+        #* Adjust learning rate
+        fe_lr_scheduler.step()
+        classifier_lr_scheduler.step()
 
     return feature_extractor, classifier

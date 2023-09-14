@@ -7,7 +7,8 @@ from utils.model_testing import test_all_domain
 #? https://arxiv.org/abs/1607.01719
 
 def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
-              feature_extractor_optimiser,  classifier_optimiser, n_epoch, save_path, target_name, device, datasetname, scenario, writer):
+              feature_extractor_optimiser,  classifier_optimiser, fe_lr_scheduler,  classifier_lr_scheduler, 
+              n_epoch, save_path, target_name, device, datasetname, scenario, writer):
     best_acc = -1.0
 
     print(f"Adapting to {target_name}")
@@ -27,6 +28,10 @@ def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
         # Log the accuracy of each epoch
         for domain in acc_dict:
             writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
+
+        # Adjust learning rate
+        fe_lr_scheduler.step()
+        classifier_lr_scheduler.step()
 
 def epoch_train(src_loader, trg_loader, feature_extractor, classifier,
               feature_extractor_optimiser, classifier_optimiser, device):
