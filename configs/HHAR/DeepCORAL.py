@@ -1,8 +1,6 @@
 configs = {
     "Dataset":{"Dataset_Name": "HHAR",
-               "Scenarios": [("CWRU_DE", "PB_Artificial", "PB_Real", "CWRU_FE"), 
-                             ("PB_Artificial", "CWRU_DE", "CWRU_FE", "PB_Real"),
-                             ("CWRU_FE", "PB_Real", "CWRU_DE", "PB_Artificial")],
+               "Scenarios": [("0", "1", "2", "3", "4", "5", "6", "7", "8")],
                "num_class": 6,
                "input_channel": 3},
 
