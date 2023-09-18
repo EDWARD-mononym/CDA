@@ -41,30 +41,3 @@ def create_dataloader(file_name, dtype):
                             shuffle=True
                             )
     return dataloader
-
-train_0 = create_dataloader(0, dtype="train")
-test_0 = create_dataloader(0, dtype="test")
-
-train_1 = create_dataloader(1, dtype="train")
-test_1 = create_dataloader(1, dtype="test")
-
-train_2 = create_dataloader(2, dtype="train")
-test_2 = create_dataloader(2, dtype="test")
-
-train_3 = create_dataloader(3, dtype="train")
-test_3 = create_dataloader(3, dtype="test")
-
-train_4 = create_dataloader(4, dtype="train")
-test_4 = create_dataloader(4, dtype="test")
-
-train_5 = create_dataloader(5, dtype="train")
-test_5 = create_dataloader(5, dtype="test")
-
-train_6 = create_dataloader(6, dtype="train")
-test_6 = create_dataloader(6, dtype="test")
-
-train_7 = create_dataloader(7, dtype="train")
-test_7 = create_dataloader(7, dtype="test")
-
-train_8 = create_dataloader(8, dtype="train")
-test_8 = create_dataloader(8, dtype="test")
