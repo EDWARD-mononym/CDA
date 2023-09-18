@@ -14,8 +14,8 @@ from utils.model_testing import test_all_domain, Acc_matrix
 # Default settings
 parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
 # Dataset Parameters
-parser.add_argument("--dataset", default="")
-parser.add_argument("--algo", default="")
+parser.add_argument("--dataset", default="HHAR")
+parser.add_argument("--algo", default="DeepCORAL")
 parser.add_argument("--writer", default="tensorboard", help="tensorboard or wandb")
 parser.add_argument('-lp', '--log-path', default="./logs")  # log path
 parser.add_argument('-e', '--entity', default="")
