@@ -21,6 +21,7 @@ parser.add_argument('-lp', '--log-path', default="./logs")  # log path
 parser.add_argument('-e', '--entity', default="")
 parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
+parser.add_argument('--plot', default=True)
 # Train Info Parameters
 parser.add_argument('--start-domain', default=0, type=int, metavar='N',
                     help='manual domain start (useful on restarts)')
@@ -63,6 +64,11 @@ def main(args = args):
             os.makedirs(save_folder)
         file_name = os.path.join(save_folder, f"{scenario}.csv")
         result_matrix.save(file_name)
+        if args.plot:
+            plot_file = os.path.join(save_folder, f"{scenario}.png")
+            writer = create_writer(configs["Dataset"]["Dataset_Name"], configs["AdaptationConfig"]["Method"], scenario, "plot")
+            result_matrix.save_plot(plot_file, writer)
+            writer.close()
 
 if __name__ == "__main__":
     seed = 42

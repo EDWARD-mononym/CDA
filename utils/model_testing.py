@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 
 from utils.get_loaders import get_loader
+from utils.plot import save_plot
 
 def test_domain(test_loader, feature_extractor, classifier, device):
     feature_extractor.eval()
@@ -73,7 +74,7 @@ class Acc_matrix():
     def calc_generalise(self):
         generalise_values = [0.0] # Generalise does not exist for source model so we start with 0
         for T, domain in enumerate(self.scenario[1:-1], start=1): #! Keep in mind T starts from 1 and ends before last domain
-            unseen_rows = [self.scenario[i] for i in range(T, len(self.scenario))]
+            unseen_rows = [self.scenario[i] for i in range(T+1, len(self.scenario))]
             n_unseen = len(unseen_rows)
             generalise_t = sum(self.acc_matrix.loc[unseen, domain] - self.acc_matrix.loc[unseen, self.scenario[0]] for unseen in unseen_rows) / n_unseen
             generalise_values.append(generalise_t)
@@ -88,12 +89,11 @@ class Acc_matrix():
                 column_df = self.acc_matrix[model]
                 row_df = pd.DataFrame(column_df).T
                 # Append metrics into the row df
-                row_df = pd.concat([row_df, 
-                                    self.acc[model],
-                                    self.bwt[model],
-                                    self.adapt[model],
-                                    self.generalise[model]],
-                                    axis = 1)
+                row_df["ACC"] = self.acc.loc[model, "ACC"]
+                row_df["BWT"] = self.bwt.loc[model, "BWT"]
+                row_df["Adapt"] = self.adapt.loc[model, "Adapt"]
+                row_df["Generalise"] = self.generalise.loc[model, "Generalise"]
+                # Save model performance
                 f.write(f"Model {model} performance")
                 row_df.to_csv(f, index=True)
                 f.write("\n")
@@ -101,3 +101,6 @@ class Acc_matrix():
             f.write("R matrix")
             # # Save R matrix
             self.acc_matrix.to_csv(f, index=True)
+
+    def save_plot(self, savefile, writer):
+        save_plot(self.acc_matrix, self.scenario, savefile, writer)
