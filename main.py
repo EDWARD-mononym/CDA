@@ -61,7 +61,8 @@ def main(args = args):
         save_folder = os.path.join(os.getcwd(), f'results/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}')
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
-        result_matrix.acc_matrix.to_csv(os.path.join(save_folder, f"{scenario}.csv"))
+        file_name = os.path.join(save_folder, f"{scenario}.csv")
+        result_matrix.save(file_name)
 
 if __name__ == "__main__":
     seed = 42
