@@ -3,6 +3,8 @@ import os
 import torch
 from torch.utils.data import Dataset, DataLoader
 
+datasetpath = os.path.join(os.getcwd(), "dataset/FD")
+
 class Custom_Dataset(Dataset):
     def __init__(self, dataset):
         super().__init__()
@@ -49,9 +51,9 @@ class Normalise():
     def transform(self, x):
         return (x-self.mean) / self.std
 
-def create_dataloader(data_path, domain_id, dtype):
+def create_dataloader(domain_id, dtype):
     # loading dataset file from path
-    dataset_file = torch.load(os.path.join(data_path, f"{dtype}_{domain_id}.pt"))
+    dataset_file = torch.load(os.path.join(datasetpath, f"{dtype}_{domain_id}.pt"))
 
     # Loading datasets
     dataset = Custom_Dataset(dataset_file)
@@ -71,53 +73,3 @@ def create_dataloader(data_path, domain_id, dtype):
                              num_workers=0)
 
     return data_loader
-
-#* Creating dataloaders for each domain
-datasetpath = os.path.join(os.getcwd(), "dataset/FD")
-
-CWRU_DE_train = create_dataloader(datasetpath, "CWRU_DE", dtype="train")
-CWRU_DE_test = create_dataloader(datasetpath, "CWRU_DE",  dtype="test")
-
-CWRU_FE_train = create_dataloader(datasetpath, "CWRU_FE", dtype="train")
-CWRU_FE_test = create_dataloader(datasetpath, "CWRU_FE",  dtype="test")
-
-PB_Artificial_train = create_dataloader(datasetpath, "PB_Artificial", dtype="train")
-PB_Artificial_test = create_dataloader(datasetpath, "PB_Artificial",  dtype="test")
-
-PB_Real_train = create_dataloader(datasetpath, "PB_Real", dtype="train")
-PB_Real_test = create_dataloader(datasetpath, "PB_Real",  dtype="test")
-
-MFPT_train = create_dataloader(datasetpath, "MFPT", dtype="train")
-MFPT_test = create_dataloader(datasetpath, "MFPT", dtype="test")
-
-# Conventional CWRU domains
-zero_train = create_dataloader(datasetpath, "zero", dtype="train")
-zero_test = create_dataloader(datasetpath, "zero",  dtype="test")
-
-one_train = create_dataloader(datasetpath, "one", dtype="train")
-one_test = create_dataloader(datasetpath, "one",  dtype="test")
-
-two_train = create_dataloader(datasetpath, "two", dtype="train")
-two_test = create_dataloader(datasetpath, "two",  dtype="test")
-
-three_train = create_dataloader(datasetpath, "three", dtype="train")
-three_test = create_dataloader(datasetpath, "three",  dtype="test")
-
-# Modified CWRU domains
-DE_7_train = create_dataloader(datasetpath, "DE_7", dtype="train")
-DE_7_test = create_dataloader(datasetpath, "DE_7",  dtype="test")
-
-DE_14_train = create_dataloader(datasetpath, "DE_14", dtype="train")
-DE_14_test = create_dataloader(datasetpath, "DE_14",  dtype="test")
-
-DE_21_train = create_dataloader(datasetpath, "DE_21", dtype="train")
-DE_21_test = create_dataloader(datasetpath, "DE_21",  dtype="test")
-
-FE_7_train = create_dataloader(datasetpath, "FE_7", dtype="train")
-FE_7_test = create_dataloader(datasetpath, "FE_7",  dtype="test")
-
-FE_14_train = create_dataloader(datasetpath, "FE_14", dtype="train")
-FE_14_test = create_dataloader(datasetpath, "FE_14",  dtype="test")
-
-FE_21_train = create_dataloader(datasetpath, "FE_21", dtype="train")
-FE_21_test = create_dataloader(datasetpath, "FE_21",  dtype="test")

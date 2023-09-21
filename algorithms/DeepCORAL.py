@@ -1,67 +1,109 @@
 from itertools import cycle
 import os
 import torch
+from torch.optim.lr_scheduler import StepLR
 
-from utils.model_testing import test_all_domain
+from algorithms.BaseAlgo import BaseAlgo
+from utils.model_testing import test_domain
 
 #? https://arxiv.org/abs/1607.01719
 
-def DeepCORAL(src_loader, trg_loader, feature_extractor, classifier,
-              feature_extractor_optimiser,  classifier_optimiser, fe_lr_scheduler,  classifier_lr_scheduler, 
-              n_epoch, save_path, target_name, device, datasetname, scenario, writer):
-    best_acc = -1.0
+class DeepCORAL(BaseAlgo):
+    def __init__(self, configs) -> None:
+        super().__init__(configs)
 
-    print(f"Adapting to {target_name}")
-    for epoch in range(n_epoch):
-        print(f"Epoch: {epoch}/{n_epoch}")
-        # Adaptation
-        epoch_train(src_loader, trg_loader, feature_extractor, classifier,
-              feature_extractor_optimiser, classifier_optimiser, device)
+        self.taskloss = torch.nn.CrossEntropyLoss()
 
-        # Test & Save best model
-        acc_dict = test_all_domain(datasetname, scenario, feature_extractor, classifier, device)
+        self.feature_extractor_optimiser = torch.optim.Adam(
+            self.feature_extractor.parameters(),
+            lr=configs["OptimiserConfig"]["lr"],
+            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+        )
+        self.classifier_optimiser = torch.optim.Adam(
+                self.feature_extractor.parameters(),
+                lr=configs["OptimiserConfig"]["lr"],
+                weight_decay=configs["OptimiserConfig"]["weight_decay"]
+            )
 
-        if acc_dict[target_name] > best_acc:
-            torch.save(feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
-            torch.save(classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
+        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
+                                      step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
+                                              step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
 
-        # Log the accuracy of each epoch
-        for domain in acc_dict:
-            writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
+    def epoch_train(self, src_loader, trg_loader, epoch, device):
+        self.feature_extractor.to(device)
+        self.classifier.to(device)
+        self.feature_extractor.train()
+        self.classifier.train()
 
-        # Adjust learning rate
-        fe_lr_scheduler.step()
-        classifier_lr_scheduler.step()
+        combined_loader = zip(cycle(src_loader), trg_loader)
 
-def epoch_train(src_loader, trg_loader, feature_extractor, classifier,
-              feature_extractor_optimiser, classifier_optimiser, device):
-    feature_extractor.train()
-    classifier.train()
+        for step, (source, target) in enumerate(combined_loader):
+            src_x, src_y, trg_x = source[0], source[1], target[0]
+            src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
 
-    combined_loader = zip(cycle(src_loader), trg_loader)
+            #* Zero grads
+            self.feature_extractor_optimiser.zero_grad()
+            self.classifier_optimiser.zero_grad()
 
-    for step, (source, target) in enumerate(combined_loader):
-        src_x, src_y, trg_x = source[0], source[1], target[0]
-        src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
+            #* Forward pass
+            src_feat = self.feature_extractor(src_x)
+            src_pred = self.classifier(src_feat)
+            trg_feat = self.feature_extractor(trg_x)
 
-        #* Zero grads
-        feature_extractor_optimiser.zero_grad()
-        classifier_optimiser.zero_grad()
+            #* Compute loss
+            classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
+            coral_loss = CORAL(src_feat, trg_feat)
+            loss = classification_loss + coral_loss
+            loss.backward()
 
-        #* Forward pass
-        src_feat = feature_extractor(src_x)
-        src_pred = classifier(src_feat)
-        trg_feat = feature_extractor(trg_x)
+            #* Step
+            self.feature_extractor_optimiser.step()
+            self.classifier_optimiser.step()
 
-        #* Compute loss
-        classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
-        coral_loss = CORAL(src_feat, trg_feat)
-        loss = classification_loss + coral_loss
-        loss.backward()
+        #* Adjust learning rate
+        self.fe_lr_scheduler.step()
+        self.classifier_lr_scheduler.step()
 
-        #* Step
-        feature_extractor_optimiser.step()
-        classifier_optimiser.step()
+    def pretrain(self, train_loader, test_loader, source_name, save_path, device):
+        best_acc = -1.0
+        print(f"Training source model")
+        for epoch in range(self.n_epoch):
+            print(f'Epoch: {epoch}/{self.n_epoch}')
+
+            self.feature_extractor.to(device)
+            self.classifier.to(device)
+            self.feature_extractor.train()
+            self.classifier.train()
+
+            for step, data in enumerate(train_loader):
+                x, y = data[0], data[1]
+                x, y = x.to(device), y.to(device)
+
+                #* Zero grads
+                self.feature_extractor_optimiser.zero_grad()
+                self.classifier_optimiser.zero_grad()
+
+                #* Forward pass
+                pred = self.classifier(self.feature_extractor(x))
+
+                #* Loss
+                loss = self.taskloss(pred, y)
+                loss.backward()
+
+                #* Step
+                self.feature_extractor_optimiser.step()
+                self.classifier_optimiser.step()
+
+            #* Adjust learning rate
+            self.fe_lr_scheduler.step()
+            self.classifier_lr_scheduler.step()
+
+            #* Save best model
+            epoch_acc = test_domain(test_loader, self.feature_extractor, self.classifier, device)
+            if epoch_acc > best_acc:
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
 
 def CORAL(source, target):
     d = source.data.shape[1]
