@@ -4,7 +4,7 @@ configs = {
                "num_class": 16,
                "input_channel": 1},
 
-    "AdaptationConfig": {"Method": "DeepCORAL"},
+    "AdaptationConfig": {"Method": "SHOT"},
 
     "BackboneConfig": {"Backbone": "CNN",
                        "feature_length": 5,
@@ -17,10 +17,12 @@ configs = {
     
     "ClassifierConfig": {"Classifier": "Classifier", "input_size": 128*5},
 
-    "TrainingConfigs": {"n_epoch": 2},
+    "TrainingConfigs": {"n_epoch": 1},
 
     "OptimiserConfig": {"lr": 0.001, "momentum": 0.9, "weight_decay": 0.0001, 
-                        "step_size": 50, "gamma": 0.5}
+                        "step_size": 50, "gamma": 0.5},
+
+    "hparams": {'epsilon': 1e-5}
 }
 
 configs["ClassifierConfig"]["input_size"] = configs["BackboneConfig"]["output_channels"] * configs["BackboneConfig"]["feature_length"]

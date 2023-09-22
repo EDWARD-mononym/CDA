@@ -19,7 +19,7 @@ configs = {
     
     "ClassifierConfig": {"Classifier": "Classifier", "input_size": 128*5},
 
-    "TrainingConfigs": {"n_epoch": 40},
+    "TrainingConfigs": {"n_epoch": 1},
 
     "OptimiserConfig": {"lr": 0.001, "momentum": 0.9, "weight_decay": 0.0001, 
                         "step_size": 50, "gamma": 0.5},

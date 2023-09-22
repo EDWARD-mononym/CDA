@@ -38,6 +38,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\results\PU_Real\DeepCORAL\('Normal', 'Rotate', 'Load', 'Radial').csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\results\PU_Real\SHOT\('Normal', 'Rotate', 'Load', 'Radial').csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
