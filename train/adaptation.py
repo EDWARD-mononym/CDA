@@ -11,7 +11,8 @@ def adapt(algo_class, target_name, scenario, configs, writer, device):
     src_loader = get_loader(configs["Dataset"]["Dataset_Name"], scenario[0], "train")
 
     save_path = os.path.join(os.getcwd(), f'adapted_models/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}/{scenario}')
-
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
     algo_class.update(src_loader, trg_loader,
                       scenario, target_name, configs["Dataset"]["Dataset_Name"],
                       save_path, writer, device)
