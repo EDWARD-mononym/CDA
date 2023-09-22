@@ -41,6 +41,8 @@ class BaseAlgo(torch.nn.Module):
             # Test & Save best model
             acc_dict = test_all_domain(datasetname, scenario, self.feature_extractor, self.classifier, device)
             if acc_dict[target_name] > best_acc:
+                if not os.path.exists(save_path):
+                    os.makedirs(save_path)
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
 

@@ -63,7 +63,7 @@ def create_dataloader(domain_id, dtype):
         drop_last = False
     else:
         shuffle = True
-        drop_last = True
+        drop_last = False
 
     # Dataloaders
     data_loader = DataLoader(dataset=dataset, 
