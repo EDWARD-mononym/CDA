@@ -2,3 +2,5 @@ dataset/
 logs/
 results/
 __pycache__/
+source_models/
+adapted_models/
