@@ -12,6 +12,8 @@ from utils.create_logger import create_writer
 from utils.load_models import load_source_model, load_best_model
 from utils.model_testing import test_all_domain, Acc_matrix
 
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+
 # Default settings
 parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
 # Dataset Parameters
