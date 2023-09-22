@@ -17,7 +17,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 # Default settings
 parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
 # Dataset Parameters
-parser.add_argument("--dataset", default="FD")
+parser.add_argument("--dataset", default="PU_Real")
 parser.add_argument("--algo", default="DeepCORAL")
 parser.add_argument("--writer", default="tensorboard", help="tensorboard or wandb")
 parser.add_argument('-lp', '--log-path', default="./logs")  # log path
