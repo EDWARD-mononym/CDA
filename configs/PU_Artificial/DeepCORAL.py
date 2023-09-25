@@ -1,7 +1,7 @@
 configs = {
     "Dataset":{"Dataset_Name": "PU_Artificial",
                "Scenarios": [("Normal", "Rotate", "Load", "Radial")],
-               "num_class": 17,
+               "num_class": 8,
                "input_channel": 1},
 
     "AdaptationConfig": {"Method": "DeepCORAL"},
