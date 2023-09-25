@@ -17,8 +17,8 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 # Default settings
 parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
 # Dataset Parameters
-parser.add_argument("--dataset", default="FD")
-parser.add_argument("--algo", default="NRC")
+parser.add_argument("--dataset", default="PU_Real")
+parser.add_argument("--algo", default="SHOT")
 parser.add_argument("--writer", default="tensorboard", help="tensorboard or wandb")
 parser.add_argument('-lp', '--log-path', default="./logs")  # log path
 parser.add_argument('-e', '--entity', default="")
@@ -84,8 +84,7 @@ def main(args=args):
 
         # * Calculate Acc, BWT, Adapt and Generalise then save the results
         result_matrix.calc_metric()
-        save_folder = os.path.join(os.getcwd(),
-                                   f'results/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}')
+        save_folder = os.path.join(os.getcwd(), f'results/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}')
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
         file_name = os.path.join(save_folder, f"{scenario}.csv")
