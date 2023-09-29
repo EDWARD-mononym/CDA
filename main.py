@@ -97,8 +97,8 @@ def main(args=args):
         save_folder = os.path.join(os.getcwd(), f'results/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}')
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
-        file_name = os.path.join(save_folder, f"{scenario}")
-        result_matrix.save(file_name)
+        folder_name = os.path.join(save_folder, f"{scenario}")
+        result_matrix.save(folder_name)
         if args.plot:
             plot_file = os.path.join(save_folder, f"{scenario}.png")
             result_matrix.save_plot(plot_file)
