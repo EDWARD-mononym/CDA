@@ -33,7 +33,7 @@ parser.add_argument('--save', default=False)
 parser.add_argument('--start-domain', default=0, type=int, metavar='N',
                     help='manual domain start (useful on restarts)')
 # Sweep
-parser.add_argument("--sweep", default=False)
+parser.add_argument("--sweep", default=True)
 args = parser.parse_args()
 
 # GPU or CPU

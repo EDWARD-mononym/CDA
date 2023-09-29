@@ -1,7 +1,7 @@
 configs = {
     "Dataset":{"Dataset_Name": "PU_Real",
                "Scenarios": [("Normal", "Rotate", "Load", "Radial")],
-               "num_class": 16,
+               "num_class": 5,
                "input_channel": 1},
 
     "AdaptationConfig": {"Method": "COSDA"},
