@@ -33,7 +33,7 @@ parser.add_argument('--save', default=False)
 parser.add_argument('--start-domain', default=0, type=int, metavar='N',
                     help='manual domain start (useful on restarts)')
 # Sweep
-parser.add_argument("--sweep", default="True")
+parser.add_argument("--sweep", default=False)
 args = parser.parse_args()
 
 # GPU or CPU
@@ -115,8 +115,10 @@ if __name__ == "__main__":
     start = time.time()
 
     if args.sweep:
+        print("sweep")
         sweep(args, device)
     else:
+        print("main")
         main(args)
 
     end = time.time()
