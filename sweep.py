@@ -72,4 +72,4 @@ def sweep(args, device):
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
             # Save with header
-        dicts_to_csv(hyperparameter_selection, loss_avg_meters, save_file, headings=True)
+        dicts_to_csv(hyperparameter_selection, loss_avg_meters, save_file)
