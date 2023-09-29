@@ -59,6 +59,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\sweep_results\PU_Real\DeepCORAL\sweep_result.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
