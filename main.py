@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 import importlib
 import numpy as np
 import os
@@ -6,8 +7,10 @@ import random
 import time
 import torch
 
+from sweep import sweep
 from train.adaptation import adapt
 from train.pretrain import pretrain
+from utils.avg_meter import AverageMeter
 from utils.create_logger import create_writer
 from utils.load_models import load_source_model, load_best_model
 from utils.model_testing import test_all_domain, Acc_matrix
@@ -29,6 +32,8 @@ parser.add_argument('--save', default=False)
 # Train Info Parameters
 parser.add_argument('--start-domain', default=0, type=int, metavar='N',
                     help='manual domain start (useful on restarts)')
+# Sweep
+parser.add_argument("--sweep", default="True")
 args = parser.parse_args()
 
 # GPU or CPU
@@ -48,10 +53,15 @@ def main(args=args):
     config_module = importlib.import_module(f"configs.{args.dataset}.{args.algo}")
     configs = getattr(config_module, 'configs')
 
+    hyperparameters = configs["Hyperparameters"]
+
     # * Load algorithm class
     algo_module = importlib.import_module(f"algorithms.{args.algo}")
     algo_class = getattr(algo_module, args.algo)
-    algo = algo_class(configs)
+    algo = algo_class(configs, hyperparameters)
+
+    #* Create loss meter
+    loss_avg_meters = defaultdict(lambda: AverageMeter())
 
     for scenario in configs["Dataset"]["Scenarios"]:
         source_name = scenario[0]
@@ -72,7 +82,7 @@ def main(args=args):
             # * Adapt & log training progress on writer
             writer = create_writer(configs["Dataset"]["Dataset_Name"], configs["AdaptationConfig"]["Method"], scenario,
                                    target_name)
-            adapt(algo, target_name, scenario, configs, writer, device)
+            adapt(algo, target_name, scenario, configs, writer, device, loss_avg_meters)
             writer.close()
 
             # * Load the best model & test acc
@@ -103,7 +113,13 @@ if __name__ == "__main__":
     random.seed(seed)
 
     start = time.time()
-    main(args)
+
+    if args.sweep:
+        sweep(args, device)
+    else:
+        main(args)
+
     end = time.time()
+    
     time_taken = end - start
     print(f"time taken: {time_taken: .2f} seconds")

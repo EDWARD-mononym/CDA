@@ -11,7 +11,7 @@ from utils.model_testing import test_all_domain
 #? configs should include parameters used which varies from algorithm to algorithm
 
 class BaseAlgo(torch.nn.Module):
-    def __init__(self, configs) -> None:
+    def __init__(self, configs, hyperparameters) -> None:
         super().__init__()
         #* Import the feature extractor & classifier 
         backbone_name, classifier_name = configs["BackboneConfig"]["Backbone"], configs["ClassifierConfig"]["Classifier"]
@@ -20,8 +20,8 @@ class BaseAlgo(torch.nn.Module):
         backbone_class = getattr(imported_backbone, backbone_name)
         classifier_class = getattr(imported_classifier, classifier_name)
 
-        self.feature_extractor = backbone_class(configs)
-        self.classifier = classifier_class(configs)
+        self.feature_extractor = backbone_class(configs, hyperparameters)
+        self.classifier = classifier_class(configs, hyperparameters)
 
         self.n_epoch = configs["TrainingConfigs"]["n_epoch"]
 
@@ -29,14 +29,14 @@ class BaseAlgo(torch.nn.Module):
 
     def update(self, src_loader, trg_loader,
                scenario, target_name, datasetname,
-               save_path, writer, device):
+               save_path, writer, device, loss_avg_meters):
         best_acc = -1.0
         print(f"Adapting to {target_name}")
         for epoch in range(self.n_epoch):
             print(f"Epoch: {epoch}/{self.n_epoch}")
 
             # Adaptation depends on the algorithm
-            self.epoch_train(src_loader, trg_loader, epoch, device)
+            loss_dict = self.epoch_train(src_loader, trg_loader, epoch, device)
 
             # Test & Save best model
             acc_dict = test_all_domain(datasetname, scenario, self.feature_extractor, self.classifier, device)
@@ -49,6 +49,10 @@ class BaseAlgo(torch.nn.Module):
             # Log the performance of each domain for this epoch
             for domain in acc_dict:
                 writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
+
+            # Log the losses
+            for loss_name in loss_dict:
+                loss_avg_meters[loss_name].update(loss_dict[loss_name])
 
     def pretrain(self, train_loader, test_loader, save_path, device):
         raise NotImplementedError

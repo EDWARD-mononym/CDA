@@ -83,7 +83,7 @@ class Acc_matrix():
         return generalise_column
 
     def save(self, file_name):
-        with open(file_name, 'w') as f:
+        with open(f"{file_name}_Overall", 'w') as f:
             # Summarise the metrics
             summary = {
             "avg_acc": [self.acc.iloc[1:]['ACC'].mean()],
@@ -93,6 +93,7 @@ class Acc_matrix():
             summary_df = pd.DataFrame(summary)
             summary_df.to_csv(f, index=False)
 
+        with open(f"{file_name}_ModelPerformance", 'w') as f:
             for model in self.acc_matrix.columns: # Save performance of each model 
                 # Separate performance of each model to make it easier to process
                 column_df = self.acc_matrix[model]
@@ -108,8 +109,9 @@ class Acc_matrix():
                 row_df.to_csv(f, index=True)
                 f.write("\n")
 
+        with open(f"{file_name}_Rmatrix", 'w') as f:
             f.write("R matrix")
-            # # Save R matrix
+            # Save R matrix
             self.acc_matrix.to_csv(f, index=True)
 
     def save_plot(self, savefile):

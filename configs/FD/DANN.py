@@ -24,5 +24,3 @@ configs = {
     "OptimiserConfig": {"lr": 0.001, "momentum": 0.9, "weight_decay": 0.0001, 
                         "step_size": 50, "gamma": 0.5}
 }
-
-configs["ClassifierConfig"]["input_size"] = configs["BackboneConfig"]["output_channels"] * configs["BackboneConfig"]["feature_length"]

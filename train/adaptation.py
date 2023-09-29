@@ -6,7 +6,7 @@ from utils.get_loaders import get_loader
 #? This function loads the necesary dataloaders and create the save folders before calling the update function for the algorithm
 #? For detailed information on how the model adapts, check the individual algorithm class in algorithms folder
 
-def adapt(algo_class, target_name, scenario, configs, writer, device):
+def adapt(algo_class, target_name, scenario, configs, writer, device, loss_avg_meters):
     trg_loader = get_loader(configs["Dataset"]["Dataset_Name"], target_name, "train")
     src_loader = get_loader(configs["Dataset"]["Dataset_Name"], scenario[0], "train")
 
@@ -15,4 +15,4 @@ def adapt(algo_class, target_name, scenario, configs, writer, device):
         os.makedirs(save_path)
     algo_class.update(src_loader, trg_loader,
                       scenario, target_name, configs["Dataset"]["Dataset_Name"],
-                      save_path, writer, device)
+                      save_path, writer, device, loss_avg_meters)

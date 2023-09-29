@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import cycle
 import os
 import torch
@@ -9,26 +10,26 @@ from utils.model_testing import test_domain
 #? https://arxiv.org/abs/1607.01719
 
 class DeepCORAL(BaseAlgo):
-    def __init__(self, configs) -> None:
-        super().__init__(configs)
+    def __init__(self, configs, hyperparameters) -> None:
+        super().__init__(configs, hyperparameters)
 
         self.taskloss = torch.nn.CrossEntropyLoss()
 
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
-            lr=configs["OptimiserConfig"]["lr"],
-            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+            lr=hyperparameters["lr"],
+            weight_decay=hyperparameters["weight_decay"]
         )
         self.classifier_optimiser = torch.optim.Adam(
                 self.feature_extractor.parameters(),
-                lr=configs["OptimiserConfig"]["lr"],
-                weight_decay=configs["OptimiserConfig"]["weight_decay"]
+                lr=hyperparameters["lr"],
+                weight_decay=hyperparameters["weight_decay"]
             )
 
         self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
-                                      step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+                                      step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
         self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
-                                              step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+                                              step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
 
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         self.feature_extractor.to(device)
@@ -37,6 +38,8 @@ class DeepCORAL(BaseAlgo):
         self.classifier.train()
 
         combined_loader = zip(cycle(src_loader), trg_loader)
+
+        loss_dict = defaultdict(float)
 
         for step, (source, target) in enumerate(combined_loader):
             src_x, src_y, trg_x = source[0], source[1], target[0]
@@ -61,9 +64,15 @@ class DeepCORAL(BaseAlgo):
             self.feature_extractor_optimiser.step()
             self.classifier_optimiser.step()
 
+            #* Log the losses
+            loss_dict["avg_loss"] += loss.item() / len(src_x)
+            loss_dict["avg_classification_loss"] += classification_loss.item() / len(src_x)
+
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
+
+        return loss_dict
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device):
         best_acc = -1.0
