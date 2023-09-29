@@ -67,9 +67,10 @@ def sweep(args, device):
             loss_avg_meters["avg_generalise"].update(result_matrix.generalise.iloc[1:-1]["Generalise"].mean())
 
         #* Save results into csv with Hparameter values
-        save_file = os.path.join(os.getcwd(), f'sweep_results/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}.csv')
-        if not os.path.exists(save_file):
-            os.makedirs(save_file)
+        save_folder = os.path.join(os.getcwd(), f'sweep_results/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}')
+        save_file = os.path.join(save_folder, f"sweep_result.csv")
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
             # Save with header
             dicts_to_csv(hyperparameter_selection, loss_avg_meters, save_file, headings=True)
 
