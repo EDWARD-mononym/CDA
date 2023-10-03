@@ -9,28 +9,28 @@ from scipy.spatial.distance import cdist
 import torch.nn.functional as F
 import numpy as np
 class SHOT(BaseAlgo):
-    def __init__(self, configs) -> None:
-        super().__init__(configs)
+    def __init__(self, configs, hyperparameters) -> None:
+        super().__init__(configs, hyperparameters)
 
 
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
-            lr=configs["OptimiserConfig"]["lr"],
-            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+            lr=hyperparameters["lr"],
+            weight_decay=hyperparameters["weight_decay"]
         )
         self.classifier_optimiser = torch.optim.Adam(
                 self.feature_extractor.parameters(),
-                lr=configs["OptimiserConfig"]["lr"],
-                weight_decay=configs["OptimiserConfig"]["weight_decay"]
+                lr=hyperparameters["lr"],
+                weight_decay=hyperparameters["weight_decay"]
             )
 
         self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
-                                      step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+                                      step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
         self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
-                                              step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+                                              step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
 
         self.configs = configs
-        self.hparams = configs["hparams"]
+        self.hparams = hyperparameters
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         # Freeze the classifier
         self.device = device

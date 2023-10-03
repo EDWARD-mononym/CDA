@@ -4,7 +4,7 @@ configs = {
                "num_class": 5,
                "input_channel": 1},
 
-    "AdaptationConfig": {"Method": "DeepCORAL"},
+    "AdaptationConfig": {"Method": "DANN"},
 
     "BackboneConfig": {"Backbone": "CNN"},
     
@@ -17,6 +17,6 @@ configs = {
 
     "Hyperparameters": {"lr": [0.001, 0.01], "momentum": [0.9], "weight_decay": [0.0001], "step_size": [50], "gamma": [0.5], # Optimiser parameters
                         "feature_length": [5], "hidden_channels": [64], "kernel_size": [5], "stride": [1], "dropout": [0.5], "output_channels": [128], "hidden_layers": [5], # Backbone parameters
-                        "coral_wt":[0.01, 0.5, 1, 5, 10] # domain adaptation parameters
+                        'ent_loss_wt': [0.01,0.05,0.1, 0.5,1], 'im':[0.01,0.05,0.1, 0.5,1] ,'target_cls_wt': 1
                         }
 }

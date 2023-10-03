@@ -30,7 +30,7 @@ class DeepCORAL(BaseAlgo):
                                       step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
         self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
                                               step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
-
+        self.hparams = hyperparameters
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         self.feature_extractor.to(device)
         self.classifier.to(device)
@@ -57,7 +57,7 @@ class DeepCORAL(BaseAlgo):
             #* Compute loss
             classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
             coral_loss = CORAL(src_feat, trg_feat)
-            loss = classification_loss + coral_loss
+            loss = classification_loss + self.hparams["coral_wt"] * coral_loss
             loss.backward()
 
             #* Step
