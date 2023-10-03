@@ -10,27 +10,28 @@ from utils.model_testing import test_domain
 #? https://arxiv.org/abs/1607.01719
 
 class DeepCORAL(BaseAlgo):
-    def __init__(self, configs, hyperparameters) -> None:
-        super().__init__(configs, hyperparameters)
+    def __init__(self, configs) -> None:
+        super().__init__(configs)
 
         self.taskloss = torch.nn.CrossEntropyLoss()
 
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
-            lr=hyperparameters["lr"],
-            weight_decay=hyperparameters["weight_decay"]
+            lr=configs.lr,
+            weight_decay=configs.weight_decay
         )
         self.classifier_optimiser = torch.optim.Adam(
                 self.feature_extractor.parameters(),
-                lr=hyperparameters["lr"],
-                weight_decay=hyperparameters["weight_decay"]
+                lr=configs.lr,
+                weight_decay=configs.weight_decay
             )
 
         self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
-                                      step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
+                                      step_size=configs.step_size, gamma=configs.gamma)
         self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
-                                              step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
-        self.hparams = hyperparameters
+                                              step_size=configs.step_size, gamma=configs.gamma)
+        self.hparams = configs.adaptation("DeepCORAL")
+
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         self.feature_extractor.to(device)
         self.classifier.to(device)

@@ -11,19 +11,19 @@ from utils.model_testing import test_all_domain
 #? configs should include parameters used which varies from algorithm to algorithm
 
 class BaseAlgo(torch.nn.Module):
-    def __init__(self, configs, hyperparameters) -> None:
+    def __init__(self, configs) -> None:
         super().__init__()
         #* Import the feature extractor & classifier 
-        backbone_name, classifier_name = configs["BackboneConfig"]["Backbone"], configs["ClassifierConfig"]["Classifier"]
+        backbone_name, classifier_name = configs.Backbone_Type , configs.Classifier_Type
         imported_backbone = importlib.import_module(f"architecture.{backbone_name}")
         imported_classifier = importlib.import_module(f"architecture.{classifier_name}")
         backbone_class = getattr(imported_backbone, backbone_name)
         classifier_class = getattr(imported_classifier, classifier_name)
 
-        self.feature_extractor = backbone_class(configs, hyperparameters)
-        self.classifier = classifier_class(configs, hyperparameters)
+        self.feature_extractor = backbone_class(configs)
+        self.classifier = classifier_class(configs)
 
-        self.n_epoch = configs["TrainingConfigs"]["n_epoch"]
+        self.n_epoch = configs.n_epoch
 
         self.configs = configs
 

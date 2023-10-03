@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 
 def load_source_model(configs, feature_extractor, classifier, scenario, device):
-    folder_path = os.path.join(os.getcwd(), f"source_models/{configs['Dataset']['Dataset_Name']}/{configs['BackboneConfig']['Backbone']}")
+    folder_path = os.path.join(os.getcwd(), f"source_models/{configs.Dataset_Name}/{configs.Backbone_Type}")
     feature_extractor_path = os.path.join(folder_path, f"{scenario[0]}_feature.pt")
     classifier_path = os.path.join(folder_path, f"{scenario[0]}_classifier.pt")
 
@@ -16,9 +16,9 @@ def load_source_model(configs, feature_extractor, classifier, scenario, device):
 
     return feature_extractor, classifier
 
-def load_best_model(configs, feature_extractor, classifier, scenario, target_name, device):
+def load_best_model(configs, feature_extractor, classifier, scenario, target_name, method, device):
     #* Load state dict
-    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs["Dataset"]["Dataset_Name"]}/{configs["AdaptationConfig"]["Method"]}/{scenario}')
+    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs.Dataset_Name}/{configs.adaptation(method)["Method"]}/{scenario}')
     feature_extractor.load_state_dict(torch.load(os.path.join(save_folder, f"{target_name}_feature.pt")))
     classifier.load_state_dict(torch.load(os.path.join(save_folder, f"{target_name}_classifier.pt")))
 

@@ -1,0 +1,19 @@
+Training source model
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/('Normal', 'Rotate', 'Load', 'Radial')/Rotate
+Adapting to Rotate
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/('Normal', 'Rotate', 'Load', 'Radial')/Load
+Adapting to Load
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/('Normal', 'Rotate', 'Load', 'Radial')/Radial
+Adapting to Radial
+Epoch: 0/1
+Traceback (most recent call last):
+  File "D:\Continual_DA\main_sweep_wandb.py", line 161, in <module>
+    diagnostic.run()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 117, in run
+    self.handle_scenarios()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 113, in handle_scenarios
+    wandb.log(overall_report)
+KeyboardInterrupt

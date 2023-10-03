@@ -1,34 +1,35 @@
 from torch import nn
 
 class CNN(nn.Module):
-    def __init__(self, configs, hyperparameters):
+    def __init__(self, configs):
         super(CNN, self).__init__()
 
         self.conv_block1 = nn.Sequential(
-            nn.Conv1d(configs["Dataset"]["input_channel"], hyperparameters["hidden_channels"], kernel_size=hyperparameters["kernel_size"],
-                      stride=hyperparameters["stride"], bias=False, padding=(hyperparameters["kernel_size"] // 2)),
-            nn.BatchNorm1d(hyperparameters["hidden_channels"]),
+            nn.Conv1d(configs.input_channel, configs.hidden_channels, kernel_size=configs.kernel_size,
+                      stride=configs.stride, bias=False, padding=(configs.kernel_size // 2)),
+            nn.BatchNorm1d(configs.hidden_channels),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1),
-            nn.Dropout(hyperparameters["dropout"])
+            nn.Dropout(configs.dropout)
         )
 
         self.conv_block2 = nn.Sequential(
-            nn.Conv1d(hyperparameters["hidden_channels"], hyperparameters["hidden_channels"]*1, kernel_size=8, stride=1, bias=False, padding=4),
-            nn.BatchNorm1d(hyperparameters["hidden_channels"]*1),
+            nn.Conv1d(configs.hidden_channels, configs.hidden_channels * 1, kernel_size=8, stride=1, bias=False,
+                      padding=4),
+            nn.BatchNorm1d(configs.hidden_channels * 1),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1)
         )
 
         self.conv_block3 = nn.Sequential(
-            nn.Conv1d(hyperparameters["hidden_channels"]*1, hyperparameters["output_channels"], kernel_size=8, stride=1, bias=False,
+            nn.Conv1d(configs.hidden_channels * 1, configs.output_channels, kernel_size=8, stride=1, bias=False,
                       padding=4),
-            nn.BatchNorm1d(hyperparameters["output_channels"]),
+            nn.BatchNorm1d(configs.output_channels),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1),
         )
 
-        self.adaptive_pool = nn.AdaptiveAvgPool1d(hyperparameters["feature_length"])
+        self.adaptive_pool = nn.AdaptiveAvgPool1d(configs.feature_length)
 
     def forward(self, x_in):
         x = self.conv_block1(x_in)

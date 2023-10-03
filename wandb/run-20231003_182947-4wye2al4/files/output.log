@@ -1,0 +1,41 @@
+Training source model
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Rotate
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\wandb\sdk\wandb_config.py", line 162, in __getattr__
+    return self.__getitem__(key)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\wandb\sdk\wandb_config.py", line 130, in __getitem__
+    return self._items[key]
+KeyError: 'adaptation'
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+  File "D:\Continual_DA\main_sweep_wandb.py", line 161, in <module>
+    diagnostic.run()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 118, in run
+    self.handle_scenarios()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 106, in handle_scenarios
+    self.adapt_to_target_domains(scenario)
+  File "D:\Continual_DA\main_sweep_wandb.py", line 74, in adapt_to_target_domains
+    f'adapted_models/{self.configs.Dataset_Name}/{self.configs.adaptation(self.args.algo)["Method"]}/{scenario}')
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\wandb\sdk\wandb_config.py", line 164, in __getattr__
+    raise AttributeError(
+AttributeError: <class 'wandb.sdk.wandb_config.Config'> object has no attribute 'adaptation'
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\wandb\sdk\wandb_config.py", line 162, in __getattr__
+    return self.__getitem__(key)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\wandb\sdk\wandb_config.py", line 130, in __getitem__
+    return self._items[key]
+KeyError: 'adaptation'
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+  File "D:\Continual_DA\main_sweep_wandb.py", line 161, in <module>
+    diagnostic.run()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 118, in run
+    self.handle_scenarios()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 106, in handle_scenarios
+    self.adapt_to_target_domains(scenario)
+  File "D:\Continual_DA\main_sweep_wandb.py", line 74, in adapt_to_target_domains
+    f'adapted_models/{self.configs.Dataset_Name}/{self.configs.adaptation(self.args.algo)["Method"]}/{scenario}')
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\wandb\sdk\wandb_config.py", line 164, in __getattr__
+    raise AttributeError(
+AttributeError: <class 'wandb.sdk.wandb_config.Config'> object has no attribute 'adaptation'

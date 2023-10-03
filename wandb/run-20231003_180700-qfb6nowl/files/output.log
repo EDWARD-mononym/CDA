@@ -1,0 +1,32 @@
+Training source model
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/('Normal', 'Rotate', 'Load', 'Radial')/Rotate
+Adapting to Rotate
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/('Normal', 'Rotate', 'Load', 'Radial')/Load
+Adapting to Load
+Epoch: 0/1
+Traceback (most recent call last):
+  File "D:\Continual_DA\main_sweep_wandb.py", line 162, in <module>
+    diagnostic.run()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 118, in run
+    self.handle_scenarios()
+  File "D:\Continual_DA\main_sweep_wandb.py", line 106, in handle_scenarios
+    self.adapt_to_target_domains(scenario)
+  File "D:\Continual_DA\main_sweep_wandb.py", line 78, in adapt_to_target_domains
+    self.algo.update(src_loader, trg_loader, scenario, target_name, self.configs.Dataset_Name, save_path,
+  File "D:\Continual_DA\algorithms\BaseAlgo.py", line 39, in update
+    loss_dict = self.epoch_train(src_loader, trg_loader, epoch, device)
+  File "D:\Continual_DA\algorithms\DeepCORAL.py", line 66, in epoch_train
+    self.classifier_optimiser.step()
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\torch\optim\lr_scheduler.py", line 69, in wrapper
+    return wrapped(*args, **kwargs)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\torch\optim\optimizer.py", line 280, in wrapper
+    out = func(*args, **kwargs)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\torch\optim\optimizer.py", line 33, in _use_grad
+    ret = func(self, *args, **kwargs)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\torch\optim\adam.py", line 141, in step
+    adam(
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\torch\optim\adam.py", line 281, in adam
+    func(params,
+KeyboardInterrupt
