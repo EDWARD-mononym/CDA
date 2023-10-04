@@ -1,0 +1,10 @@
+Training source model
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Rotate
+Adapting to Rotate
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Load
+Adapting to Load
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Radial
+Adapting to Radial
