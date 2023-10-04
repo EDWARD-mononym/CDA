@@ -1,0 +1,6 @@
+wandb_version: 1
+
+coral_wt:
+  value: 7.464331533892552
+lr:
+  value: 0.01

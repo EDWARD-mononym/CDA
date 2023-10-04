@@ -18,7 +18,7 @@ def load_source_model(configs, feature_extractor, classifier, scenario, device):
 
 def load_best_model(configs, feature_extractor, classifier, scenario, target_name, method, device):
     #* Load state dict
-    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs.Dataset_Name}/{configs.adaptation(method)["Method"]}/{scenario}')
+    save_folder = os.path.join(os.getcwd(), f'adapted_models/{configs.Dataset_Name}/{configs.Method}/{scenario}')
     feature_extractor.load_state_dict(torch.load(os.path.join(save_folder, f"{target_name}_feature.pt")))
     classifier.load_state_dict(torch.load(os.path.join(save_folder, f"{target_name}_classifier.pt")))
 

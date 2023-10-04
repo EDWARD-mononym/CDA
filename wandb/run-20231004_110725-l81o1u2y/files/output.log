@@ -1,0 +1,21 @@
+Training source model
+Epoch: 0/1
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Rotate
+Adapting to Rotate
+Epoch: 0/1
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 903, in __getitem__
+    field = self._fields[key]
+KeyError: 'adaptation'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 827, in __getattr__
+    return self[attribute]
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 909, in __getitem__
+    raise KeyError(self._generate_did_you_mean_message(key, str(e)))
+KeyError: "'adaptation'"
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 829, in __getattr__
+    raise AttributeError(e)
+AttributeError: "'adaptation'"

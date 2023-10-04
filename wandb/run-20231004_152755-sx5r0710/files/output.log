@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 178, in <module>
+    diagnostic.run()
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 134, in run
+    self.handle_scenarios()
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 114, in handle_scenarios
+    self.result_matrix = Acc_matrix(scenario)
+  File "D:\Continual_DA\utils\model_testing.py", line 35, in __init__
+    self.acc_matrix = pd.DataFrame(index=scenario, columns=scenario)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\pandas\core\frame.py", line 636, in __init__
+    mgr = dict_to_mgr(data, index, columns, dtype=dtype, copy=copy, typ=manager)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\pandas\core\internals\construction.py", line 445, in dict_to_mgr
+    arrays = Series(data, index=columns, dtype=object)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\pandas\core\series.py", line 380, in __init__
+    index = ensure_index(index)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\pandas\core\indexes\base.py", line 7060, in ensure_index
+    return Index._with_infer(index_like, copy=copy)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\pandas\core\indexes\base.py", line 680, in _with_infer
+    result = cls(*args, **kwargs)
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\pandas\core\indexes\base.py", line 508, in __new__
+    raise cls._scalar_data_error(data)
+TypeError: Index(...) must be called with a collection of some kind, 'Normal' was passed

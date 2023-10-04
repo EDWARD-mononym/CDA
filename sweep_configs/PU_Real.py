@@ -32,21 +32,21 @@ class Configs:
 
         # Tuned params
         self.lr = 1e-4
+        self.algo_configs = self.adaptation()
 
         # self.tune_configs = self.adaptation()
     def adaptation(self, method="SHOT"):
         methods = {
-            # "SHOT":
-            #
-            #     {
-            #     "Method": "SHOT",
-            #     "lr": {'values': [1e-2, 5e-3, 1e-3, 5e-4]},
-            #     "ent_loss_wt": tune.loguniform(1e-2, 1e-1),
-            #     "im": tune.loguniform(1e-2, 1e-1),
-            #     "target_cls_wt": tune.loguniform(1e-2, 1e-1)
-            # },
+            "SHOT":
+                {
+                # "Method": "SHOT",
+                "lr": {'values': [1e-2, 5e-3, 1e-3, 5e-4]},
+                "ent_loss_wt": {'distribution': 'uniform', 'min': 1e-1, 'max': 10},
+                "im": {'distribution': 'uniform', 'min': 1e-1, 'max': 10},
+                "target_cls_wt": {'distribution': 'uniform', 'min': 1e-1, 'max': 10},
+                },
             "DeepCORAL": {
-                "Method": "DeepCORAL",
+                # "Method": "DeepCORAL",
                 "lr": {'values': [1e-2, 5e-3, 1e-3, 5e-4]},
                 "coral_wt":  {'distribution': 'uniform', 'min': 1e-1, 'max': 10},
         },

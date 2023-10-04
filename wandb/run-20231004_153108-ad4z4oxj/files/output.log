@@ -1,0 +1,27 @@
+Training source model
+Epoch: 0/1
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 903, in __getitem__
+    field = self._fields[key]
+KeyError: 'algo_configs'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 827, in __getattr__
+    return self[attribute]
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 909, in __getitem__
+    raise KeyError(self._generate_did_you_mean_message(key, str(e)))
+KeyError: "'algo_configs'"
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 178, in <module>
+    diagnostic.run()
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 134, in run
+    self.handle_scenarios()
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 120, in handle_scenarios
+    self.adapt_to_target_domains(scenario)
+  File "D:\Continual_DA\main_sweep_wandb2.py", line 82, in adapt_to_target_domains
+    save_path = os.path.join(os.getcwd(), f'adapted_models/{self.configs.Dataset_Name}/{self.configs.algo_configs.Method}/{scenario}')
+  File "C:\Users\Mohamed Ragab\.conda\envs\dl_work\lib\site-packages\ml_collections\config_dict\config_dict.py", line 829, in __getattr__
+    raise AttributeError(e)
+AttributeError: "'algo_configs'"
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Rotate

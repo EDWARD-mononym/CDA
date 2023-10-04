@@ -7,7 +7,7 @@ import torch
 import numpy as np
 from collections import defaultdict
 import logging
-
+from ml_collections import config_dict
 from utils.get_loaders import get_loader
 from sweep import sweep
 from train.adaptation import adapt
@@ -28,7 +28,7 @@ class FaultDiagnostic:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.args = args
         self.setup_seed(SEED)
-        self.configs = self.load_configs()
+        self.configs, self.sweep_paramters= self.load_configs()
         self.algo = self.load_algorithm(self.configs)
         self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
@@ -43,8 +43,9 @@ class FaultDiagnostic:
 
     def load_configs(self):
         """Load configuration based on dataset."""
-        config_module = importlib.import_module(f"sweep_configs.{self.args.dataset}")
-        return getattr(config_module, 'configs')
+        config_module = importlib.import_module(f"configs.{self.args.dataset}")
+        sweep_config_module =  importlib.import_module(f"sweep_configs.{self.args.dataset}")
+        return getattr(config_module, 'configs'), getattr(sweep_config_module, 'configs')
 
     def load_algorithm(self, configs):
         """Load the specified algorithm."""
@@ -63,6 +64,7 @@ class FaultDiagnostic:
                                       self.algo.classifier, self.device)
         self.result_matrix.update(source_name, source_accs)
 
+
     def adapt_to_target_domains(self, scenario):
         """Adapt the model to all target domains."""
         for target_name in scenario[1:]:
@@ -70,7 +72,7 @@ class FaultDiagnostic:
             trg_loader = get_loader(self.configs.Dataset_Name, target_name, "train")
             src_loader = get_loader(self.configs.Dataset_Name, scenario[0], "train")
 
-            save_path = os.path.join(os.getcwd(), f'adapted_models/{self.configs.Dataset_Name}/{self.configs.adaptation(self.args.algo)["Method"]}/{scenario}')
+            save_path = os.path.join(os.getcwd(), f'adapted_models/{self.configs.Dataset_Name}/{self.configs.algo_configs.Method}/{scenario}')
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
 
@@ -86,11 +88,18 @@ class FaultDiagnostic:
                                                                                 self.device)
             target_accs = test_all_domain(self.configs.Dataset_Name, scenario, self.algo.feature_extractor,
                                           self.algo.classifier, self.device)
+            #updating
             self.result_matrix.update(target_name, target_accs)
 
+        self.result_matrix.calc_metric()
+        self.loss_avg_meters["avg_acc"].update(self.result_matrix.acc.iloc[1:]['ACC'].mean())
+        self.loss_avg_meters["avg_bwt"].update(self.result_matrix.bwt.iloc[2:]['BWT'].mean())
+        self.loss_avg_meters["avg_adapt"].update(self.result_matrix.adapt.iloc[1:]["Adapt"].mean())
+        self.loss_avg_meters["avg_generalise"].update(self.result_matrix.generalise.iloc[1:-1]["Generalise"].mean())
     def handle_scenarios(self):
+        # self.configs should not contain any sweep paramters, it should normal paramters that has starting point
         run = wandb.init(config=self.configs)
-        self.configs = wandb.config
+        self.configs = config_dict.ConfigDict(wandb.config)
         """Handle all scenarios for training and adaptation."""
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
@@ -106,8 +115,10 @@ class FaultDiagnostic:
 
             # Calculate metrics and save results
             self.save_results(scenario)
-            overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
-                              self.loss_avg_meters.keys()}
+
+
+        overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
+                          self.loss_avg_meters.keys()}
 
         wandb.log(overall_report)
         run.finish()
@@ -121,8 +132,9 @@ class FaultDiagnostic:
         sweep_runs_count = 10
         sweep_config = {
             "method": "random",
-            # "metric": {"name": "avg_loss", "goal": "minimize"},
-            "parameters": {**self.configs.adaptation(args.algo)}
+            "metric": {"name": "avg_loss", "goal": "minimize"},
+            # here only give the sweep_paramters
+            "parameters": {**self.sweep_paramters.adaptation(args.algo)}
         }
         sweep_id = wandb.sweep(sweep = sweep_config, project="test_project")
 
@@ -157,4 +169,4 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
     diagnostic = FaultDiagnostic(args)
-    diagnostic.run()
+    diagnostic.sweep()

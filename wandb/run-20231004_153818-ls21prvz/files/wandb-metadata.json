@@ -1,0 +1,53 @@
+{
+    "os": "Windows-10-10.0.19045-SP0",
+    "python": "3.9.13",
+    "heartbeatAt": "2023-10-04T07:38:18.894229",
+    "startedAt": "2023-10-04T07:38:18.025533",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "D:\\Continual_DA\\main_sweep_wandb2.py",
+    "codePathLocal": "main_sweep_wandb2.py",
+    "codePath": "main_sweep_wandb2.py",
+    "git": {
+        "remote": "https://github.com/EDWARD-mononym/CDA",
+        "commit": "bc1c34ca7146c8e459a5cea1e54a0ab84ecec2ab"
+    },
+    "email": "42439092+mohamedr002@users.noreply.github.com",
+    "root": "D:/Continual_DA",
+    "host": "DESKTOP-QA7UUCC",
+    "username": "Mohamed Ragab",
+    "executable": "C:\\Users\\Mohamed Ragab\\.conda\\envs\\dl_work\\python.exe",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 3600.0,
+        "min": 0.0,
+        "max": 3600.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3600.0,
+            "min": 0.0,
+            "max": 3600.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 1862.9999961853027,
+            "used": 624.7974891662598
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 2080 Ti",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 2080 Ti",
+            "memory_total": 11811160064
+        }
+    ],
+    "memory": {
+        "total": 63.932838439941406
+    }
+}

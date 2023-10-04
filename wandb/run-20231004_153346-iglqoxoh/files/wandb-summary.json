@@ -1,0 +1,1 @@
+{"avg_loss": 0.04, "avg_classification_loss": 0.04, "avg_acc": 0.85, "avg_bwt": -0.07, "avg_adapt": 0.17, "avg_generalise": 0.06, "_timestamp": 1696404842.8151917, "_runtime": 16.305291652679443, "_step": 0, "_wandb": {"runtime": 15}}

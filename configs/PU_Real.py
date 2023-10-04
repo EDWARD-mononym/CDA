@@ -29,10 +29,9 @@ class Configs:
         self.weight_decay = 0.0001
         self.step_size = 50
         self.gamma = 0.5
+        self.algo_configs = self.adaptation()
 
-
-    def adaptation(self, method="SHOT"):
-        methods = {
+        self.algo_config = {
             "SHOT": {
                 "Method": "SHOT",
                 "ent_loss_wt": 0.8467,
@@ -60,7 +59,6 @@ class Configs:
                 "only_mi": False  # The actual value (True or False) for only_mi; Replace with the appropriate value
             }
         }
-        return methods.get(method, {})
 
 # Create an instance of the Configs class
 configs = Configs()

@@ -1,0 +1,51 @@
+wandb_version: 1
+
+coral_wt:
+  desc: null
+  value: 6.325657381315997
+lr:
+  desc: null
+  value: 0.01
+_fields:
+  desc: null
+  value:
+    coral_wt: 3.72388731175663
+    lr: 0.01
+_locked:
+  desc: null
+  value: false
+_type_safe:
+  desc: null
+  value: true
+_convert_dict:
+  desc: null
+  value: true
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.13
+    cli_version: 0.15.11
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1696392359.559288
+    t:
+      1:
+      - 1
+      - 30
+      - 55
+      2:
+      - 1
+      - 30
+      - 55
+      3:
+      - 2
+      - 16
+      - 23
+      - 37
+      4: 3.9.13
+      5: 0.15.11
+      8:
+      - 3
+      - 5
+      13: windows-amd64
