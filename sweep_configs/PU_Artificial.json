@@ -1,0 +1,60 @@
+{
+    "train_params": {
+        "feature_length": {
+          "values": [32, 64]},
+        "hidden_channels":  {"values": [32, 64]},
+        "kernel_size":  {"values": [3, 5, 7]},
+        "dropout": {"values": [0.5, 0.7]},
+        "output_channels":  {"values": [64, 128]},
+        "hidden_layers": 5,
+        "n_epoch": {"values": [40, 60, 100]}
+    },
+    "algo_params":
+    {
+      "SHOT": {
+          "lr": {
+              "values": [0.01, 0.005, 0.001, 0.0005]
+          },
+          "ent_loss_wt": {
+              "distribution": "uniform",
+              "min": 0.1,
+              "max": 10
+          },
+          "im": {
+              "distribution": "uniform",
+              "min": 0.1,
+              "max": 10
+          },
+          "target_cls_wt": {
+              "distribution": "uniform",
+              "min": 0.1,
+              "max": 10
+          }
+      },
+      "DeepCORAL": {
+          "lr": {
+              "values": [0.01, 0.005, 0.001, 0.0005]
+          },
+          "coral_wt": {
+              "distribution": "uniform",
+              "min": 0.1,
+              "max": 10
+          }
+      },
+      "NRC": {
+          "Method": "NRC",
+          "epsilon": 0.00001
+      },
+      "COSDA": {
+          "Method": "COSDA",
+          "beta": 2,
+          "reg_alpha": 0.1,
+          "temp": 0.07,
+          "temperature_end": 0.07,
+          "conf_gate": 0.4,
+          "confidence_gate_end": 0.7,
+          "only_mi": false
+      }
+  }
+
+}

@@ -7,19 +7,15 @@ import torch
 import numpy as np
 from collections import defaultdict
 import logging
-
+from ml_collections import config_dict
 from utils.get_loaders import get_loader
-from sweep import sweep
-from train.adaptation import adapt
 from train.pretrain import pretrain
 from utils.avg_meter import AverageMeter
 from utils.create_logger import create_writer
 from utils.load_models import load_source_model, load_best_model
 from utils.model_testing import test_all_domain, Acc_matrix
-
-from ray import tune, train
-from ray.tune.search.optuna import OptunaSearch
-
+import wandb
+import json
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -28,10 +24,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class FaultDiagnostic:
     def __init__(self, args):
+        """Initialize the FaultDiagnostic class."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.args = args
         self.setup_seed(SEED)
-        self.configs = self.load_configs()
+        self.configs, self.sweep_paramters = self.load_configs()
         self.algo = self.load_algorithm(self.configs)
         self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
@@ -45,9 +42,18 @@ class FaultDiagnostic:
         random.seed(seed)
 
     def load_configs(self):
-        """Load configuration based on dataset."""
-        config_module = importlib.import_module(f"configs.{self.args.dataset}")
-        return getattr(config_module, 'configs')
+        """Load default configuration based on dataset."""
+        with open(f"configs/{self.args.dataset}.json", 'r') as f:
+            all_configs = json.load(f)
+        general_configs = all_configs['train_params']
+        algo_configs = all_configs['algo_params'].get(self.args.algo, None)
+        default_configs = config_dict.ConfigDict({**general_configs, **algo_configs})
+
+        """Load sweep configuration based on dataset."""
+        with open(f"sweep_configs/{self.args.dataset}.json", 'r') as f:
+            all_configs = json.load(f)
+        sweep_algo_configs = all_configs['algo_params'].get(self.args.algo, None)
+        return default_configs, sweep_algo_configs
 
     def load_algorithm(self, configs):
         """Load the specified algorithm."""
@@ -73,7 +79,7 @@ class FaultDiagnostic:
             trg_loader = get_loader(self.configs.Dataset_Name, target_name, "train")
             src_loader = get_loader(self.configs.Dataset_Name, scenario[0], "train")
 
-            save_path = os.path.join(os.getcwd(),  f'adapted_models/{self.configs.Dataset_Name}/{self.configs.adaptation(self.args.algo)["Method"]}/{scenario}')
+            save_path = os.path.join(os.getcwd(), f'adapted_models/{self.configs.Dataset_Name}/{self.configs.Method}/{scenario}')
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
 
@@ -97,9 +103,10 @@ class FaultDiagnostic:
         self.loss_avg_meters["avg_adapt"].update(self.result_matrix.adapt.iloc[1:]["Adapt"].mean())
         self.loss_avg_meters["avg_generalise"].update(self.result_matrix.generalise.iloc[1:-1]["Generalise"].mean())
 
-    def handle_scenarios(self, config):
-        self.configs.lr = config["lr"]
+    def handle_scenarios(self):
         """Handle all scenarios for training and adaptation."""
+        run = wandb.init(config=self.configs.__dict__['_fields'])
+        self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
 
@@ -113,37 +120,30 @@ class FaultDiagnostic:
             self.adapt_to_target_domains(scenario)
 
             # Calculate metrics and save results
-            # self.save_results(scenario)
-            overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
-                              self.loss_avg_meters.keys()}
-            train.report(overall_report)
-    # def train(self):
-    #     self.handle_scenarios()
+            self.save_results(scenario)
+
+        overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
+                          self.loss_avg_meters.keys()}
+
+        wandb.log(overall_report)
+        run.finish()
 
     def run(self):
         """Main run method for the FaultDiagnostic class."""
         logging.info("Starting the FaultDiagnostic run.")
-        if not self.args.sweep:
-            # Use Ray Tune for hyperparameter tuning
-            search_alg = OptunaSearch(
-                metric="avg_acc",
-                mode="max",
-            )
-            tuner = tune.Tuner(
-                self.handle_scenarios(tune_config),
-                tune_config = tune.TuneConfig(
-                    metric="mean_accuracy",
-                    mode="max",
-                    search_alg=search_alg,
-                    num_samples=10
-                ),
-                param_space={self.configs.lr: tune.sample_from(lambda spec: 10 ** (-10 * np.random.rand())),}
-            )
-            results = tuner.fit()
-            print("Best hyperparameters found were: ",results.get_best_result().config)
-        else:
-            self.handle_scenarios()
+        self.handle_scenarios()
         logging.info("Completed the FaultDiagnostic run.")
+
+    def sweep(self):
+        """Run a sweep to find the best hyperparameters."""
+        sweep_runs_count = 10
+        sweep_config = {
+            "method": "random",
+            "metric": {"name": "avg_loss", "goal": "minimize"},
+            "parameters": {**self.sweep_paramters}
+        }
+        sweep_id = wandb.sweep(sweep=sweep_config, project="test_project")
+        wandb.agent(sweep_id, self.handle_scenarios, count=sweep_runs_count,)
 
     def save_results(self, scenario):
         """Save the results after training and adaptation."""
@@ -175,4 +175,4 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
     diagnostic = FaultDiagnostic(args)
-    diagnostic.run()
+    diagnostic.sweep()
