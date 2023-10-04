@@ -1,21 +1,10 @@
 import argparse
-import importlib
 import os
-import random
-import time
-import torch
-import numpy as np
-from collections import defaultdict
+
 import logging
 from ml_collections import config_dict
-from utils.get_loaders import get_loader
-from train.pretrain import pretrain
-from utils.avg_meter import AverageMeter
-from utils.create_logger import create_writer
-from utils.load_models import load_source_model, load_best_model
 from utils.model_testing import test_all_domain, Acc_matrix
 import wandb
-import json
 from train.sweep import Abstract_sweep
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -28,17 +17,22 @@ class FaultDiagnostic(Abstract_sweep):
         super(FaultDiagnostic, self).__init__(args)
 
         """Initialize sweep_params"""
+        self.num_sweeps = args.num_sweeps
+        self.sweep_project_wandb = args.sweep_project_wandb
+        self.wandb_entity = args.wandb_entity
+        self.hp_search_strategy = args.hp_search_strategy
+        self.metric_to_minimize = args.metric_to_minimize
 
     def sweep(self):
         """Run a sweep to find the best hyperparameters."""
-        sweep_runs_count = 10
         sweep_config = {
-            "method": "random",
-            "metric": {"name": "avg_loss", "goal": "minimize"},
+            'method': self.hp_search_strategy,
+            'metric': {'name': self.metric_to_minimize, 'goal': 'minimize'},
+            'name':self.configs.Method + '_' + self.configs.Backbone_Type,
             "parameters": {**self.sweep_paramters}
         }
         sweep_id = wandb.sweep(sweep=sweep_config, project="test_project")
-        wandb.agent(sweep_id, self.train, count=sweep_runs_count)
+        wandb.agent(sweep_id, self.train, count=self.num_sweeps)
     def train(self):
         """Handle all scenarios for training and adaptation."""
         run = wandb.init(config=self.configs.__dict__['_fields'])
@@ -69,17 +63,29 @@ class FaultDiagnostic(Abstract_sweep):
 
 def parse_arguments():
     """Parse command-line arguments."""
+    # ========= Select the DATASET ==============
     parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
     parser.add_argument("--dataset", default="PU_Real", help="Name of the dataset.")
+    parser.add_argument('--start-domain', default=0, type=int, help='Manual domain start.')
+    # ========= Select the algoritm ==============
     parser.add_argument("--algo", default="DeepCORAL", help="Algorithm to use.")
+    # ========= Experiment settings ===============
     parser.add_argument("--writer", default="tensorboard", choices=["tensorboard", "wandb"], help="Logging tool to use.")
     parser.add_argument('-lp', '--log-path', default="./logs", help="Path for logging.")
     parser.add_argument('-e', '--entity', default="", help="Entity for logging.")
     parser.add_argument('-j', '--workers', default=8, type=int, help='Number of data loading workers.')
     parser.add_argument('--plot', action='store_true', help="Flag to enable plotting.")
     parser.add_argument('--save', action='store_true', help="Flag to enable saving.")
-    parser.add_argument('--start-domain', default=0, type=int, help='Manual domain start.')
+    # ======== sweep settings =====================
     parser.add_argument("--sweep", action='store_true', help="Flag to enable sweep.")
+    parser.add_argument('--num_sweeps', default=1, type=str, help='Number of sweep runs')
+    parser.add_argument('--sweep_project_wandb', default='Test_CDA', type=str, help='Project name in Wandb')
+    parser.add_argument('--wandb_entity', type=str, help='Entity name in Wandb (can be left blank if there is a default entity)')
+    parser.add_argument('--hp_search_strategy', default="random", type=str,
+                        help='The way of selecting hyper-parameters (random-grid-bayes). in wandb see:https://docs.wandb.ai/guides/sweeps/configuration')
+    parser.add_argument('--metric_to_minimize', default="avg_loss", type=str,
+                        help='select one of: (src_risk - trg_risk - few_shot_trg_risk - dev_risk)')
+
     return parser.parse_args()
 
 if __name__ == "__main__":
