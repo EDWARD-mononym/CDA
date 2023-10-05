@@ -14,8 +14,7 @@ from utils.create_logger import AverageMeter
 class COSDA(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
-        backbone_name, classifier_name = configs["BackboneConfig"]["Backbone"], configs["ClassifierConfig"][
-            "Classifier"]
+        backbone_name, classifier_name = configs.Backbone_Type, configs.Classifier_Type
         imported_backbone = importlib.import_module(f"architecture.{backbone_name}")
         imported_classifier = importlib.import_module(f"architecture.{classifier_name}")
         backbone_class = getattr(imported_backbone, backbone_name)
@@ -27,22 +26,19 @@ class COSDA(BaseAlgo):
 
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
-            lr=configs["OptimiserConfig"]["lr"],
-            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+            lr=configs.lr,
+            weight_decay=configs.weight_decay
         )
         self.classifier_optimiser = torch.optim.Adam(
                 self.feature_extractor.parameters(),
-                lr=configs["OptimiserConfig"]["lr"],
-                weight_decay=configs["OptimiserConfig"]["weight_decay"]
+                lr=configs.lr,
+                weight_decay=configs.weight_decay
             )
 
-        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
-                                      step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
-        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
-                                              step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
+        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser,   step_size=configs.step_size, gamma=configs.gamma)
+        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser,     step_size=configs.step_size, gamma=configs.gamma)
 
         self.configs = configs
-        self.hparams = configs["hparams"]
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         utilized_ratio = AverageMeter()
 
@@ -72,12 +68,12 @@ class COSDA(BaseAlgo):
             # Obtain teacher's predictions without gradients
             with torch.no_grad():
                 predictions = self.teacher_classifier(self.teacher_backbone(trg_x))
-                knowledge, knowledge_mask = self.distill_knowledge(predictions, self.hparams["conf_gate"],
-                                                                   temperature=self.hparams["temp"])
+                knowledge, knowledge_mask = self.distill_knowledge(predictions, self.configs.conf_gate,
+                                                                   temperature= self.configs.temp)
 
             # Mixup preparation
-            if self.hparams["beta"] > 0:
-                lam = np.random.beta(self.hparams["beta"], self.hparams["beta"])
+            if  self.configs.beta > 0:
+                lam = np.random.beta( self.configs.beta, self.configs.beta)
                 lam = max(lam, 1 - lam)  # Ensure lam is closer to 1
             else:
                 lam = 1
@@ -106,10 +102,10 @@ class COSDA(BaseAlgo):
             )
 
             # Calculate final task loss
-            if self.hparams["only_mi"]:
-                task_loss = self.hparams["reg_alpha"] * mutual_info_loss
+            if  self.configs.only_mi:
+                task_loss =  self.configs.reg_alpha * mutual_info_loss
             else:
-                task_loss = consistency_loss + self.hparams["reg_alpha"] * mutual_info_loss
+                task_loss = consistency_loss +  self.configs.reg_alpha * mutual_info_loss
 
             # Backward propagation and optimizer steps
             task_loss.backward()
@@ -147,7 +143,7 @@ class COSDA(BaseAlgo):
                 pred = self.classifier(self.feature_extractor(x))
 
                 #* Loss
-                loss = self.cross_entropy_label_smooth(pred, y,self.configs["Dataset"]["num_class"], device, epsilon=0.1)
+                loss = self.cross_entropy_label_smooth(pred, y, self.configs.num_class, device, epsilon=0.1)
                 loss.backward()
 
                 #* Step

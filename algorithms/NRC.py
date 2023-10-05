@@ -15,22 +15,20 @@ class NRC(BaseAlgo):
 
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
-            lr=configs["OptimiserConfig"]["lr"],
-            weight_decay=configs["OptimiserConfig"]["weight_decay"]
+            lr=configs.lr,
+            weight_decay=configs.weight_decay
         )
         self.classifier_optimiser = torch.optim.Adam(
                 self.feature_extractor.parameters(),
-                lr=configs["OptimiserConfig"]["lr"],
-                weight_decay=configs["OptimiserConfig"]["weight_decay"]
+                lr=configs.lr,
+                weight_decay=configs.weight_decay
             )
 
-        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
-                                      step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
-        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
-                                              step_size=configs["OptimiserConfig"]['step_size'], gamma=configs["OptimiserConfig"]['gamma'])
-
+        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser,
+                                      step_size=configs.step_size, gamma=configs.gamma)
+        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser,
+                                              step_size=configs.step_size, gamma=configs.gamma)
         self.configs = configs
-        self.hparams = configs["hparams"]
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         # Freeze the classifier
         self.device = device
@@ -61,8 +59,8 @@ class NRC(BaseAlgo):
             trg_pred = self.classifier(trg_feat)
 
             num_samples = len(trg_loader.dataset)
-            fea_bank = torch.randn(num_samples, self.configs["ClassifierConfig"]["input_size"])
-            score_bank = torch.randn(num_samples, self.configs["Dataset"]["num_class"]).cuda()
+            fea_bank = torch.randn(num_samples, self.configs.input_size)
+            score_bank = torch.randn(num_samples, self.configs.num_class).cuda()
             softmax_out = nn.Softmax(dim=1)(trg_pred)
 
             with torch.no_grad():
@@ -106,7 +104,7 @@ class NRC(BaseAlgo):
                                                         -1)  # batch x KM
 
                 score_near_kk = score_near_kk.contiguous().view(score_near_kk.shape[0], -1,
-                                                                self.configs["Dataset"]["num_class"])  # batch x KM x C
+                                                                self.configs.num_class)  # batch x KM x C
 
                 score_self = score_bank[trg_idx]
 
@@ -127,7 +125,7 @@ class NRC(BaseAlgo):
 
 
             msoftmax = softmax_out.mean(dim=0)
-            gentropy_loss = torch.sum(msoftmax * torch.log(msoftmax + self.hparams['epsilon']))
+            gentropy_loss = torch.sum(msoftmax * torch.log(msoftmax + self.configs.epsilon))
             loss += gentropy_loss
 
 

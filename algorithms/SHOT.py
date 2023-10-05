@@ -8,29 +8,30 @@ from utils.model_testing import test_domain
 from scipy.spatial.distance import cdist
 import torch.nn.functional as F
 import numpy as np
+from collections import defaultdict
+
 class SHOT(BaseAlgo):
-    def __init__(self, configs, hyperparameters) -> None:
-        super().__init__(configs, hyperparameters)
+    def __init__(self, configs) -> None:
+        super().__init__(configs)
 
 
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
-            lr=hyperparameters["lr"],
-            weight_decay=hyperparameters["weight_decay"]
+            lr=configs.lr,
+            weight_decay=configs.weight_decay
         )
         self.classifier_optimiser = torch.optim.Adam(
                 self.feature_extractor.parameters(),
-                lr=hyperparameters["lr"],
-                weight_decay=hyperparameters["weight_decay"]
+                lr=configs.lr,
+                weight_decay=configs.weight_decay
             )
 
         self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
-                                      step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
+                                      step_size=configs.step_size, gamma=configs.gamma)
         self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
-                                              step_size=hyperparameters['step_size'], gamma=hyperparameters['gamma'])
+                                              step_size=configs.step_size, gamma=configs.gamma)
 
         self.configs = configs
-        self.hparams = hyperparameters
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         # Freeze the classifier
         self.device = device
@@ -47,6 +48,7 @@ class SHOT(BaseAlgo):
         # obtain pseudo labels for each epoch
         pseudo_labels = self.obtain_pseudo_labels(trg_loader)
 
+        loss_dict = defaultdict(float)
 
         for step, (source, target) in enumerate(combined_loader):
             src_x, src_y, trg_x, trg_idx = source[0], source[1], target[0], target[2]
@@ -65,13 +67,13 @@ class SHOT(BaseAlgo):
             target_loss = F.cross_entropy(trg_pred.squeeze(), pseudo_label.long())
 
             softmax_out = nn.Softmax(dim=1)(trg_pred)
-            entropy_loss = self.hparams['ent_loss_wt'] * torch.mean(self.EntropyLoss(softmax_out))
+            entropy_loss = self.configs.ent_loss_wt * torch.mean(self.EntropyLoss(softmax_out))
 
             #  Information maximization loss
-            entropy_loss -= self.hparams['im'] * torch.sum(-softmax_out.mean(dim=0) * torch.log(softmax_out.mean(dim=0) + 1e-5))
+            entropy_loss -= self.configs.im * torch.sum(-softmax_out.mean(dim=0) * torch.log(softmax_out.mean(dim=0) + 1e-5))
 
             # Total loss
-            loss = entropy_loss + self.hparams['target_cls_wt'] * target_loss
+            loss = entropy_loss + self.configs.target_cls_wt * target_loss
 
 
             #* Compute loss
@@ -80,9 +82,16 @@ class SHOT(BaseAlgo):
             #* update weights
             self.feature_extractor_optimiser.step()
 
+            # save average losses
+            loss_dict["avg_loss"] += loss.item() / len(src_x)
+            loss_dict["avg_ent_loss"] += entropy_loss.item() / len(src_x)
+            loss_dict["avg_pseud_target_loss"] += target_loss.item() / len(src_x)
+
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
+
+
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device):
         best_acc = -1.0
@@ -107,7 +116,7 @@ class SHOT(BaseAlgo):
                 pred = self.classifier(self.feature_extractor(x))
 
                 #* Loss
-                loss = self.cross_entropy_label_smooth(pred, y,self.configs["Dataset"]["num_class"], device, epsilon=0.1)
+                loss = self.cross_entropy_label_smooth(pred, y,self.configs.num_class, device, epsilon=0.1)
                 loss.backward()
 
                 #* Step
