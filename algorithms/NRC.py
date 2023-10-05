@@ -8,6 +8,8 @@ from utils.model_testing import test_domain
 from scipy.spatial.distance import cdist
 import torch.nn.functional as F
 import numpy as np
+from collections import defaultdict
+
 class NRC(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
@@ -42,9 +44,7 @@ class NRC(BaseAlgo):
 
         combined_loader = zip(cycle(src_loader), trg_loader)
 
-        # obtain pseudo labels for each epoch
-        pseudo_labels = self.obtain_pseudo_labels(trg_loader)
-
+        loss_dict = defaultdict(float)
 
         for step, (source, target) in enumerate(combined_loader):
             src_x, src_y, trg_x, trg_idx = source[0], source[1], target[0], target[2]
@@ -135,6 +135,11 @@ class NRC(BaseAlgo):
             #* update weights
             self.feature_extractor_optimiser.step()
             self.classifier_optimiser.step()
+
+            # save average losses
+            loss_dict["avg_loss"] += loss.item() / len(src_x)
+            loss_dict["avg_ent_loss"] += gentropy_loss.item() / len(src_x)
+
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
@@ -162,7 +167,7 @@ class NRC(BaseAlgo):
                 pred = self.classifier(self.feature_extractor(x))
 
                 #* Loss
-                loss = self.cross_entropy_label_smooth(pred, y,self.configs["Dataset"]["num_class"], device, epsilon=0.1)
+                loss = self.cross_entropy_label_smooth(pred, y,self.configs.num_class, device, epsilon=0.1)
                 loss.backward()
 
                 #* Step

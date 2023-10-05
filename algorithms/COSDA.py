@@ -11,6 +11,8 @@ import numpy as np
 import importlib
 from utils.create_logger import AverageMeter
 
+from collections import defaultdict
+
 class COSDA(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
@@ -55,6 +57,8 @@ class COSDA(BaseAlgo):
 
 
         combined_loader = zip(cycle(src_loader), trg_loader)
+
+        loss_dict = defaultdict(float)
 
         for step, (source, target) in enumerate(combined_loader):
             # Extract data from source and target batches
@@ -116,9 +120,16 @@ class COSDA(BaseAlgo):
             ratio = float(torch.mean(knowledge_mask))
             utilized_ratio.update(ratio, knowledge_mask.size(0))
 
+
+            loss_dict["avg_task_loss"] += task_loss.item() / len(src_x)
+            loss_dict["avg_mutual_info_loss"] += mutual_info_loss.item() / len(src_x)
+            loss_dict["avg_consistency_loss"] += consistency_loss.item() / len(src_x)
+
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
+
+        return loss_dict
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device):
         best_acc = -1.0
