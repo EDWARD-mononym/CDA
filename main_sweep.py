@@ -3,7 +3,7 @@ import os
 
 import logging
 from ml_collections import config_dict
-from utils.model_testing import test_all_domain, Acc_matrix
+from utils.model_testing import  Acc_matrix
 import wandb
 from train.train import DomainTrainer
 SEED = 42

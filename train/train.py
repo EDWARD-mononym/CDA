@@ -7,7 +7,7 @@ from utils.load_models import load_source_model, load_best_model
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-from train.base_train_test import Abstract_train
+from train.base_trainer import Abstract_train
 
 class DomainTrainer(Abstract_train):
     def __init__(self, args):
