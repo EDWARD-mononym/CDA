@@ -1,0 +1,120 @@
+import argparse
+import importlib
+import os
+import random
+import time
+import torch
+import numpy as np
+from collections import defaultdict
+import logging
+from ml_collections import config_dict
+from utils.avg_meter import AverageMeter
+import json
+SEED = 42
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+import os
+from pathlib import Path
+
+from utils.get_loaders import get_loader
+# Setup logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class Abstract_train:
+    def __init__(self, args):
+        """Initialize the FaultDiagnostic class."""
+        self.result_matrix = None
+        self.calc_overall_metrics = None
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.args = args
+        self.setup_seed(SEED)
+        self.loss_avg_meters = defaultdict(lambda: AverageMeter())
+
+    @staticmethod
+    def setup_seed(seed):
+        """Set random seeds for reproducibility."""
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+
+    def load_configs(self):
+        """Load default configuration based on dataset."""
+        with open(f"configs/{self.args.dataset}.json", 'r') as f:
+            all_configs = json.load(f)
+        general_configs = all_configs['train_params']
+        algo_configs = all_configs['algo_params'].get(self.args.algo, None)
+        default_configs = config_dict.ConfigDict({**general_configs, **algo_configs})
+
+        """Load sweep configuration based on dataset."""
+        with open(f"sweep_configs/{self.args.dataset}.json", 'r') as f:
+            all_configs = json.load(f)
+        sweep_algo_configs = all_configs['algo_params'].get(self.args.algo, None)
+        return default_configs, sweep_algo_configs
+
+    def load_algorithm(self, configs):
+        """Load the specified algorithm."""
+        algo_module = importlib.import_module(f"algorithms.{self.args.algo}")
+        algo_class = getattr(algo_module, self.args.algo)
+        return algo_class(configs)
+
+    def calc_overal_metrics(self):
+        self.loss_avg_meters["avg_acc"].update(self.result_matrix.acc.iloc[1:]['ACC'].mean())
+        self.loss_avg_meters["avg_bwt"].update(self.result_matrix.bwt.iloc[2:]['BWT'].mean())
+        self.loss_avg_meters["avg_adapt"].update(self.result_matrix.adapt.iloc[1:]["Adapt"].mean())
+        self.loss_avg_meters["avg_generalise"].update(self.result_matrix.generalise.iloc[1:-1]["Generalise"].mean())
+    def save_results(self, scenario):
+        """Save the results after training and adaptation."""
+        self.result_matrix.calc_metric()
+        save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}')
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+        folder_name = os.path.join(save_folder, f"{scenario}")
+        self.result_matrix.save(folder_name)
+        if self.args.plot:
+            plot_file = os.path.join(save_folder, f"{scenario}.png")
+            self.result_matrix.save_plot(plot_file)
+    def pretrain(self, source_name):
+        train_loader = get_loader(self.configs.Dataset_Name, source_name, "train")
+        test_loader = get_loader(self.configs.Dataset_Name, source_name, "test")
+
+        save_folder = os.path.join(os.getcwd(), f"source_models/{self.configs.Dataset_Name}/{self.configs.Backbone_Type}")
+        Path(save_folder).mkdir(parents=True, exist_ok=True)
+
+        self.algo.pretrain(train_loader, test_loader, source_name, save_folder, self.device)
+
+    def adapt(self, target_name, scenario, writer):
+        trg_loader = get_loader(self.configs.Dataset_Name, target_name, "train")
+        src_loader = get_loader(self.configs.Dataset_Name, scenario[0], "train")
+
+        save_path = os.path.join(os.getcwd(), f'adapted_models/{self.configs.Dataset_Name}/{self.configs.Method}/{scenario}')
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        self.algo.update(src_loader, trg_loader,
+                          scenario, target_name, self.configs.Dataset_Name,
+                          save_path, writer, self.device, self.loss_avg_meters)
+
+
+    def test_domain(self, test_loader):
+        self.algo.feature_extractor.eval()
+        self.algo.classifier.eval()
+
+        correct, total = 0, 0
+        with torch.no_grad():
+            for data in test_loader:
+                x, y = data[0], data[1]
+                x, y = x.to(self.device), y.to(self.device)
+                logits = self.algo.classifier(self.algo.feature_extractor(x))
+                _, pred = torch.max(logits, 1)
+                total += y.size(0)
+                correct += (pred == y).sum().item()
+        accuracy = correct / total
+        return accuracy
+
+    def test_all_domain(self, scenario):
+        acc_dict = defaultdict(float)
+        for domain in scenario:
+            test_loader = get_loader(self.configs.Dataset_Name, domain, "test")
+            acc = self.test_domain(test_loader)
+            acc_dict[domain] = acc
+        return acc_dict

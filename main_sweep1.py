@@ -5,16 +5,16 @@ import logging
 from ml_collections import config_dict
 from utils.model_testing import test_all_domain, Acc_matrix
 import wandb
-from train.sweep import Abstract_sweep
+from train.train import DomainTrainer
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Setup logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-class FaultDiagnostic(Abstract_sweep):
+class FDSweep(DomainTrainer):
     def __init__(self, args):
-        super(FaultDiagnostic, self).__init__(args)
+        super(FDSweep, self).__init__(args)
 
         """Initialize sweep_params"""
         self.num_sweeps = args.num_sweeps
@@ -29,7 +29,7 @@ class FaultDiagnostic(Abstract_sweep):
             'method': self.hp_search_strategy,
             'metric': {'name': self.metric_to_minimize, 'goal': 'minimize'},
             'name':self.configs.Method + '_' + self.configs.Backbone_Type,
-            "parameters": {**self.sweep_paramters}
+            "parameters": {**self.sweep_parameters}
         }
         sweep_id = wandb.sweep(sweep=sweep_config, project="test_project")
         wandb.agent(sweep_id, self.train, count=self.num_sweeps)
@@ -90,5 +90,5 @@ def parse_arguments():
 
 if __name__ == "__main__":
     args = parse_arguments()
-    diagnostic = FaultDiagnostic(args)
+    diagnostic = FDSweep(args)
     diagnostic.sweep()
