@@ -5,6 +5,7 @@
         "num_class": 5,
         "input_channel": 1,
         "Backbone_Type": "CNN",
+        "chkpoint_type": "last",
         "feature_length": 5,
         "hidden_channels": 64,
         "kernel_size": 5,

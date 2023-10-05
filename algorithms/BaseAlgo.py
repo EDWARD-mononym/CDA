@@ -43,8 +43,8 @@ class BaseAlgo(torch.nn.Module):
             if acc_dict[target_name] > best_acc:
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
-                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
-                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature_best.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier_best.pt"))
 
             # Log the performance of each domain for this epoch
             for domain in acc_dict:
@@ -53,6 +53,9 @@ class BaseAlgo(torch.nn.Module):
             # Log the losses
             for loss_name in loss_dict:
                 loss_avg_meters[loss_name].update(loss_dict[loss_name])
+
+        torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature_last.pt"))
+        torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier_last.pt"))
 
     def pretrain(self, train_loader, test_loader, save_path, device):
         raise NotImplementedError

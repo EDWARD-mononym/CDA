@@ -5,7 +5,7 @@ import logging
 from ml_collections import config_dict
 from utils.model_testing import test_all_domain, Acc_matrix
 import wandb
-from train.train import DomainTrainer
+from train.scenario_trainer import DomainTrainer
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 

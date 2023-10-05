@@ -47,7 +47,7 @@ class DomainTrainer(Abstract_train):
 
             # Load the best-performing model for the current target domain.
             self.algo.feature_extractor, self.algo.classifier = load_best_model(
-                self.configs, self.algo.feature_extractor, self.algo.classifier, scenario, target_name, self.args.algo,
+                self.configs, self.algo.feature_extractor, self.algo.classifier, scenario, target_name, self.args.algo, self.configs.chkpoint_type,
                 self.device
             )
             # Test the adapted model's performance on all domains in the scenario.
