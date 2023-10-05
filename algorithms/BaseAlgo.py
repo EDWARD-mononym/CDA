@@ -34,6 +34,7 @@ class BaseAlgo(torch.nn.Module):
         print(f"Adapting to {target_name}")
         for epoch in range(self.n_epoch):
             print(f"Epoch: {epoch}/{self.n_epoch}")
+            print("-" * 30)  # Print a separator for clarity
 
             # Adaptation depends on the algorithm
             loss_dict = self.epoch_train(src_loader, trg_loader, epoch, device)
@@ -53,6 +54,13 @@ class BaseAlgo(torch.nn.Module):
             # Log the losses
             for loss_name in loss_dict:
                 loss_avg_meters[loss_name].update(loss_dict[loss_name])
+
+
+            # Print average loss every 'print_every' steps
+            if (epoch + 1) % self.configs.print_every == 0:
+                for loss_name, loss_value in loss_dict.items():
+                    loss_avg_meters[loss_name].update(loss_value)
+                    print(f"{loss_name}: {loss_value:.4f}")
 
         torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature_last.pt"))
         torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier_last.pt"))

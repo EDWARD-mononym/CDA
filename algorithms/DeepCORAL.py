@@ -85,29 +85,37 @@ class DeepCORAL(BaseAlgo):
             self.classifier.to(device)
             self.feature_extractor.train()
             self.classifier.train()
-
+            running_loss = 0
             for step, data in enumerate(train_loader):
                 x, y = data[0], data[1]
                 x, y = x.to(device), y.to(device)
 
-                #* Zero grads
+                # Zero grads
                 self.feature_extractor_optimiser.zero_grad()
                 self.classifier_optimiser.zero_grad()
 
-                #* Forward pass
+                # Forward pass
                 pred = self.classifier(self.feature_extractor(x))
 
-                #* Loss
+                # Loss
                 loss = self.taskloss(pred, y)
                 loss.backward()
 
-                #* Step
+                # Step
                 self.feature_extractor_optimiser.step()
                 self.classifier_optimiser.step()
 
-            #* Adjust learning rate
+                running_loss += loss.item()
+
+            # Adjust learning rate
             self.fe_lr_scheduler.step()
             self.classifier_lr_scheduler.step()
+
+            # Print average loss every 'print_every' steps
+            if (epoch + 1) % self.configs.print_every == 0:
+                avg_loss = running_loss / len(train_loader)
+                print(f"Average Loss: {avg_loss:.4f}")
+            print("-" * 30)  # Print a separator for clarity
 
             #* Save best model
             epoch_acc = test_domain(test_loader, self.feature_extractor, self.classifier, device)
