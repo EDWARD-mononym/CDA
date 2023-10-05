@@ -2,7 +2,7 @@
 import os
 import logging
 from utils.create_logger import create_writer
-from utils.load_models import load_source_model, load_best_model
+from utils.load_models import load_source_model, load_target_model
 
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -46,7 +46,7 @@ class DomainTrainer(Abstract_train):
             writer.close()
 
             # Load the best-performing model for the current target domain.
-            self.algo.feature_extractor, self.algo.classifier = load_best_model(
+            self.algo.feature_extractor, self.algo.classifier = load_target_model(
                 self.configs, self.algo.feature_extractor, self.algo.classifier, scenario, target_name, self.args.algo, self.configs.chkpoint_type,
                 self.device
             )

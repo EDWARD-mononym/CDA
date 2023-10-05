@@ -45,6 +45,27 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\results\PU_Real\COSDA\['Normal', 'Rotate', 'Load', 'Radial']_ModelPerformance.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\results\PU_Real\COSDA\['Normal', 'Rotate', 'Load', 'Radial']_Overall.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\results\PU_Real\COSDA\['Normal', 'Rotate', 'Load', 'Radial']_Rmatrix.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\results\PU_Real\DeepCORAL\('Normal', 'Rotate', 'Load', 'Radial').csv">
           <value>
             <Attribute>
