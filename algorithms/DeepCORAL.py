@@ -68,6 +68,7 @@ class DeepCORAL(BaseAlgo):
             #* Log the losses
             loss_dict["avg_loss"] += loss.item() / len(src_x)
             loss_dict["avg_classification_loss"] += classification_loss.item() / len(src_x)
+            loss_dict["avg_coral_loss"] += coral_loss.item() / len(src_x)
 
         #* Adjust learning rate
         self.fe_lr_scheduler.step()

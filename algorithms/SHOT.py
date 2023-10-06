@@ -105,6 +105,7 @@ class SHOT(BaseAlgo):
             self.feature_extractor.train()
             self.classifier.train()
 
+            running_loss = 0
             for step, data in enumerate(train_loader):
                 x, y = data[0], data[1]
                 x, y = x.to(device), y.to(device)
@@ -124,6 +125,8 @@ class SHOT(BaseAlgo):
                 self.feature_extractor_optimiser.step()
                 self.classifier_optimiser.step()
 
+                running_loss += loss.item()
+
             #* Adjust learning rate
             self.fe_lr_scheduler.step()
             self.classifier_lr_scheduler.step()
@@ -133,7 +136,11 @@ class SHOT(BaseAlgo):
             if epoch_acc > best_acc:
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
-
+            # Print average loss every 'print_every' steps
+            if (epoch + 1) % self.configs.print_every == 0:
+                avg_loss = running_loss / len(train_loader)
+                print(f"Average Loss: {avg_loss:.4f}")
+            print("-" * 30)  # Print a separator for clarity
     def obtain_pseudo_labels(self, trg_loader):
         self.feature_extractor.eval()
         self.classifier.eval()

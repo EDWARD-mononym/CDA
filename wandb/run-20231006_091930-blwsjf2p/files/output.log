@@ -1,0 +1,703 @@
+Training source model
+Epoch: 0/100
+Average Loss: 0.5007
+------------------------------
+Epoch: 1/100
+Average Loss: 0.2085
+------------------------------
+Epoch: 2/100
+Average Loss: 0.1378
+------------------------------
+Epoch: 3/100
+Average Loss: 0.1034
+------------------------------
+Epoch: 4/100
+Average Loss: 0.0790
+------------------------------
+Epoch: 5/100
+Average Loss: 0.0680
+------------------------------
+Epoch: 6/100
+Average Loss: 0.0556
+------------------------------
+Epoch: 7/100
+Average Loss: 0.0471
+------------------------------
+Epoch: 8/100
+Average Loss: 0.0415
+------------------------------
+Epoch: 9/100
+Average Loss: 0.0363
+------------------------------
+Epoch: 10/100
+Average Loss: 0.0367
+------------------------------
+Epoch: 11/100
+Average Loss: 0.0315
+------------------------------
+Epoch: 12/100
+Average Loss: 0.0278
+------------------------------
+Epoch: 13/100
+Average Loss: 0.0279
+------------------------------
+Epoch: 14/100
+Average Loss: 0.0249
+------------------------------
+Epoch: 15/100
+Average Loss: 0.0226
+------------------------------
+Epoch: 16/100
+Average Loss: 0.0208
+------------------------------
+Epoch: 17/100
+Average Loss: 0.0198
+------------------------------
+Epoch: 18/100
+Average Loss: 0.0218
+------------------------------
+Epoch: 19/100
+Average Loss: 0.0189
+------------------------------
+Epoch: 20/100
+Average Loss: 0.0179
+------------------------------
+Epoch: 21/100
+Average Loss: 0.0171
+------------------------------
+Epoch: 22/100
+Average Loss: 0.0155
+------------------------------
+Epoch: 23/100
+Average Loss: 0.0196
+------------------------------
+Epoch: 24/100
+Average Loss: 0.0174
+------------------------------
+Epoch: 25/100
+Average Loss: 0.0170
+------------------------------
+Epoch: 26/100
+Average Loss: 0.0168
+------------------------------
+Epoch: 27/100
+Average Loss: 0.0159
+------------------------------
+Epoch: 28/100
+Average Loss: 0.0164
+------------------------------
+Epoch: 29/100
+Average Loss: 0.0161
+------------------------------
+Epoch: 30/100
+Average Loss: 0.0145
+------------------------------
+Epoch: 31/100
+Average Loss: 0.0154
+------------------------------
+Epoch: 32/100
+Average Loss: 0.0138
+------------------------------
+Epoch: 33/100
+Average Loss: 0.0137
+------------------------------
+Epoch: 34/100
+Average Loss: 0.0137
+------------------------------
+Epoch: 35/100
+Average Loss: 0.0140
+------------------------------
+Epoch: 36/100
+Average Loss: 0.0133
+------------------------------
+Epoch: 37/100
+Average Loss: 0.0145
+------------------------------
+Epoch: 38/100
+Average Loss: 0.0144
+------------------------------
+Epoch: 39/100
+Average Loss: 0.0129
+------------------------------
+Epoch: 40/100
+Average Loss: 0.0128
+------------------------------
+Epoch: 41/100
+Average Loss: 0.0132
+------------------------------
+Epoch: 42/100
+Average Loss: 0.0124
+------------------------------
+Epoch: 43/100
+Average Loss: 0.0136
+------------------------------
+Epoch: 44/100
+Average Loss: 0.0146
+------------------------------
+Epoch: 45/100
+Average Loss: 0.0157
+------------------------------
+Epoch: 46/100
+Average Loss: 0.0123
+------------------------------
+Epoch: 47/100
+Average Loss: 0.0132
+------------------------------
+Epoch: 48/100
+Average Loss: 0.0122
+------------------------------
+Epoch: 49/100
+Average Loss: 0.0152
+------------------------------
+Epoch: 50/100
+Average Loss: 0.0100
+------------------------------
+Epoch: 51/100
+Average Loss: 0.0098
+------------------------------
+Epoch: 52/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 53/100
+Average Loss: 0.0111
+------------------------------
+Epoch: 54/100
+Average Loss: 0.0109
+------------------------------
+Epoch: 55/100
+Average Loss: 0.0101
+------------------------------
+Epoch: 56/100
+Average Loss: 0.0101
+------------------------------
+Epoch: 57/100
+Average Loss: 0.0112
+------------------------------
+Epoch: 58/100
+Average Loss: 0.0118
+------------------------------
+Epoch: 59/100
+Average Loss: 0.0105
+------------------------------
+Epoch: 60/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 61/100
+Average Loss: 0.0118
+------------------------------
+Epoch: 62/100
+Average Loss: 0.0112
+------------------------------
+Epoch: 63/100
+Average Loss: 0.0106
+------------------------------
+Epoch: 64/100
+Average Loss: 0.0120
+------------------------------
+Epoch: 65/100
+Average Loss: 0.0113
+------------------------------
+Epoch: 66/100
+Average Loss: 0.0110
+------------------------------
+Epoch: 67/100
+Average Loss: 0.0113
+------------------------------
+Epoch: 68/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 69/100
+Average Loss: 0.0110
+------------------------------
+Epoch: 70/100
+Average Loss: 0.0122
+------------------------------
+Epoch: 71/100
+Average Loss: 0.0103
+------------------------------
+Epoch: 72/100
+Average Loss: 0.0107
+------------------------------
+Epoch: 73/100
+Average Loss: 0.0118
+------------------------------
+Epoch: 74/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 75/100
+Average Loss: 0.0114
+------------------------------
+Epoch: 76/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 77/100
+Average Loss: 0.0109
+------------------------------
+Epoch: 78/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 79/100
+Average Loss: 0.0118
+------------------------------
+Epoch: 80/100
+Average Loss: 0.0109
+------------------------------
+Epoch: 81/100
+Average Loss: 0.0121
+------------------------------
+Epoch: 82/100
+Average Loss: 0.0105
+------------------------------
+Epoch: 83/100
+Average Loss: 0.0104
+------------------------------
+Epoch: 84/100
+Average Loss: 0.0105
+------------------------------
+Epoch: 85/100
+Average Loss: 0.0099
+------------------------------
+Epoch: 86/100
+Average Loss: 0.0108
+------------------------------
+Epoch: 87/100
+Average Loss: 0.0102
+------------------------------
+Epoch: 88/100
+Average Loss: 0.0109
+------------------------------
+Epoch: 89/100
+Average Loss: 0.0116
+------------------------------
+Epoch: 90/100
+Average Loss: 0.0103
+------------------------------
+Epoch: 91/100
+Average Loss: 0.0106
+------------------------------
+Epoch: 92/100
+Average Loss: 0.0116
+------------------------------
+Epoch: 93/100
+Average Loss: 0.0099
+------------------------------
+Epoch: 94/100
+Average Loss: 0.0100
+------------------------------
+Epoch: 95/100
+Average Loss: 0.0116
+------------------------------
+Epoch: 96/100
+Average Loss: 0.0102
+------------------------------
+Epoch: 97/100
+Average Loss: 0.0101
+------------------------------
+Epoch: 98/100
+Average Loss: 0.0109
+------------------------------
+Epoch: 99/100
+Average Loss: 0.0113
+------------------------------
+Creating writer in D:\Continual_DA\logs/PU_Real/DeepCORAL/['Normal', 'Rotate', 'Load', 'Radial']/Rotate
+Adapting to Rotate
+Epoch: 0/100
+avg_loss: 0.0107
+avg_classification_loss: 0.0059
+avg_coral_loss: 0.0005
+------------------------------
+Epoch: 1/100
+avg_loss: 0.0075
+avg_classification_loss: 0.0048
+avg_coral_loss: 0.0003
+------------------------------
+Epoch: 2/100
+avg_loss: 0.0074
+avg_classification_loss: 0.0048
+avg_coral_loss: 0.0003
+------------------------------
+Epoch: 3/100
+avg_loss: 0.0068
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 4/100
+avg_loss: 0.0067
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 5/100
+avg_loss: 0.0068
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 6/100
+avg_loss: 0.0068
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 7/100
+avg_loss: 0.0068
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 8/100
+avg_loss: 0.0067
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 9/100
+avg_loss: 0.0070
+avg_classification_loss: 0.0048
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 10/100
+avg_loss: 0.0069
+avg_classification_loss: 0.0047
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 11/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 12/100
+avg_loss: 0.0067
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 13/100
+avg_loss: 0.0066
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 14/100
+avg_loss: 0.0067
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 15/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 16/100
+avg_loss: 0.0068
+avg_classification_loss: 0.0047
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 17/100
+avg_loss: 0.0068
+avg_classification_loss: 0.0047
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 18/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 19/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 20/100
+avg_loss: 0.0064
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 21/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 22/100
+avg_loss: 0.0066
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 23/100
+avg_loss: 0.0066
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 24/100
+avg_loss: 0.0066
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 25/100
+avg_loss: 0.0064
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 26/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 27/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 28/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 29/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 30/100
+avg_loss: 0.0064
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 31/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 32/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 33/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 34/100
+avg_loss: 0.0064
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 35/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 36/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0046
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 37/100
+avg_loss: 0.0064
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 38/100
+avg_loss: 0.0064
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 39/100
+avg_loss: 0.0062
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 40/100
+avg_loss: 0.0062
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 41/100
+avg_loss: 0.0062
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 42/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 43/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 44/100
+avg_loss: 0.0065
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 45/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 46/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0045
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 47/100
+avg_loss: 0.0063
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 48/100
+avg_loss: 0.0062
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 49/100
+avg_loss: 0.0062
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 50/100
+avg_loss: 0.0061
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 51/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 52/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0041
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 53/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 54/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 55/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 56/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 57/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 58/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 59/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 60/100
+avg_loss: 0.0058
+avg_classification_loss: 0.0041
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 61/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 62/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 63/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 64/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 65/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 66/100
+avg_loss: 0.0058
+avg_classification_loss: 0.0040
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 67/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 68/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 69/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 70/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 71/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 72/100
+avg_loss: 0.0061
+avg_classification_loss: 0.0044
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 73/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 74/100
+avg_loss: 0.0058
+avg_classification_loss: 0.0041
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 75/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 76/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0041
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 77/100
+avg_loss: 0.0058
+avg_classification_loss: 0.0041
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 78/100
+avg_loss: 0.0059
+avg_classification_loss: 0.0042
+avg_coral_loss: 0.0002
+------------------------------
+Epoch: 79/100
+avg_loss: 0.0060
+avg_classification_loss: 0.0043
+avg_coral_loss: 0.0002
+------------------------------

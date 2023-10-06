@@ -28,14 +28,14 @@ class FDSweep(DomainTrainer):
         sweep_config = {
             'method': self.hp_search_strategy,
             'metric': {'name': self.metric_to_minimize, 'goal': 'minimize'},
-            'name':self.configs.Method + '_' + self.configs.Backbone_Type,
+            'name': self.configs.Method + '_' + self.configs.Dataset_Name,
             "parameters": {**self.sweep_parameters}
         }
-        sweep_id = wandb.sweep(sweep=sweep_config, project="test_project")
+        sweep_id = wandb.sweep(sweep_config, project=self.sweep_project_wandb, entity=self.wandb_entity)
         wandb.agent(sweep_id, self.train, count=self.num_sweeps)
     def train(self):
         """Handle all scenarios for training and adaptation."""
-        run = wandb.init(config=self.configs.__dict__['_fields'])
+        run = wandb.init(config=self.configs.__dict__['_fields'], sync_tensorboard=True)
         self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
@@ -78,9 +78,9 @@ def parse_arguments():
     parser.add_argument('--save', action='store_true', help="Flag to enable saving.")
     # ======== sweep settings =====================
     parser.add_argument("--sweep", action='store_true', help="Flag to enable sweep.")
-    parser.add_argument('--num_sweeps', default=1, type=str, help='Number of sweep runs')
-    parser.add_argument('--sweep_project_wandb', default='Test_CDA', type=str, help='Project name in Wandb')
-    parser.add_argument('--wandb_entity', type=str, help='Entity name in Wandb (can be left blank if there is a default entity)')
+    parser.add_argument('--num_sweeps', default=100, type=str, help='Number of sweep runs')
+    parser.add_argument('--sweep_project_wandb', default='Pilot_Test', type=str, help='Project name in Wandb')
+    parser.add_argument('--wandb_entity', default='timeseries-cda', type=str, help='Entity name in Wandb (can be left blank if there is a default entity)')
     parser.add_argument('--hp_search_strategy', default="random", type=str,
                         help='The way of selecting hyper-parameters (random-grid-bayes). in wandb see:https://docs.wandb.ai/guides/sweeps/configuration')
     parser.add_argument('--metric_to_minimize', default="avg_loss", type=str,
