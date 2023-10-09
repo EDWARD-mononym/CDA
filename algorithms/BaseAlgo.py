@@ -2,7 +2,7 @@ import importlib
 import os
 import torch
 
-from utils.model_testing import test_all_domain
+# from utils.model_testing import test_all_domain
 
 ####### Info #######
 #? When creating a new algorithm, make the algo a subclass of BaseAlgo and redefine pretrain & epoch_train
@@ -27,9 +27,10 @@ class BaseAlgo(torch.nn.Module):
 
         self.configs = configs
 
+
     def update(self, src_loader, trg_loader,
                scenario, target_name, datasetname,
-               save_path, writer, device, loss_avg_meters):
+               save_path, writer, device, evaluator):
         best_acc = -1.0
         print(f"Adapting to {target_name}")
         for epoch in range(self.n_epoch):
@@ -39,7 +40,8 @@ class BaseAlgo(torch.nn.Module):
             loss_dict = self.epoch_train(src_loader, trg_loader, epoch, device)
 
             # Test & Save best model
-            acc_dict = test_all_domain(datasetname, scenario, self.feature_extractor, self.classifier, device)
+
+            acc_dict = evaluator.test_all_domain()
             if acc_dict[target_name] > best_acc:
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
@@ -52,13 +54,13 @@ class BaseAlgo(torch.nn.Module):
 
             # Log the losses
             for loss_name in loss_dict:
-                loss_avg_meters[loss_name].update(loss_dict[loss_name])
+                evaluator.loss_avg_meters[loss_name].update(loss_dict[loss_name])
 
 
             # Print average loss every 'print_every' steps
             if (epoch + 1) % self.configs.print_every == 0:
                 for loss_name, loss_value in loss_dict.items():
-                    loss_avg_meters[loss_name].update(loss_value)
+                    evaluator.loss_avg_meters[loss_name].update(loss_value)
                     print(f"{loss_name}: {loss_value:.4f}")
             print("-" * 30)  # Print a separator for clarity
 

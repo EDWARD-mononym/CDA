@@ -1,8 +1,6 @@
-import argparse
 import importlib
 import os
 import random
-import time
 import torch
 import numpy as np
 from collections import defaultdict
@@ -10,6 +8,7 @@ import logging
 from ml_collections import config_dict
 from utils.avg_meter import AverageMeter
 import json
+import torch.nn as nn
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import os
@@ -22,12 +21,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 class Abstract_train:
     def __init__(self, args):
         """Initialize the FaultDiagnostic class."""
-        self.result_matrix = None
-        self.calc_overall_metrics = None
+        self.evaluator = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.args = args
         self.setup_seed(SEED)
-        self.loss_avg_meters = defaultdict(lambda: AverageMeter())
+        # self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
     @staticmethod
     def setup_seed(seed):
@@ -58,22 +56,23 @@ class Abstract_train:
         algo_class = getattr(algo_module, self.args.algo)
         return algo_class(configs)
 
-    def calc_overal_metrics(self):
-        self.loss_avg_meters["avg_acc"].update(self.result_matrix.acc.iloc[1:]['ACC'].mean())
-        self.loss_avg_meters["avg_bwt"].update(self.result_matrix.bwt.iloc[2:]['BWT'].mean())
-        self.loss_avg_meters["avg_adapt"].update(self.result_matrix.adapt.iloc[1:]["Adapt"].mean())
-        self.loss_avg_meters["avg_generalise"].update(self.result_matrix.generalise.iloc[1:-1]["Generalise"].mean())
+    def calc_overall_metrics(self):
+        self.loss_avg_meters["avg_acc"].update(self.evaluator.acc.iloc[1:]['ACC'].mean())
+        self.loss_avg_meters["avg_bwt"].update(self.evaluator.bwt.iloc[2:]['BWT'].mean())
+        self.loss_avg_meters["avg_adapt"].update(self.evaluator.adapt.iloc[1:]["Adapt"].mean())
+        self.loss_avg_meters["avg_generalise"].update(self.evaluator.generalise.iloc[1:-1]["Generalise"].mean())
+
     def save_results(self, scenario):
         """Save the results after training and adaptation."""
-        self.result_matrix.calc_metric()
+        self.evaluator.calc_metric()
         save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}')
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
         folder_name = os.path.join(save_folder, f"{scenario}")
-        self.result_matrix.save(folder_name)
+        self.evaluator.save(folder_name)
         if self.args.plot:
             plot_file = os.path.join(save_folder, f"{scenario}.png")
-            self.result_matrix.save_plot(plot_file)
+            self.evaluator.save_plot(plot_file)
     def pretrain(self, source_name):
         train_loader = get_loader(self.configs.Dataset_Name, source_name, "train")
         test_loader = get_loader(self.configs.Dataset_Name, source_name, "test")
@@ -81,7 +80,7 @@ class Abstract_train:
         save_folder = os.path.join(os.getcwd(), f"source_models/{self.configs.Dataset_Name}/{self.configs.Backbone_Type}")
         Path(save_folder).mkdir(parents=True, exist_ok=True)
 
-        self.algo.pretrain(train_loader, test_loader, source_name, save_folder, self.device)
+        self.algo.pretrain(train_loader, test_loader, source_name, save_folder, self.device, self.evaluator)
 
     def adapt(self, target_name, scenario, writer):
         trg_loader = get_loader(self.configs.Dataset_Name, target_name, "train")
@@ -92,7 +91,7 @@ class Abstract_train:
             os.makedirs(save_path)
         self.algo.update(src_loader, trg_loader,
                           scenario, target_name, self.configs.Dataset_Name,
-                          save_path, writer, self.device, self.loss_avg_meters)
+                          save_path, writer, self.device, self.evaluator)
 
 
     def test_domain(self, test_loader):
@@ -118,3 +117,24 @@ class Abstract_train:
             acc = self.test_domain(test_loader)
             acc_dict[domain] = acc
         return acc_dict
+
+    # def get_src_risk(self, domain):
+    #     src_loader = get_loader(self.configs.Dataset_Name, domain, "test")
+    #
+    #     self.algo.feature_extractor.eval()
+    #     self.algo.classifier.eval()
+    #
+    #     self.loss_fn = nn.CrossEntropyLoss()
+    #     total_loss = 0.0
+    #     total_samples = 0
+    #
+    #     with torch.no_grad():
+    #         for inputs, labels, _ in src_loader:
+    #             inputs, labels = inputs.to(self.device), labels.to(self.device)
+    #
+    #             logits = self.algo.classifier(self.algo.feature_extractor(inputs))
+    #             batch_loss = self.loss_fn(logits, labels)
+    #
+    #             total_loss += batch_loss.item() * labels.size(0)
+    #             total_samples += labels.size(0)
+    #     self.loss_avg_meters["src_risk"].update(total_loss / total_samples)

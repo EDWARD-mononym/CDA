@@ -5,29 +5,29 @@ import torch
 from utils.get_loaders import get_loader
 from utils.plot import save_plot
 
-def test_domain(test_loader, feature_extractor, classifier, device):
-    feature_extractor.eval()
-    classifier.eval()
-
-    correct, total = 0, 0
-    with torch.no_grad():
-        for data in test_loader:
-            x, y = data[0], data[1]
-            x, y = x.to(device), y.to(device)
-            logits = classifier(feature_extractor(x))
-            _, pred = torch.max(logits, 1)
-            total += y.size(0)
-            correct += (pred == y).sum().item()
-    accuracy = correct / total
-    return accuracy
-
-def test_all_domain(datasetname, scenario, feature_extractor, classifier, device):
-    acc_dict = defaultdict(float)
-    for domain in scenario:
-        testloader = get_loader(datasetname, domain, "test")
-        acc = test_domain(testloader, feature_extractor, classifier, device)
-        acc_dict[domain] = acc
-    return acc_dict
+# def test_domain(test_loader, feature_extractor, classifier, device):
+#     feature_extractor.eval()
+#     classifier.eval()
+#
+#     correct, total = 0, 0
+#     with torch.no_grad():
+#         for data in test_loader:
+#             x, y = data[0], data[1]
+#             x, y = x.to(device), y.to(device)
+#             logits = classifier(feature_extractor(x))
+#             _, pred = torch.max(logits, 1)
+#             total += y.size(0)
+#             correct += (pred == y).sum().item()
+#     accuracy = correct / total
+#     return accuracy
+#
+# def test_all_domain(datasetname, scenario, feature_extractor, classifier, device):
+#     acc_dict = defaultdict(float)
+#     for domain in scenario:
+#         testloader = get_loader(datasetname, domain, "test")
+#         acc = test_domain(testloader, feature_extractor, classifier, device)
+#         acc_dict[domain] = acc
+#     return acc_dict
 
 class Acc_matrix():
     def __init__(self, scenario) -> None:

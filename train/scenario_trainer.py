@@ -8,6 +8,7 @@ SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 from train.base_trainer import Abstract_train
+# from train.base_evaluator import DomainEvaluator
 
 class DomainTrainer(Abstract_train):
     def __init__(self, args):
@@ -16,6 +17,7 @@ class DomainTrainer(Abstract_train):
         self.configs, self.sweep_parameters = self.load_configs()
         # Initialize the chosen algorithm with the loaded configurations.
         self.algo = self.load_algorithm(self.configs)
+        # self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
     def train_and_log_source_model(self, source_name, scenario):
         """
@@ -28,9 +30,9 @@ class DomainTrainer(Abstract_train):
             self.configs, self.algo.feature_extractor, self.algo.classifier, scenario, self.device
         )
         # Test the model's performance on all domains in the scenario.
-        source_accs = self.test_all_domain(scenario)
+        source_accs = self.evaluator.test_all_domain()
         # Update the results matrix with the source domain's performance metrics.
-        self.result_matrix.update(source_name, source_accs)
+        self.evaluator.update(source_name, source_accs)
 
     def adapt_to_target_domains(self, scenario):
         """
@@ -51,13 +53,15 @@ class DomainTrainer(Abstract_train):
                 self.device
             )
             # Test the adapted model's performance on all domains in the scenario.
-            target_accs = self.test_all_domain(scenario)
+            target_accs = self.evaluator.test_all_domain()
             # Update the results matrix with the target domain's performance metrics.
-            self.result_matrix.update(target_name, target_accs)
+            self.evaluator.update(target_name, target_accs)
+            # Estimating the Source Risk
+            self.evaluator.get_src_risk(scenario[0])
 
         # Calculate overall metrics for the entire scenario.
-        self.result_matrix.calc_metric()
+        self.evaluator.calc_metric()
         # Calculates and logs overall metrics for the scenario
-        self.calc_overall_metrics
+        self.evaluator.calc_overall_metrics()
 
 

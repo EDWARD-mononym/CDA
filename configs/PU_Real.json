@@ -16,7 +16,7 @@
         "hidden_layers": 5,
         "Classifier_Type": "Classifier",
         "input_size": 1280,
-        "n_epoch": 100,
+        "n_epoch": 2,
         "lr": 0.001,
         "momentum": 0.9,
         "weight_decay": 0.0001,

@@ -11,6 +11,8 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Setup logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+wandb.tensorboard.patch(pytorch=True)
+
 
 class FDSweep(DomainTrainer):
     def __init__(self, args):
@@ -35,7 +37,7 @@ class FDSweep(DomainTrainer):
         wandb.agent(sweep_id, self.train, count=self.num_sweeps)
     def train(self):
         """Handle all scenarios for training and adaptation."""
-        run = wandb.init(config=self.configs.__dict__['_fields'], sync_tensorboard=True)
+        run = wandb.init(config=self.configs.__dict__['_fields'])
         self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
@@ -52,10 +54,10 @@ class FDSweep(DomainTrainer):
             # Calculate metrics and save results
             self.save_results(scenario)
 
-        overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
-                          self.loss_avg_meters.keys()}
+            overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
+                              self.loss_avg_meters.keys()}
 
-        wandb.log(overall_report)
+            wandb.log(overall_report)
         run.finish()
 
 

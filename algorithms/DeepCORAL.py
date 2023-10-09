@@ -5,7 +5,7 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
-from utils.model_testing import test_domain
+# from utils.model_testing import test_domain
 
 #? https://arxiv.org/abs/1607.01719
 
@@ -76,7 +76,7 @@ class DeepCORAL(BaseAlgo):
 
         return loss_dict
 
-    def pretrain(self, train_loader, test_loader, source_name, save_path, device):
+    def pretrain(self, train_loader, test_loader, source_name, save_path, device, evaluator):
         best_acc = -1.0
         print(f"Training source model")
         for epoch in range(self.n_epoch):
@@ -119,7 +119,7 @@ class DeepCORAL(BaseAlgo):
             print("-" * 30)  # Print a separator for clarity
 
             #* Save best model
-            epoch_acc = test_domain(test_loader, self.feature_extractor, self.classifier, device)
+            epoch_acc = evaluator.test_domain(test_loader)
             if epoch_acc > best_acc:
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
