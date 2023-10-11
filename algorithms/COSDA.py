@@ -131,7 +131,7 @@ class COSDA(BaseAlgo):
 
         return loss_dict
 
-    def pretrain(self, train_loader, test_loader, source_name, save_path, device):
+    def pretrain(self, train_loader, test_loader, source_name, save_path, device, evaluator):
         best_acc = -1.0
         print(f"Training source model")
         for epoch in range(self.n_epoch):
@@ -166,7 +166,7 @@ class COSDA(BaseAlgo):
             self.classifier_lr_scheduler.step()
 
             #* Save best model
-            epoch_acc = test_domain(test_loader, self.feature_extractor, self.classifier, device)
+            epoch_acc = evaluator.test_domain(test_loader, self.feature_extractor, self.classifier, device)
             if epoch_acc > best_acc:
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
