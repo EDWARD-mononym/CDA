@@ -25,7 +25,7 @@ class Abstract_train:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.args = args
         self.setup_seed(SEED)
-        # self.loss_avg_meters = defaultdict(lambda: AverageMeter())
+        self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
     @staticmethod
     def setup_seed(seed):
@@ -91,7 +91,7 @@ class Abstract_train:
             os.makedirs(save_path)
         self.algo.update(src_loader, trg_loader,
                           scenario, target_name, self.configs.Dataset_Name,
-                          save_path, writer, self.device, self.evaluator)
+                          save_path, writer, self.device, self.evaluator, self.loss_avg_meters)
 
 
     def test_domain(self, test_loader):

@@ -3,7 +3,8 @@ import os
 import logging
 from utils.create_logger import create_writer
 from utils.load_models import load_source_model, load_target_model
-
+from utils.avg_meter import AverageMeter
+from collections import defaultdict
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -18,6 +19,7 @@ class DomainTrainer(Abstract_train):
         # Initialize the chosen algorithm with the loaded configurations.
         self.algo = self.load_algorithm(self.configs)
         # self.loss_avg_meters = defaultdict(lambda: AverageMeter())
+
 
     def train_and_log_source_model(self, source_name, scenario):
         """
@@ -57,11 +59,11 @@ class DomainTrainer(Abstract_train):
             # Update the results matrix with the target domain's performance metrics.
             self.evaluator.update(target_name, target_accs)
             # Estimating the Source Risk
-            self.evaluator.get_src_risk(scenario[0])
+            self.evaluator.get_src_risk(scenario[0], self.loss_avg_meters)
 
         # Calculate overall metrics for the entire scenario.
         self.evaluator.calc_metric()
         # Calculates and logs overall metrics for the scenario
-        self.evaluator.calc_overall_metrics()
+        self.evaluator.calc_overall_metrics(self.loss_avg_meters)
 
 

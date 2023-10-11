@@ -30,7 +30,7 @@ class BaseAlgo(torch.nn.Module):
 
     def update(self, src_loader, trg_loader,
                scenario, target_name, datasetname,
-               save_path, writer, device, evaluator):
+               save_path, writer, device, evaluator, loss_avg_meters):
         best_acc = -1.0
         print(f"Adapting to {target_name}")
         for epoch in range(self.n_epoch):
@@ -54,13 +54,13 @@ class BaseAlgo(torch.nn.Module):
 
             # Log the losses
             for loss_name in loss_dict:
-                evaluator.loss_avg_meters[loss_name].update(loss_dict[loss_name])
+                loss_avg_meters[loss_name].update(loss_dict[loss_name])
 
 
             # Print average loss every 'print_every' steps
             if (epoch + 1) % self.configs.print_every == 0:
                 for loss_name, loss_value in loss_dict.items():
-                    evaluator.loss_avg_meters[loss_name].update(loss_value)
+                    loss_avg_meters[loss_name].update(loss_value)
                     print(f"{loss_name}: {loss_value:.4f}")
             print("-" * 30)  # Print a separator for clarity
 

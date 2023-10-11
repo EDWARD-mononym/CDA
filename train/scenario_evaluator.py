@@ -14,7 +14,6 @@ class DomainEvaluator:
         self.scenario = scenario
         self.configs = configs
         self.acc_matrix = pd.DataFrame(index=scenario, columns=scenario)
-        self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
     def test_domain(self, test_loader):
         self.algo.feature_extractor.eval()
@@ -93,13 +92,13 @@ class DomainEvaluator:
         generalise_column = pd.DataFrame(generalise_values, index=self.scenario, columns=['Generalise'])
         return generalise_column
 
-    def calc_overall_metrics(self):
-        self.loss_avg_meters["avg_acc"].update(self.acc.iloc[1:]['ACC'].mean())
-        self.loss_avg_meters["avg_bwt"].update(self.bwt.iloc[2:]['BWT'].mean())
-        self.loss_avg_meters["avg_adapt"].update(self.adapt.iloc[1:]["Adapt"].mean())
-        self.loss_avg_meters["avg_generalise"].update(self.generalise.iloc[1:-1]["Generalise"].mean())
+    def calc_overall_metrics(self, loss_avg_meters):
+        loss_avg_meters["avg_acc"].update(self.acc.iloc[1:]['ACC'].mean())
+        loss_avg_meters["avg_bwt"].update(self.bwt.iloc[2:]['BWT'].mean())
+        loss_avg_meters["avg_adapt"].update(self.adapt.iloc[1:]["Adapt"].mean())
+        loss_avg_meters["avg_generalise"].update(self.generalise.iloc[1:-1]["Generalise"].mean())
 
-    def get_src_risk(self, domain):
+    def get_src_risk(self, domain, loss_avg_meters):
         src_loader = get_loader(self.configs.Dataset_Name, domain, "test")
 
         self.algo.feature_extractor.eval()
@@ -119,7 +118,7 @@ class DomainEvaluator:
                 total_loss += batch_loss.item() * labels.size(0)
                 total_samples += labels.size(0)
 
-        self.loss_avg_meters["src_risk"].update(total_loss / total_samples)
+        loss_avg_meters["src_risk"].update(total_loss / total_samples)
         # return total_loss / total_samples
 
     def save(self, folder_name):

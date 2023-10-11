@@ -6,12 +6,14 @@ from ml_collections import config_dict
 from utils.model_testing import  Acc_matrix
 import wandb
 from train.scenario_trainer import DomainTrainer
+from train.scenario_evaluator import DomainEvaluator
+
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Setup logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-wandb.tensorboard.patch(pytorch=True)
+wandb.tensorboard.patch(root_logdir=os.path.join(os.getcwd(), "logs"))
 
 
 class FDSweep(DomainTrainer):
@@ -37,13 +39,14 @@ class FDSweep(DomainTrainer):
         wandb.agent(sweep_id, self.train, count=self.num_sweeps)
     def train(self):
         """Handle all scenarios for training and adaptation."""
+        # writer_path = os.path.join(os.getcwd(), f"logs/{dataset}/{method}/{scenario}/{target_id}")
         run = wandb.init(config=self.configs.__dict__['_fields'])
         self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
 
-            # Initialize accuracy matrix
-            self.result_matrix = Acc_matrix(scenario)
+            # Initialize evaluator matrix
+            self.evaluator = DomainEvaluator(self.algo, self.device, scenario, self.configs)
 
             # Train source model and log performance
             self.train_and_log_source_model(source_name, scenario)
