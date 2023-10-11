@@ -1,10 +1,7 @@
 import argparse
 import os
-
 import logging
-from ml_collections import config_dict
-from utils.model_testing import Acc_matrix
-import wandb
+
 from train.scenario_trainer import DomainTrainer
 from train.scenario_evaluator import DomainEvaluator
 SEED = 42

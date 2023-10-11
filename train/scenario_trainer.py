@@ -3,8 +3,7 @@ import os
 import logging
 from utils.create_logger import create_writer
 from utils.load_models import load_source_model, load_target_model
-from utils.avg_meter import AverageMeter
-from collections import defaultdict
+
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -18,7 +17,6 @@ class DomainTrainer(Abstract_train):
         self.configs, self.sweep_parameters = self.load_configs()
         # Initialize the chosen algorithm with the loaded configurations.
         self.algo = self.load_algorithm(self.configs)
-        # self.loss_avg_meters = defaultdict(lambda: AverageMeter())
 
 
     def train_and_log_source_model(self, source_name, scenario):

@@ -1,10 +1,8 @@
 import torch
 import torch.nn as nn
 import pandas as pd
-from collections import defaultdict
 from utils.plot import save_plot
 from utils.get_loaders import get_loader
-from utils.avg_meter import AverageMeter
 from collections import defaultdict
 
 class DomainEvaluator:
