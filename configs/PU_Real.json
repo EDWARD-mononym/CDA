@@ -16,7 +16,7 @@
         "hidden_layers": 5,
         "Classifier_Type": "Classifier",
         "input_size": 1280,
-        "n_epoch": 2,
+        "n_epoch": 40,
         "lr": 0.001,
         "momentum": 0.9,
         "weight_decay": 0.0001,
@@ -24,20 +24,24 @@
         "gamma": 0.5
     },
     "algo_params": {
-        "SHOT": {
-            "Method": "SHOT",
-            "ent_loss_wt": 0.8467,
-            "im": 0.2983,
-            "target_cls_wt": 1
-        },
-        "DeepCORAL": {
-            "Method": "DeepCORAL",
-            "coral_wt": 10
-        },
-        "NRC": {
-            "Method": "NRC",
-            "epsilon": 1e-5
-        },
+    "SHOT": {
+        "Method": "SHOT",
+        "ent_loss_wt": 0.8467,
+        "im": 0.2983,
+        "target_cls_wt": 1
+    },
+    "DeepCORAL": {
+        "Method": "DeepCORAL",
+        "coral_wt": 10
+    },
+      "DANN": {
+    "Method": "DANN",
+    "da_wt": 0.1
+},
+    "NRC": {
+        "Method": "NRC",
+        "epsilon": 1e-5
+    },
    "COSDA": {
             "Method": "COSDA",
             "beta": 2,

@@ -13,7 +13,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Setup logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-wandb.tensorboard.patch(root_logdir=os.path.join(os.getcwd(), "logs"))
+# wandb.tensorboard.patch(root_logdir=os.path.join(os.getcwd(), "logs"))
 
 
 class FDSweep(DomainTrainer):
@@ -40,7 +40,7 @@ class FDSweep(DomainTrainer):
     def train(self):
         """Handle all scenarios for training and adaptation."""
         # writer_path = os.path.join(os.getcwd(), f"logs/{dataset}/{method}/{scenario}/{target_id}")
-        run = wandb.init(config=self.configs.__dict__['_fields'])
+        run = wandb.init(config=self.configs.__dict__['_fields'], sync_tensorboard=True)
         self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
@@ -57,7 +57,7 @@ class FDSweep(DomainTrainer):
             # Calculate metrics and save results
             self.save_results(scenario)
 
-            overall_report = {metric: round(self.loss_avg_meters[metric].avg, 2) for metric in
+            overall_report = {metric: round(self.loss_avg_meters[metric].avg, 4) for metric in
                               self.loss_avg_meters.keys()}
 
             wandb.log(overall_report)
@@ -83,8 +83,8 @@ def parse_arguments():
     parser.add_argument('--save', action='store_true', help="Flag to enable saving.")
     # ======== sweep settings =====================
     parser.add_argument("--sweep", action='store_true', help="Flag to enable sweep.")
-    parser.add_argument('--num_sweeps', default=100, type=str, help='Number of sweep runs')
-    parser.add_argument('--sweep_project_wandb', default='Pilot_Test', type=str, help='Project name in Wandb')
+    parser.add_argument('--num_sweeps', default=50, type=str, help='Number of sweep runs')
+    parser.add_argument('--sweep_project_wandb', default='CDA_FD', type=str, help='Project name in Wandb')
     parser.add_argument('--wandb_entity', default='timeseries-cda', type=str, help='Entity name in Wandb (can be left blank if there is a default entity)')
     parser.add_argument('--hp_search_strategy', default="random", type=str,
                         help='The way of selecting hyper-parameters (random-grid-bayes). in wandb see:https://docs.wandb.ai/guides/sweeps/configuration')

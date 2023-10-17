@@ -5,7 +5,6 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
-# from utils.model_testing import test_domain
 
 #? https://arxiv.org/abs/1607.01719
 

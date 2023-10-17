@@ -8,7 +8,6 @@ import logging
 from ml_collections import config_dict
 from utils.avg_meter import AverageMeter
 import json
-import torch.nn as nn
 SEED = 42
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import os
@@ -117,24 +116,3 @@ class Abstract_train:
             acc = self.test_domain(test_loader)
             acc_dict[domain] = acc
         return acc_dict
-
-    # def get_src_risk(self, domain):
-    #     src_loader = get_loader(self.configs.Dataset_Name, domain, "test")
-    #
-    #     self.algo.feature_extractor.eval()
-    #     self.algo.classifier.eval()
-    #
-    #     self.loss_fn = nn.CrossEntropyLoss()
-    #     total_loss = 0.0
-    #     total_samples = 0
-    #
-    #     with torch.no_grad():
-    #         for inputs, labels, _ in src_loader:
-    #             inputs, labels = inputs.to(self.device), labels.to(self.device)
-    #
-    #             logits = self.algo.classifier(self.algo.feature_extractor(inputs))
-    #             batch_loss = self.loss_fn(logits, labels)
-    #
-    #             total_loss += batch_loss.item() * labels.size(0)
-    #             total_samples += labels.size(0)
-    #     self.loss_avg_meters["src_risk"].update(total_loss / total_samples)
