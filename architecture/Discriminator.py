@@ -10,7 +10,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
 
         self.layer = nn.Sequential(
-            nn.Linear(configs.input_size, 100),
+            nn.Linear(configs.output_channels * configs.feature_length, 100),
             nn.BatchNorm1d(100),
             nn.ReLU(True),
             nn.Linear(100, 2),
