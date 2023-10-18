@@ -17,7 +17,7 @@
         "Classifier_Type": "Classifier",
         "input_size": 1280,
         "n_epoch": 40,
-        "lr": 0.001,
+        "lr": 0.005,
         "momentum": 0.9,
         "weight_decay": 0.0001,
         "step_size": 50,
@@ -32,7 +32,7 @@
     },
     "DeepCORAL": {
         "Method": "DeepCORAL",
-        "coral_wt": 10
+        "coral_wt": 5.061
     },
       "DANN": {
     "Method": "DANN",
