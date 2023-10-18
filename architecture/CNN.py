@@ -14,15 +14,15 @@ class CNN(nn.Module):
         )
 
         self.conv_block2 = nn.Sequential(
-            nn.Conv1d(configs.hidden_channels, configs.hidden_channels * 1, kernel_size=8, stride=1, bias=False,
+            nn.Conv1d(configs.hidden_channels, configs.hidden_channels * 2, kernel_size=8, stride=1, bias=False,
                       padding=4),
-            nn.BatchNorm1d(configs.hidden_channels * 1),
+            nn.BatchNorm1d(configs.hidden_channels * 2),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2, padding=1)
         )
 
         self.conv_block3 = nn.Sequential(
-            nn.Conv1d(configs.hidden_channels * 1, configs.output_channels, kernel_size=8, stride=1, bias=False,
+            nn.Conv1d(configs.hidden_channels * 2, configs.output_channels, kernel_size=8, stride=1, bias=False,
                       padding=4),
             nn.BatchNorm1d(configs.output_channels),
             nn.ReLU(),
