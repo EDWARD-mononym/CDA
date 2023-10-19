@@ -49,8 +49,10 @@ class MCD(BaseAlgo):
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         self.feature_extractor.to(device)
         self.classifier.to(device)
+        self.classifier2.to(device)
         self.feature_extractor.train()
         self.classifier.train()
+        self.classifier2.train()
 
         combined_loader = zip(cycle(src_loader), trg_loader)
 
@@ -131,8 +133,10 @@ class MCD(BaseAlgo):
 
             self.feature_extractor.to(device)
             self.classifier.to(device)
+            self.classifier2.to(device)
             self.feature_extractor.train()
             self.classifier.train()
+            self.classifier2.train()
             running_loss = 0
             for step, data in enumerate(train_loader):
                 x, y = data[0], data[1]
