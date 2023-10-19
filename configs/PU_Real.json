@@ -51,6 +51,10 @@
             "conf_gate": 0.4,
             "confidence_gate_end": 0.7,
             "only_mi": false
-        }
+        }, 
+    "MCD": {
+        "Method": "MCD",
+        "domain_loss_wt": 1
+    }
     }
 }
