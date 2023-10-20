@@ -69,7 +69,37 @@
           "conf_gate": 0.4,
           "confidence_gate_end": 0.7,
           "only_mi": false
-      }
+      },
+      "MCD": {
+        "lr": {
+            "values": [0.01, 0.005, 0.001, 0.0005]
+        },
+        "domain_loss_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        }
+        },
+        "CDAN": {
+        "lr": {
+            "values": [0.01, 0.005, 0.001, 0.0005]
+        },
+        "src_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        },
+        "domain_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        },
+        "cond_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        }
+        }
   }
 
 }
