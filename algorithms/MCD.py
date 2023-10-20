@@ -161,6 +161,8 @@ class MCD(BaseAlgo):
                 self.optimizer_c2.step()
                 self.optimizer_fe.step()
 
+                running_loss += loss.item()
+
             # Print average loss every 'print_every' steps
             if (epoch + 1) % self.configs.print_every == 0:
                 avg_loss = running_loss / len(train_loader)
