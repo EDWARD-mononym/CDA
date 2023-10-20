@@ -144,11 +144,11 @@ class DANN(BaseAlgo):
             self.fe_lr_scheduler.step()
             self.classifier_lr_scheduler.step()
 
-        # Print average loss every 'print_every' steps
-        if (epoch + 1) % self.configs.print_every == 0:
-            avg_loss = running_loss / len(train_loader)
-            print(f"Average Loss: {avg_loss:.4f}")
-        print("-" * 30)  # Print a separator for clarity
+            # Print average loss every 'print_every' steps
+            if (epoch + 1) % self.configs.print_every == 0:
+                avg_loss = running_loss / len(train_loader)
+                print(f"Average Loss: {avg_loss:.4f}")
+            print("-" * 30)  # Print a separator for clarity
 
         # * Save best model
         epoch_acc = evaluator.test_domain(test_loader)

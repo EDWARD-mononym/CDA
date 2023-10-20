@@ -55,6 +55,12 @@
     "MCD": {
         "Method": "MCD",
         "domain_loss_wt": 1
+    },
+    "CDAN": {
+        "Method": "CDAN",
+        "src_wt": 1,
+        "domain_wt": 1,
+        "cond_wt": 1
     }
     }
 }
