@@ -15,7 +15,7 @@ class CDAN(BaseAlgo):
         super().__init__(configs)
 
         self.domain_classifier = Discriminator_CDAN(configs)
-        self.random_layer = RandomLayer([configs.feature_length * configs.output_channels, configs.num_classes],
+        self.random_layer = RandomLayer([configs.feature_length * configs.output_channels, configs.num_class],
                                         configs.feature_length * configs.output_channels)
 
         # optimizer and scheduler
@@ -173,7 +173,7 @@ class Discriminator_CDAN(torch.nn.Module):
         self.restored = False
 
         self.layer = torch.nn.Sequential(
-            torch.nn.Linear(configs.feature_length * configs.output_channels * configs.num_classes, 64),
+            torch.nn.Linear(configs.feature_length * configs.output_channels * configs.num_class, 64),
             torch.nn.ReLU(),
             torch.nn.Linear(64, 64),
             torch.nn.ReLU(),
