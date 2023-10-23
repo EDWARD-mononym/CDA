@@ -57,11 +57,14 @@
           }
       },
       "NRC": {
-          "Method": "NRC",
-          "epsilon": 0.00001
+          "lr": {
+              "values": [0.01, 0.005, 0.001, 0.0005]
+          },
+          "epsilon": {
+              "values": [0.01, 0.001, 0.0001, 0.00001]
+          }
       },
       "COSDA": {
-          "Method": "COSDA",
           "beta": 2,
           "reg_alpha": 0.1,
           "temp": 0.07,

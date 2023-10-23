@@ -4,7 +4,6 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 from algorithms.BaseAlgo import BaseAlgo
-from utils.model_testing import test_domain
 from scipy.spatial.distance import cdist
 import torch.nn.functional as F
 import numpy as np
@@ -46,9 +45,8 @@ class NRC(BaseAlgo):
 
         loss_dict = defaultdict(float)
 
-        for step, (source, target) in enumerate(combined_loader):
-            src_x, src_y, trg_x, trg_idx = source[0], source[1], target[0], target[2]
-            src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
+        for step, (trg_x, _, trg_idx) in enumerate(trg_loader):
+            trg_x, trg_idx = trg_x.to(device), trg_idx.to(device)
 
             #* Zero grads
             self.feature_extractor_optimiser.zero_grad()
@@ -83,13 +81,10 @@ class NRC(BaseAlgo):
                 distance_ = torch.bmm(fea_near, fea_bank_re.permute(0, 2, 1))  # batch x K x n
                 _, idx_near_near = torch.topk(distance_, dim=-1, largest=True,
                                               k=5 + 1)  # M near neighbors for each of above K ones
-                idx_near_near = idx_near_near[:, :, 1:]  # batch x K x M
+                idx_near_near = idx_near_near[:, :, 1:].to(device)  # batch x K x M
                 trg_idx_ = trg_idx.unsqueeze(-1).unsqueeze(-1)
-                match = (
-                        idx_near_near == trg_idx_).sum(-1).float()  # batch x K
-                weight = torch.where(
-                    match > 0., match,
-                    torch.ones_like(match).fill_(0.1))  # batch x K
+                match = (idx_near_near == trg_idx_).sum(-1).float()  # batch x K
+                weight = torch.where(   match > 0., match,   torch.ones_like(match).fill_(0.1))  # batch x K
 
                 weight_kk = weight.unsqueeze(-1).expand(-1, -1,
                                                         5)  # batch x K x M
@@ -137,12 +132,15 @@ class NRC(BaseAlgo):
             self.classifier_optimiser.step()
 
             # save average losses
-            loss_dict["avg_loss"] += loss.item() / len(src_x)
-            loss_dict["avg_ent_loss"] += gentropy_loss.item() / len(src_x)
+            loss_dict["avg_loss"] += loss.item() / len(trg_x)
+            loss_dict["avg_ent_loss"] += gentropy_loss.item() / len(trg_x)
+
 
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
+
+        return loss_dict
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device, evaluator):
         best_acc = -1.0
@@ -181,16 +179,17 @@ class NRC(BaseAlgo):
             self.classifier_lr_scheduler.step()
 
             #* Save best model
-            epoch_acc = evaluator.test_domain(test_loader, self.feature_extractor, self.classifier, device)
-            if epoch_acc > best_acc:
-                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
-                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
-
             # Print average loss every 'print_every' steps
             if (epoch + 1) % self.configs.print_every == 0:
                 avg_loss = running_loss / len(train_loader)
                 print(f"Average Loss: {avg_loss:.4f}")
             print("-" * 30)  # Print a separator for clarity
+
+            # * Save best model
+            epoch_acc = evaluator.test_domain(test_loader)
+            if epoch_acc > best_acc:
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
     def obtain_pseudo_labels(self, trg_loader):
         self.feature_extractor.eval()
         self.classifier.eval()

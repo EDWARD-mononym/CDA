@@ -4,7 +4,6 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 from algorithms.BaseAlgo import BaseAlgo
-from utils.model_testing import test_domain
 from scipy.spatial.distance import cdist
 import torch.nn.functional as F
 import numpy as np
@@ -83,9 +82,9 @@ class SHOT(BaseAlgo):
             self.feature_extractor_optimiser.step()
 
             # save average losses
-            loss_dict["avg_loss"] += loss.item() / len(src_x)
-            loss_dict["avg_ent_loss"] += entropy_loss.item() / len(src_x)
-            loss_dict["avg_pseud_target_loss"] += target_loss.item() / len(src_x)
+            loss_dict["avg_loss"] += loss.item() / len(trg_x)
+            loss_dict["avg_ent_loss"] += entropy_loss.item() / len(trg_x)
+            loss_dict["avg_pseud_target_loss"] += target_loss.item() / len(trg_x)
 
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
@@ -132,54 +131,58 @@ class SHOT(BaseAlgo):
             self.classifier_lr_scheduler.step()
 
             #* Save best model
-            epoch_acc = evaluator.test_domain(test_loader, self.feature_extractor, self.classifier, device)
-            if epoch_acc > best_acc:
-                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
-                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
             # Print average loss every 'print_every' steps
             if (epoch + 1) % self.configs.print_every == 0:
                 avg_loss = running_loss / len(train_loader)
                 print(f"Average Loss: {avg_loss:.4f}")
             print("-" * 30)  # Print a separator for clarity
+
+            # * Save best model
+            epoch_acc = evaluator.test_domain(test_loader)
+            if epoch_acc > best_acc:
+                torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
+                torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
+
+
     def obtain_pseudo_labels(self, trg_loader):
-        self.feature_extractor.eval()
-        self.classifier.eval()
-        preds, feas = [], []
-        with torch.no_grad():
-            for inputs, labels, _ in trg_loader:
-                inputs = inputs.float().to(self.device)
+            self.feature_extractor.eval()
+            self.classifier.eval()
+            preds, feas = [], []
+            with torch.no_grad():
+                for inputs, labels, _ in trg_loader:
+                    inputs = inputs.float().to(self.device)
 
-                features = self.feature_extractor(inputs)
-                predictions = self.classifier(features)
-                preds.append(predictions)
-                feas.append(features)
+                    features = self.feature_extractor(inputs)
+                    predictions = self.classifier(features)
+                    preds.append(predictions)
+                    feas.append(features)
 
-        preds = torch.cat((preds))
-        feas = torch.cat((feas))
+            preds = torch.cat((preds))
+            feas = torch.cat((feas))
 
-        preds = nn.Softmax(dim=1)(preds)
-        _, predict = torch.max(preds, 1)
+            preds = nn.Softmax(dim=1)(preds)
+            _, predict = torch.max(preds, 1)
 
-        all_features = torch.cat((feas, torch.ones(feas.size(0), 1).to(self.device)), 1)
-        all_features = (all_features.t() / torch.norm(all_features, p=2, dim=1)).t()
-        all_features = all_features.float().cpu().numpy()
+            all_features = torch.cat((feas, torch.ones(feas.size(0), 1).to(self.device)), 1)
+            all_features = (all_features.t() / torch.norm(all_features, p=2, dim=1)).t()
+            all_features = all_features.float().cpu().numpy()
 
-        K = preds.size(1)
-        aff = preds.float().cpu().numpy()
-        initc = aff.transpose().dot(all_features)
-        initc = initc / (1e-8 + aff.sum(axis=0)[:, None])
-        dd = cdist(all_features, initc, 'cosine')
-        pred_label = dd.argmin(axis=1)
-        pred_label = torch.from_numpy(pred_label)
-
-        for round in range(1):
-            aff = np.eye(K)[pred_label]
+            K = preds.size(1)
+            aff = preds.float().cpu().numpy()
             initc = aff.transpose().dot(all_features)
             initc = initc / (1e-8 + aff.sum(axis=0)[:, None])
             dd = cdist(all_features, initc, 'cosine')
             pred_label = dd.argmin(axis=1)
             pred_label = torch.from_numpy(pred_label)
-        return pred_label
+
+            for round in range(1):
+                aff = np.eye(K)[pred_label]
+                initc = aff.transpose().dot(all_features)
+                initc = initc / (1e-8 + aff.sum(axis=0)[:, None])
+                dd = cdist(all_features, initc, 'cosine')
+                pred_label = dd.argmin(axis=1)
+                pred_label = torch.from_numpy(pred_label)
+            return pred_label
 
     def cross_entropy_label_smooth(self, inputs, targets, num_classes, device, epsilon=0.1):
         logsoftmax = nn.LogSoftmax(dim=1)

@@ -98,9 +98,9 @@ class DANN(BaseAlgo):
             self.discriminator_optimiser.step()
 
             # * Log the losses
-            loss_dict["avg_loss"] += loss.item() / len(src_x)
+            loss_dict["avg_loss"] += loss.item() / len(trg_x)
             loss_dict["avg_classification_loss"] += src_cls_loss.item() / len(src_x)
-            loss_dict["avg_domain_loss"] += domain_loss.item() / len(src_x)
+            loss_dict["avg_domain_loss"] += domain_loss.item() / len(trg_x)
 
             # * Adjust learning rate
         self.fe_lr_scheduler.step()
@@ -155,89 +155,4 @@ class DANN(BaseAlgo):
         if epoch_acc > best_acc:
             torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
             torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
-
-
-
-# def DANN(src_loader, trg_loader, feature_extractor, classifier, discriminator,
-#          feature_extractor_optimiser,  classifier_optimiser, discriminator_optimiser, fe_lr_scheduler, classifier_lr_scheduler,
-#          n_epoch, save_path, target_name, device, datasetname, scenario, writer):
-#     best_acc = -1.0
-#
-#     print(f"Adapting to {target_name}")
-#     for epoch in range(n_epoch):
-#         print(f"Epoch: {epoch}/{n_epoch}")
-#
-#         epoch_train(src_loader, trg_loader, feature_extractor, classifier, discriminator,
-#                     feature_extractor_optimiser, classifier_optimiser, discriminator_optimiser,
-#                     epoch, n_epoch, device)
-#
-#         # Test & Save best model
-#         acc_dict = test_all_domain(datasetname, scenario, feature_extractor, classifier, device)
-#
-#         if acc_dict[target_name] > best_acc:
-#             torch.save(feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature.pt"))
-#             torch.save(classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier.pt"))
-#
-#         # Log the accuracy of each epoch
-#         for domain in acc_dict:
-#             writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
-#
-#         # Adjust Learning Rate
-#         fe_lr_scheduler.step()
-#         classifier_lr_scheduler.step()
-#
-# def epoch_train(src_loader, trg_loader, feature_extractor, classifier, discriminator,
-#                 feature_extractor_optimiser,  classifier_optimiser, discriminator_optimiser,
-#                 epoch, n_epoch, device):
-#     feature_extractor.train()
-#     classifier.train()
-#     discriminator.train()
-#     combined_loader = zip(cycle(src_loader), trg_loader)
-#
-#     for step, (source, target) in enumerate(combined_loader):
-#         src_x, src_y, trg_x = source[0], source[1], target[0]
-#         src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
-#
-#         p = float(step + epoch * len(trg_loader)) / n_epoch / len(trg_loader)
-#         alpha = 2. / (1. + np.exp(-10 * p)) - 1
-#
-#         src_domain_label = torch.zeros(len(src_x)).long().cuda()
-#         trg_domain_labels = torch.ones(len(trg_x)).long().cuda()
-#
-#         #* Zero grads
-#         feature_extractor_optimiser.zero_grad()
-#         classifier_optimiser.zero_grad()
-#         discriminator_optimiser.zero_grad()
-#
-#         #* Forward pass
-#         src_feature = feature_extractor(src_x)
-#         src_output = classifier(src_feature)
-#         trg_feat = feature_extractor(trg_x)
-#
-#         #* Task classification
-#         src_cls_loss = loss_class(src_output.squeeze(), src_y)
-#
-#         #* Domain classification
-#         # Source
-#         src_feat_reversed = ReverseLayerF.apply(src_feature, alpha)
-#         src_domain_pred = discriminator(src_feat_reversed)
-#         src_domain_loss = loss_domain(src_domain_pred, src_domain_label)
-#
-#         # Target
-#         trg_feat_reversed = ReverseLayerF.apply(trg_feat, alpha)
-#         trg_domain_pred = discriminator(trg_feat_reversed)
-#         trg_domain_loss = loss_domain(trg_domain_pred, trg_domain_labels)
-#
-#         domain_loss = src_domain_loss + trg_domain_loss
-#         loss = src_cls_loss + domain_loss
-#         loss.backward()
-#
-#         feature_extractor_optimiser.step()
-#         classifier_optimiser.step()
-#         discriminator_optimiser.step()
-#
-# loss_class = torch.nn.NLLLoss().cuda()
-# loss_domain = torch.nn.NLLLoss().cuda()
-
-
 

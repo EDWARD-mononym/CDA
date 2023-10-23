@@ -15,7 +15,7 @@
         "output_channels": 128,
         "hidden_layers": 5,
         "Classifier_Type": "Classifier",
-        "input_size": 1280,
+        "input_size": 640,
         "n_epoch": 40,
         "lr": 0.001,
         "momentum": 0.9,
