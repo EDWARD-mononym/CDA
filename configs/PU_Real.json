@@ -17,7 +17,7 @@
         "Classifier_Type": "Classifier",
         "input_size": 640,
         "n_epoch": 40,
-        "lr": 0.001,
+        "lr": 0.005,
         "momentum": 0.9,
         "weight_decay": 0.0001,
         "step_size": 50,
@@ -32,7 +32,7 @@
     },
     "DeepCORAL": {
         "Method": "DeepCORAL",
-        "coral_wt": 10
+        "coral_wt": 5.061
     },
       "DANN": {
     "Method": "DANN",
@@ -51,6 +51,16 @@
             "conf_gate": 0.4,
             "confidence_gate_end": 0.7,
             "only_mi": false
-        }
+        }, 
+    "MCD": {
+        "Method": "MCD",
+        "domain_loss_wt": 1
+    },
+    "CDAN": {
+        "Method": "CDAN",
+        "src_wt": 1,
+        "domain_wt": 1,
+        "cond_wt": 1
+    }
     }
 }
