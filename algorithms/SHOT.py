@@ -88,7 +88,6 @@ class SHOT(BaseAlgo):
 
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
-        self.classifier_lr_scheduler.step()
 
         return loss_dict
 

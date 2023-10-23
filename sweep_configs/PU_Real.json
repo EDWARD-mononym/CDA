@@ -17,18 +17,18 @@
           },
           "ent_loss_wt": {
               "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
+              "min": 0.01,
+              "max": 1
           },
           "im": {
               "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
+              "min": 0.01,
+              "max": 1
           },
           "target_cls_wt": {
               "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
+              "min": 0.01,
+              "max": 1
           }
       },
       "DeepCORAL": {
@@ -42,7 +42,7 @@
           },
           "coral_wt": {
               "distribution": "uniform",
-              "min": 0.1,
+              "min": 0.01,
               "max": 10
           }
       },
