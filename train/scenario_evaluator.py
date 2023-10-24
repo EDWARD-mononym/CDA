@@ -164,10 +164,10 @@ class DomainEvaluator:
             for row in self.acc_matrix.index:
                 self.avg_Rmatrix[(row, col)].update(self.acc_matrix.loc[row, col])
 
-            self.avg_ACC[col].update(self.acc[col_id])
-            self.avg_BWT[col].update(self.bwt[col_id])
-            self.avg_Adapt[col].update(self.adapt[col_id])
-            self.avg_Generalise[col].update(self.generalise[col_id])
+            self.avg_ACC[col].update(self.acc[col])
+            self.avg_BWT[col].update(self.bwt[col])
+            self.avg_Adapt[col].update(self.adapt[col])
+            self.avg_Generalise[col].update(self.generalise[col])
 
     def save_overall(self, folder_name):
         overall_df = pd.DataFrame(columns=self.acc_matrix.columns, index=self.acc_matrix.index)
