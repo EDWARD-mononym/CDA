@@ -17,7 +17,7 @@
         "Classifier_Type": "Classifier",
         "input_size": 640,
         "n_epoch": 40,
-        "lr": 0.005,
+        "lr": 0.001,
         "momentum": 0.9,
         "weight_decay": 0.0001,
         "step_size": 50,
@@ -54,13 +54,13 @@
         }, 
     "MCD": {
         "Method": "MCD",
-        "domain_loss_wt": 1
+        "domain_loss_wt": 6.752
     },
     "CDAN": {
         "Method": "CDAN",
-        "src_wt": 1,
-        "domain_wt": 1,
-        "cond_wt": 1
+        "src_wt": 2.366,
+        "domain_wt": 0.4575,
+        "cond_wt": 3.476
     }
     }
 }
