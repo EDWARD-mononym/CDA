@@ -64,19 +64,20 @@ class Abstract_train:
     def save_run_results(self, scenario, run):
         """Save the results after training and adaptation."""
         self.evaluator.calc_metric()
-        save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}')
+        save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}')
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
-        folder_name = os.path.join(save_folder, f"{scenario}/Run_{run}")
-        self.evaluator.save_singlerun(folder_name)
+        file_name = os.path.join(save_folder, f"Run_{run}")
+        self.evaluator.save_singlerun(file_name)
         if self.args.plot:
             plot_file = os.path.join(save_folder, f"{scenario}.png")
             self.evaluator.save_plot(plot_file)
 
     def save_avg_runs(self, scenario):
-        save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}')
-        folder_name = os.path.join(save_folder, f"{scenario}")
-        self.evaluator.save_overall(folder_name)
+        save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}')
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+        self.evaluator.save_overall(save_folder)
 
     def pretrain(self, source_name):
         train_loader = get_loader(self.configs.Dataset_Name, source_name, "train")

@@ -182,8 +182,8 @@ class DomainEvaluator:
             metrics_df[row, 'Adapt'] = f"{self.avg_Adapt[row].average()} ± {self.avg_Adapt[row].standard_deviation()}"
             metrics_df[row, 'Generalise'] = f"{self.avg_Generalise[row].average()} ± {self.avg_Generalise[row].standard_deviation()}"
 
-        overall_df.to_csv(os.path.join(folder_name, "R_matrix"))
-        metrics_df.to_csv(os.path.join(folder_name, "Metrics"))
+        overall_df.to_csv(f"{folder_name}_R_matrix.csv")
+        metrics_df.to_csv(f"{folder_name}_Metrics.csv")
 
     def save_plot(self, savefile):
         save_plot(self.acc_matrix, self.scenario, savefile)
