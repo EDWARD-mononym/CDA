@@ -2,6 +2,7 @@ import argparse
 import os
 import logging
 
+from utils.set_seed import set_seed
 from train.scenario_trainer import DomainTrainer
 from train.scenario_evaluator import DomainEvaluator
 SEED = 42
@@ -22,20 +23,26 @@ class FDTrain(DomainTrainer):
             # Initialize evaluator matrix
             self.evaluator = DomainEvaluator(self.algo, self.device, scenario, self.configs)
 
-            # Train source model and log performance
-            self.train_and_log_source_model(source_name, scenario)
+            for run in range(args.Nruns):
+                set_seed(run)
 
-            # Adapt to all target domains
-            self.adapt_to_target_domains(scenario)
+                # Train source model and log performance
+                self.train_and_log_source_model(source_name, scenario)
 
-            # Calculate metrics and save results
-            self.save_results(scenario)
+                # Adapt to all target domains
+                self.adapt_to_target_domains(scenario)
+
+                # Calculate metrics and save results
+                self.save_run_results(scenario, run)
+
+            self.save_avg_runs(scenario)
 
 
 def parse_arguments():
     """Parse command-line arguments."""
     # ========= Select the DATASET ==============
     parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
+    parser.add_argument('--Nruns', default=5, type=int, help='Number of runs')
     parser.add_argument("--dataset", default="PU_Real", help="Name of the dataset.")
     parser.add_argument('--start-domain', default=0, type=int, help='Manual domain start.')
     # ========= Select the algoritm ==============
