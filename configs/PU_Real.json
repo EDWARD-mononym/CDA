@@ -26,13 +26,13 @@
     "algo_params": {
     "SHOT": {
         "Method": "SHOT",
-        "ent_loss_wt": 0.8467,
-        "im": 0.2983,
-        "target_cls_wt": 1
+        "ent_loss_wt": 0.7229,
+        "im": 0.4677,
+        "target_cls_wt": 0.609
     },
     "DeepCORAL": {
         "Method": "DeepCORAL",
-        "coral_wt": 5.061
+        "coral_wt": 7.503
     },
       "DANN": {
     "Method": "DANN",

@@ -78,7 +78,7 @@ class DomainEvaluator:
         source = self.scenario[0]
         for T, domain in enumerate(self.scenario[1:], start=1):  # ! Keep in mind T starts from 1
             row_names = [self.scenario[i] for i in range(1, T + 1)]
-            adapt_t = sum(self.acc_matrix.loc[row, row] - self.acc_matrix.loc[row, source] for row in row_names) / T
+            adapt_t = sum(self.acc_matrix.loc[row, row] - self.acc_matrix.loc[row, row_names[i-1]] for i, row in enumerate(row_names)) / T
             adapt_values.append(adapt_t)
         adapt_column = pd.DataFrame(adapt_values, index=self.scenario, columns=['Adapt'])
         return adapt_column
