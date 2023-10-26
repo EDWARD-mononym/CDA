@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
+import os
 import pandas as pd
+from utils.avg_meter import AverageMeter
 from utils.plot import save_plot
 from utils.get_loaders import get_loader
 from collections import defaultdict
@@ -12,6 +14,11 @@ class DomainEvaluator:
         self.scenario = scenario
         self.configs = configs
         self.acc_matrix = pd.DataFrame(index=scenario, columns=scenario)
+        self.avg_Rmatrix = {(row, col): AverageMeter() for row in self.acc_matrix.index for col in self.acc_matrix.columns}
+        self.avg_ACC = {col: AverageMeter() for col in self.acc_matrix.columns}
+        self.avg_BWT = {col: AverageMeter() for col in self.acc_matrix.columns}
+        self.avg_Adapt = {col: AverageMeter() for col in self.acc_matrix.columns}
+        self.avg_Generalise = {col: AverageMeter() for col in self.acc_matrix.columns}
 
     def test_domain(self, test_loader):
         self.algo.feature_extractor.eval()
@@ -71,7 +78,7 @@ class DomainEvaluator:
         source = self.scenario[0]
         for T, domain in enumerate(self.scenario[1:], start=1):  # ! Keep in mind T starts from 1
             row_names = [self.scenario[i] for i in range(1, T + 1)]
-            adapt_t = sum(self.acc_matrix.loc[row, row] - self.acc_matrix.loc[row, source] for row in row_names) / T
+            adapt_t = sum(self.acc_matrix.loc[row, row] - self.acc_matrix.loc[row, row_names[i-1]] for i, row in enumerate(row_names)) / T
             adapt_values.append(adapt_t)
         adapt_column = pd.DataFrame(adapt_values, index=self.scenario, columns=['Adapt'])
         return adapt_column
@@ -119,7 +126,8 @@ class DomainEvaluator:
         loss_avg_meters["src_risk"].update(total_loss / total_samples)
         # return total_loss / total_samples
 
-    def save(self, folder_name):
+    def save_singlerun(self, folder_name):
+        self.update_overall()
         with open(f"{folder_name}_Overall.csv", 'w') as f:
             # Summarise the metrics
             summary = {
@@ -150,6 +158,32 @@ class DomainEvaluator:
             f.write("R matrix")
             # Save R matrix
             self.acc_matrix.to_csv(f, index=True)
+
+    def update_overall(self):
+        for col_id, col in enumerate(self.acc_matrix.columns):
+            for row in self.acc_matrix.index:
+                self.avg_Rmatrix[(row, col)].update(self.acc_matrix.loc[row, col])
+
+            self.avg_ACC[col].update(self.acc.loc[col]['ACC'])
+            self.avg_BWT[col].update(self.bwt.loc[col]['BWT'])
+            self.avg_Adapt[col].update(self.adapt.loc[col]['Adapt'])
+            self.avg_Generalise[col].update(self.generalise.loc[col]['Generalise'])
+
+    def save_overall(self, folder_name):
+        overall_df = pd.DataFrame(columns=self.acc_matrix.columns, index=self.acc_matrix.index)
+        metrics_df = pd.DataFrame(columns = ['ACC', 'BWT', 'Adapt', 'Generalise'], index=self.acc_matrix.index)
+
+        for (row, col) in self.avg_Rmatrix:
+            overall_df.at[row, col] = f"{self.avg_Rmatrix[(row, col)].average()} +/- {self.avg_Rmatrix[(row, col)].standard_deviation()}"
+
+        for row in self.acc_matrix.index:
+            metrics_df.at[row, 'ACC'] = f"{self.avg_ACC[row].average()} ± {self.avg_ACC[row].standard_deviation()}"
+            metrics_df.at[row, 'BWT'] = f"{self.avg_BWT[row].average()} ± {self.avg_BWT[row].standard_deviation()}"
+            metrics_df.at[row, 'Adapt'] = f"{self.avg_Adapt[row].average()} ± {self.avg_Adapt[row].standard_deviation()}"
+            metrics_df.at[row, 'Generalise'] = f"{self.avg_Generalise[row].average()} ± {self.avg_Generalise[row].standard_deviation()}"
+
+        overall_df.to_csv(f"{folder_name}_R_matrix.csv")
+        metrics_df.to_csv(f"{folder_name}_Metrics.csv")
 
     def save_plot(self, savefile):
         save_plot(self.acc_matrix, self.scenario, savefile)
