@@ -22,7 +22,7 @@ class FDTrain(DomainTrainer):
 
             # Initialize evaluator matrix
             self.evaluator = DomainEvaluator(self.algo, self.device, scenario, self.configs)
-            
+
             print("===============================================")
             print("                   CONFIG INFO                  ")
             print("===============================================")
