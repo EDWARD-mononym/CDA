@@ -23,6 +23,14 @@ class FDTrain(DomainTrainer):
             # Initialize evaluator matrix
             self.evaluator = DomainEvaluator(self.algo, self.device, scenario, self.configs)
 
+            print("===============================================")
+            print("                   CONFIG INFO                  ")
+            print("===============================================")
+            print(f"Method: {self.configs.Method}")
+            print(f"Dataset: {self.configs.Dataset_Name}")
+            print(f"Scenario: {' → '.join(scenario)}")
+            print("===============================================")
+
             for run in range(args.Nruns):
                 set_seed(run)
 

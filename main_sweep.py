@@ -44,6 +44,13 @@ class FDSweep(DomainTrainer):
         self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
             source_name = scenario[0]
+            print("===============================================")
+            print("                   CONFIG INFO                  ")
+            print("===============================================")
+            print(f"Method: {self.configs.Method}")
+            print(f"Dataset: {self.configs.Dataset_Name}")
+            print(f"Scenario: {' → '.join(scenario)}")
+            print("===============================================")
 
             # Initialize evaluator matrix
             self.evaluator = DomainEvaluator(self.algo, self.device, scenario, self.configs)
@@ -95,5 +102,6 @@ def parse_arguments():
 
 if __name__ == "__main__":
     args = parse_arguments()
+
     diagnostic = FDSweep(args)
     diagnostic.sweep()
