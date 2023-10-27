@@ -4,7 +4,6 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 from algorithms.BaseAlgo import BaseAlgo
-from utils.model_testing import test_domain
 from scipy.spatial.distance import cdist
 import torch.nn.functional as F
 import numpy as np
@@ -166,7 +165,7 @@ class COSDA(BaseAlgo):
             self.classifier_lr_scheduler.step()
 
             #* Save best model
-            epoch_acc = evaluator.test_domain(test_loader, self.feature_extractor, self.classifier, device)
+            epoch_acc = evaluator.test_domain(test_loader)
             if epoch_acc > best_acc:
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
