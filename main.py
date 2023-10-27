@@ -43,10 +43,10 @@ def parse_arguments():
     # ========= Select the DATASET ==============
     parser = argparse.ArgumentParser(description='DA for Fault Diagnostic')
     parser.add_argument('--Nruns', default=5, type=int, help='Number of runs')
-    parser.add_argument("--dataset", default="PU_Real", help="Name of the dataset.")
+    parser.add_argument("--dataset", default="PU_Artificial", help="Name of the dataset.")
     parser.add_argument('--start-domain', default=0, type=int, help='Manual domain start.')
     # ========= Select the algoritm ==============
-    parser.add_argument("--algo", default="NRC", help="Algorithm to use: DeepCORAL, DANN, ")
+    parser.add_argument("--algo", default="DANN", help="Algorithm to use: DeepCORAL, DANN, ")
     # ========= Experiment settings ===============
     parser.add_argument("--writer", default="tensorboard", choices=["tensorboard", "wandb"], help="Logging tool to use.")
     parser.add_argument('-lp', '--log-path', default="./logs", help="Path for logging.")
