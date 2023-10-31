@@ -91,7 +91,7 @@ class COSDA(BaseAlgo):
             mixed_log_softmax = torch.log_softmax(mixed_output, dim=1)
             consistency_loss = torch.sum(
                 knowledge_mask * torch.sum(-1 * mixed_consensus * mixed_log_softmax, dim=1)
-            ) / torch.sum(knowledge_mask)
+            ) / torch.sum(knowledge_mask) #! Potential to crash?
 
             # Compute regularization
             output = self.classifier(self.feature_extractor(trg_x))
