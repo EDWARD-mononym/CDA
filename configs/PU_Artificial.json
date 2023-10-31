@@ -26,17 +26,17 @@
     "algo_params": {
     "SHOT": {
         "Method": "SHOT",
-        "ent_loss_wt": 0.7229,
-        "im": 0.4677,
-        "target_cls_wt": 0.609
+        "ent_loss_wt": 0.9697,
+        "im": 9.04,
+        "target_cls_wt": 4.288
     },
     "DeepCORAL": {
         "Method": "DeepCORAL",
-        "coral_wt": 7.503
+        "coral_wt": 8.824
     },
       "DANN": {
     "Method": "DANN",
-    "da_wt": 0.1
+    "da_wt": 0.2207
 },
     "NRC": {
         "Method": "NRC",
@@ -51,16 +51,16 @@
             "conf_gate": 0.4,
             "confidence_gate_end": 0.7,
             "only_mi": false
-        },
+        }, 
     "MCD": {
         "Method": "MCD",
-        "domain_loss_wt": 6.752
+        "domain_loss_wt": 0.5394
     },
     "CDAN": {
         "Method": "CDAN",
-        "src_wt": 2.366,
-        "domain_wt": 0.4575,
-        "cond_wt": 3.476
+        "src_wt": 4.373,
+        "domain_wt": 6.108,
+        "cond_wt": 0.4118
     }
     }
 }
