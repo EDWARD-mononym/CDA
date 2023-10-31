@@ -1,0 +1,66 @@
+{
+    "train_params": {
+        "Dataset_Name": "PU_Artificial",
+        "Scenarios": [["7", "14", "21"]],
+        "num_class": 7,
+        "input_channel": 1,
+        "Backbone_Type": "CNN",
+        "chkpoint_type": "last",
+        "print_every": 1,
+        "feature_length": 5,
+        "hidden_channels": 64,
+        "kernel_size": 5,
+        "stride": 1,
+        "dropout": 0.5,
+        "output_channels": 128,
+        "hidden_layers": 5,
+        "Classifier_Type": "Classifier",
+        "input_size": 640,
+        "n_epoch": 40,
+        "lr": 0.001,
+        "momentum": 0.9,
+        "weight_decay": 0.0001,
+        "step_size": 50,
+        "gamma": 0.5
+    },
+    "algo_params": {
+    "SHOT": {
+        "Method": "SHOT",
+        "ent_loss_wt": 0.7229,
+        "im": 0.4677,
+        "target_cls_wt": 0.609
+    },
+    "DeepCORAL": {
+        "Method": "DeepCORAL",
+        "coral_wt": 7.503
+    },
+      "DANN": {
+    "Method": "DANN",
+    "da_wt": 0.1
+},
+    "NRC": {
+        "Method": "NRC",
+        "epsilon": 1e-5
+    },
+   "COSDA": {
+            "Method": "COSDA",
+            "beta": 2,
+            "reg_alpha": 0.1,
+            "temp": 0.07,
+            "temperature_end": 0.07,
+            "conf_gate": 0.4,
+            "confidence_gate_end": 0.7,
+            "only_mi": false
+        },
+    "MCD": {
+        "Method": "MCD",
+        "domain_loss_wt": 6.752
+    },
+    "CDAN": {
+        "Method": "CDAN",
+        "src_wt": 2.366,
+        "domain_wt": 0.4575,
+        "cond_wt": 3.476
+    }
+    }
+}
