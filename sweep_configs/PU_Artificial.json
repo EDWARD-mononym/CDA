@@ -17,18 +17,18 @@
           },
           "ent_loss_wt": {
               "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
+              "min": 0.01,
+              "max": 1
           },
           "im": {
               "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
+              "min": 0.01,
+              "max": 1
           },
           "target_cls_wt": {
               "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
+              "min": 0.01,
+              "max": 1
           }
       },
       "DeepCORAL": {
@@ -42,7 +42,7 @@
           },
           "coral_wt": {
               "distribution": "uniform",
-              "min": 0.1,
+              "min": 0.01,
               "max": 10
           }
       },
@@ -57,19 +57,61 @@
           }
       },
       "NRC": {
-          "Method": "NRC",
-          "epsilon": 0.00001
+          "lr": {
+              "values": [0.01, 0.005, 0.001, 0.0005]
+          },
+          "epsilon": {
+              "values": [0.01, 0.001, 0.0001, 0.00001]
+          }
       },
       "COSDA": {
-          "Method": "COSDA",
-          "beta": 2,
-          "reg_alpha": 0.1,
-          "temp": 0.07,
-          "temperature_end": 0.07,
-          "conf_gate": 0.4,
-          "confidence_gate_end": 0.7,
-          "only_mi": false
-      }
+          "lr": {
+            "values": [0.01, 0.005, 0.001, 0.0005]
+           },
+          "beta": {"values": [1,2,3,4]},
+          "reg_alpha": {"values": [0.1,0.2,0.3,0.4]},
+          "temp": {
+            "distribution": "uniform",
+            "min": 0.01,
+            "max": 0.2
+        },
+          "conf_gate": {
+            "distribution": "uniform",
+            "min": 0.4,
+            "max": 0.7
+        },
+          "only_mi": {"values":[false]}
+      },
+      "MCD": {
+        "lr": {
+            "values": [0.01, 0.005, 0.001, 0.0005]
+        },
+        "domain_loss_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        }
+        },
+        "CDAN": {
+        "lr": {
+            "values": [0.01, 0.005, 0.001, 0.0005]
+        },
+        "src_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        },
+        "domain_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        },
+        "cond_wt": {
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 10
+        }
+        }
   }
 
 }

@@ -201,7 +201,7 @@ class COSDA(BaseAlgo):
             selected_inputs = torch.cat(selected_inputs)
             selected_labels = torch.cat(selected_labels)
 
-            new_memory = DataLoader(TensorDataset(selected_inputs, selected_labels), batch_size=trg_loader.batch_size)
+            new_memory = DataLoader(TensorDataset(selected_inputs, selected_labels), batch_size=trg_loader.batch_size, shuffle=True)
 
             # Update memory
             if self.memory is None:
