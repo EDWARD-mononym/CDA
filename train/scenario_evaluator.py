@@ -8,8 +8,7 @@ from utils.get_loaders import get_loader
 from collections import defaultdict
 
 class DomainEvaluator:
-    def __init__(self, algorithm, device, scenario, configs):
-        self.algo = algorithm
+    def __init__(self, device, scenario, configs):
         self.device = device
         self.scenario = scenario
         self.configs = configs
@@ -20,27 +19,28 @@ class DomainEvaluator:
         self.avg_Adapt = {col: AverageMeter() for col in self.acc_matrix.columns}
         self.avg_Generalise = {col: AverageMeter() for col in self.acc_matrix.columns}
 
-    def test_domain(self, test_loader):
-        self.algo.feature_extractor.eval()
-        self.algo.classifier.eval()
+    def test_domain(self, algo, test_loader):
+        algo.to(self.device)
+        algo.feature_extractor.eval()
+        algo.classifier.eval()
 
         correct, total = 0, 0
         with torch.no_grad():
             for data in test_loader:
                 x, y = data[0], data[1]
                 x, y = x.to(self.device), y.to(self.device)
-                logits = self.algo.classifier(self.algo.feature_extractor(x))
+                logits = algo.classifier(algo.feature_extractor(x))
                 _, pred = torch.max(logits, 1)
                 total += y.size(0)
                 correct += (pred == y).sum().item()
         accuracy = correct / total
         return accuracy
 
-    def test_all_domain(self):
+    def test_all_domain(self, algo):
         acc_dict = defaultdict(float)
         for domain in self.scenario:
             test_loader = get_loader(self.configs.Dataset_Name, domain, "test")
-            acc = self.test_domain(test_loader)
+            acc = self.test_domain(algo, test_loader)
             acc_dict[domain] = acc
         return acc_dict
 
@@ -103,11 +103,11 @@ class DomainEvaluator:
         loss_avg_meters["avg_adapt"].update(self.adapt.iloc[1:]["Adapt"].mean())
         loss_avg_meters["avg_generalise"].update(self.generalise.iloc[1:-1]["Generalise"].mean())
 
-    def get_src_risk(self, domain, loss_avg_meters):
+    def get_src_risk(self, algo, domain, loss_avg_meters):
         src_loader = get_loader(self.configs.Dataset_Name, domain, "test")
 
-        self.algo.feature_extractor.eval()
-        self.algo.classifier.eval()
+        algo.feature_extractor.eval()
+        algo.classifier.eval()
 
         self.loss_fn = nn.CrossEntropyLoss()
         total_loss = 0.0
@@ -117,7 +117,7 @@ class DomainEvaluator:
             for inputs, labels, _ in src_loader:
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
 
-                logits = self.algo.classifier(self.algo.feature_extractor(inputs))
+                logits = algo.classifier(algo.feature_extractor(inputs))
                 batch_loss = self.loss_fn(logits, labels)
 
                 total_loss += batch_loss.item() * labels.size(0)

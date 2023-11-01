@@ -247,7 +247,7 @@ class COSDA(BaseAlgo):
             self.classifier_lr_scheduler.step()
 
             #* Save best model
-            epoch_acc = evaluator.test_domain(test_loader)
+            epoch_acc = evaluator.test_domain(self, test_loader)
             if epoch_acc > best_acc:
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))

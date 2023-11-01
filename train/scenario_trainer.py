@@ -15,14 +15,14 @@ class DomainTrainer(Abstract_train):
         super(DomainTrainer, self).__init__(args)
         # Load configurations and algorithm-specific parameters.
         self.configs, self.sweep_parameters = self.load_configs()
-        # Initialize the chosen algorithm with the loaded configurations.
-        self.algo = self.load_algorithm(self.configs)
 
 
     def train_and_log_source_model(self, source_name, scenario):
         """
         Train the model on the source domain and log its performance.
         """
+        # Initialize the chosen algorithm with the loaded configurations.
+        self.algo = self.load_algorithm(self.configs)
         # Pre-train the model on the source domain.
         self.pretrain(source_name)
         # Load the trained model's feature extractor and classifier.
@@ -30,7 +30,7 @@ class DomainTrainer(Abstract_train):
             self.configs, self.algo.feature_extractor, self.algo.classifier, scenario, self.device
         )
         # Test the model's performance on all domains in the scenario.
-        source_accs = self.evaluator.test_all_domain()
+        source_accs = self.evaluator.test_all_domain(self.algo)
         # Update the results matrix with the source domain's performance metrics.
         self.evaluator.update(source_name, source_accs)
 
@@ -53,11 +53,11 @@ class DomainTrainer(Abstract_train):
                 self.device
             )
             # Test the adapted model's performance on all domains in the scenario.
-            target_accs = self.evaluator.test_all_domain()
+            target_accs = self.evaluator.test_all_domain(self.algo)
             # Update the results matrix with the target domain's performance metrics.
             self.evaluator.update(target_name, target_accs)
             # Estimating the Source Risk
-            self.evaluator.get_src_risk(scenario[0], self.loss_avg_meters)
+            self.evaluator.get_src_risk(self.algo, scenario[0], self.loss_avg_meters)
 
         # Calculate overall metrics for the entire scenario.
         self.evaluator.calc_metric()

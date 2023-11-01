@@ -53,7 +53,7 @@ class FDSweep(DomainTrainer):
             print("===============================================")
 
             # Initialize evaluator matrix
-            self.evaluator = DomainEvaluator(self.algo, self.device, scenario, self.configs)
+            self.evaluator = DomainEvaluator(self.device, scenario, self.configs)
 
             # Train source model and log performance
             self.train_and_log_source_model(source_name, scenario)

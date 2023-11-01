@@ -41,7 +41,7 @@ class BaseAlgo(torch.nn.Module):
 
             # Test & Save best model
 
-            acc_dict = evaluator.test_all_domain()
+            acc_dict = evaluator.test_all_domain(self)
             if acc_dict[target_name] > best_acc:
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
