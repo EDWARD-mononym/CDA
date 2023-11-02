@@ -1,6 +1,7 @@
 from collections import defaultdict
 from itertools import cycle
 import os
+import random
 import torch
 from torch.optim.lr_scheduler import StepLR
 
@@ -99,6 +100,31 @@ class ReviewDeepCORAL(BaseAlgo):
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
+
+        if epoch == self.configs.n_epoch-1:
+            # Select a portion of the current data for the memory
+            indices = list(range(len(epoch_memory_inputs)))
+            random.shuffle(indices)
+            # n_to_store = int(self.configs.alpha * len(epoch_memory_inputs))
+            n_to_store = int(0.05 * len(epoch_memory_inputs))
+            selected_indices = indices[:n_to_store]
+
+            selected_inputs = [epoch_memory_inputs[i] for i in selected_indices]
+            selected_labels = [epoch_memory_inputs[i] for i in selected_indices]
+            
+            selected_inputs = torch.cat(selected_inputs)
+            selected_labels = torch.cat(selected_labels)
+
+            new_memory = DataLoader(TensorDataset(selected_inputs, selected_labels), batch_size=trg_loader.batch_size, shuffle=True)
+
+            # Update memory
+            if self.memory is None:
+                self.memory = new_memory
+            else:
+                concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
+                self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size)
+
+        return loss_dict
 
         return loss_dict
 
