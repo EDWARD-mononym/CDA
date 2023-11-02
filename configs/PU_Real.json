@@ -34,6 +34,10 @@
         "Method": "DeepCORAL",
         "coral_wt": 7.503
     },
+    "ReviewDeepCORAL": {
+        "Method": "DeepCORAL",
+        "coral_wt": 7.503
+    },
       "DANN": {
     "Method": "DANN",
     "da_wt": 5.843
