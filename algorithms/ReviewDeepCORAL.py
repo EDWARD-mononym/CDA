@@ -40,7 +40,7 @@ class ReviewDeepCORAL(BaseAlgo):
         self.feature_extractor.train()
         self.classifier.train()
 
-        epoch_memory_inputs, epoch_memory_labels = [], []
+        epoch_memory_inputs = []
 
         if self.memory:
             combined_loader = zip(cycle(src_loader), trg_loader, cycle(self.memory))
@@ -98,6 +98,8 @@ class ReviewDeepCORAL(BaseAlgo):
             loss_dict["avg_classification_loss"] += classification_loss.item() / len(src_x)
             loss_dict["avg_coral_loss"] += coral_loss.item() / len(src_x)
 
+            epoch_memory_inputs.append(trg_x.cpu().detach())
+
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
@@ -111,12 +113,10 @@ class ReviewDeepCORAL(BaseAlgo):
             selected_indices = indices[:n_to_store]
 
             selected_inputs = [epoch_memory_inputs[i] for i in selected_indices]
-            selected_labels = [epoch_memory_inputs[i] for i in selected_indices]
             
             selected_inputs = torch.cat(selected_inputs)
-            selected_labels = torch.cat(selected_labels)
 
-            new_memory = DataLoader(TensorDataset(selected_inputs, selected_labels), batch_size=trg_loader.batch_size, shuffle=True)
+            new_memory = DataLoader(TensorDataset(selected_inputs), batch_size=trg_loader.batch_size, shuffle=True)
 
             # Update memory
             if self.memory is None:
@@ -124,8 +124,6 @@ class ReviewDeepCORAL(BaseAlgo):
             else:
                 concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
                 self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size)
-
-        return loss_dict
 
         return loss_dict
 
