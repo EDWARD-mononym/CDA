@@ -74,7 +74,7 @@ class COSDA(BaseAlgo):
                 memory, mem_x = None, None
 
             # Extract data from source and target batches
-            src_x, src_y, trg_x, trg_y = source[0], source[1], target[0], target[1]
+            src_x, src_y, trg_x = source[0], source[1], target[0]
             src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
 
             # Reset the gradients
@@ -160,11 +160,16 @@ class COSDA(BaseAlgo):
                 mutual_info_loss += mem_mutual_info_loss
             ####### END OF REPLAY MEMORY SECTION #####
 
+            ####### ADDED OF SRC RISK SECTION #####
+            src_pred = self.classifier(self.feature_extractor(src_x))
+            src_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
+            ####### END OF SRC RISK SECTION #####
+
             # Calculate final task loss
             if  self.configs.only_mi:
                 task_loss =  self.configs.reg_alpha * mutual_info_loss
             else:
-                task_loss = consistency_loss +  self.configs.reg_alpha * mutual_info_loss
+                task_loss = consistency_loss +  self.configs.reg_alpha * mutual_info_loss + src_loss
 
             # Backward propagation and optimizer steps
             task_loss.backward()
@@ -181,7 +186,6 @@ class COSDA(BaseAlgo):
             loss_dict["avg_consistency_loss"] += consistency_loss.item() / len(src_x)
 
             epoch_memory_inputs.append(trg_x.cpu().detach())
-            epoch_memory_labels.append(trg_y.cpu().detach())
 
         #* Adjust learning rate
         self.fe_lr_scheduler.step()
@@ -196,12 +200,10 @@ class COSDA(BaseAlgo):
             selected_indices = indices[:n_to_store]
 
             selected_inputs = [epoch_memory_inputs[i] for i in selected_indices]
-            selected_labels = [epoch_memory_inputs[i] for i in selected_indices]
             
             selected_inputs = torch.cat(selected_inputs)
-            selected_labels = torch.cat(selected_labels)
 
-            new_memory = DataLoader(TensorDataset(selected_inputs, selected_labels), batch_size=trg_loader.batch_size, shuffle=True)
+            new_memory = DataLoader(TensorDataset(selected_inputs), batch_size=trg_loader.batch_size, shuffle=True)
 
             # Update memory
             if self.memory is None:
