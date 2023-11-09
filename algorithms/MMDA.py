@@ -1,3 +1,4 @@
+from collections import defaultdict
 import itertools
 import os
 import torch
@@ -49,6 +50,8 @@ class MMDA(BaseAlgo):
         # Construct Joint Loaders 
         combined_loader = zip(src_loader, itertools.cycle(trg_loader))
 
+        loss_dict = defaultdict(float)
+
         for step, (source, target) in enumerate(combined_loader):
             src_x, src_y, trg_x = source[0], source[1], target[0]
             src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
@@ -81,9 +84,18 @@ class MMDA(BaseAlgo):
             self.feature_extractor_optimiser.step()
             self.classifier_optimiser.step()
 
+            #* Log the losses
+            loss_dict["avg_loss"] += loss.item() / len(src_x)
+            loss_dict["avg_src_cls_loss"] += src_cls_loss.item() / len(src_x)
+            loss_dict["avg_coral_loss"] += coral_loss.item() / len(src_x)
+            loss_dict["avg_mmd_loss"] += mmd_loss.item() / len(src_x)
+            loss_dict["avg_cond_ent_loss"] += cond_ent_loss.item() / len(src_x)
+
 
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
+
+        return loss_dict
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device, evaluator):
 
