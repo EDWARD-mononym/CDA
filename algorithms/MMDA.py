@@ -47,10 +47,11 @@ class MMDA(BaseAlgo):
         self.classifier.train()
 
         # Construct Joint Loaders 
-        joint_loader =enumerate(zip(src_loader, itertools.cycle(trg_loader)))
+        combined_loader = zip(src_loader, itertools.cycle(trg_loader))
 
-        for step, ((src_x, src_y), (trg_x, _)) in joint_loader:
-            src_x, src_y, trg_x = src_x.to(self.device), src_y.to(self.device), trg_x.to(self.device)
+        for step, (source, target) in enumerate(combined_loader):
+            src_x, src_y, trg_x = source[0], source[1], target[0]
+            src_x, src_y, trg_x = src_x.to(device), src_y.to(device), trg_x.to(device)
 
             src_feat = self.feature_extractor(src_x)
             src_pred = self.classifier(src_feat)
