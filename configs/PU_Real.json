@@ -1,7 +1,7 @@
 {
     "train_params": {
         "Dataset_Name": "PU_Real",
-        "Scenarios": [["Normal", "Rotate", "Load", "Radial"]],
+        "Scenarios": [["Normal", "Rotate", "Load", "Radial"], ["Normal", "Rotate", "Radial", "Load"], ["Normal", "Load", "Rotate", "Radial"]],
         "num_class": 5,
         "input_channel": 1,
         "Backbone_Type": "CNN",
@@ -65,6 +65,13 @@
         "src_wt": 2.366,
         "domain_wt": 0.4575,
         "cond_wt": 3.476
+    },
+    "MMDA": {
+        "Method": "MMDA",
+        "coral_wt": 1,
+        "mmd_wt": 1,
+        "cond_ent_wt": 1,
+        "src_cls_loss_wt":1
     }
     }
 }
