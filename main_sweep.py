@@ -2,8 +2,10 @@ import argparse
 import os
 
 import logging
+
 from ml_collections import config_dict
 # from utils.model_testing import  Acc_matrix
+from utils.set_seed import set_seed
 import wandb
 from train.scenario_trainer import DomainTrainer
 from train.scenario_evaluator import DomainEvaluator
@@ -101,7 +103,7 @@ def parse_arguments():
     return parser.parse_args()
 
 if __name__ == "__main__":
+    set_seed(42)
     args = parse_arguments()
-
     diagnostic = FDSweep(args)
     diagnostic.sweep()
