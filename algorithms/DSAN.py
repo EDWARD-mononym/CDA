@@ -37,7 +37,7 @@ class DSAN(BaseAlgo):
         self.hparams = configs
 
         # Alignment losses
-        self.loss_LMMD = LMMD_loss(device=device, class_num=configs.num_classes).to(device)
+        self.loss_LMMD = LMMD_loss(device=device, class_num=configs.num_class).to(device)
         self.cross_entropy = nn.CrossEntropyLoss()
 
     def epoch_train(self, src_loader, trg_loader, epoch, device):
