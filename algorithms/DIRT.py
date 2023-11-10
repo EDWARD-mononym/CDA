@@ -38,7 +38,7 @@ class DIRT(BaseAlgo):
         self.criterion_cond = ConditionalEntropyLoss()
         self.vat_loss = VAT(self.network, device)
         self.ema = EMA(0.998)
-        self.ema.register(self.network)
+        self.ema.register(self.network.to(device))
         self.cross_entropy = nn.CrossEntropyLoss()
 
         # Discriminator
