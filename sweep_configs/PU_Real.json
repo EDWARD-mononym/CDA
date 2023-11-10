@@ -136,7 +136,47 @@
                 "min": 0.1,
                 "max": 10
             }
-            }
+            },
+            "DIRT": {
+                "lr": {
+                    "values": [0.01, 0.005, 0.001, 0.0005]
+                },
+                "src_cls_loss_wt": {
+                    "distribution": "uniform",
+                    "min": 0.1,
+                    "max": 10
+                },
+                "domain_loss_wt": {
+                    "distribution": "uniform",
+                    "min": 0.1,
+                    "max": 10
+                },
+                "cond_ent_wt": {
+                    "distribution": "uniform",
+                    "min": 0.1,
+                    "max": 10
+                },
+                "vat_loss_wt": {
+                    "distribution": "uniform",
+                    "min": 0.1,
+                    "max": 10
+                }
+                },
+            "DSAN": {
+                "lr": {
+                    "values": [0.01, 0.005, 0.001, 0.0005]
+                },
+                "domain_loss_wt": {
+                    "distribution": "uniform",
+                    "min": 0.1,
+                    "max": 10
+                },
+                "src_cls_loss_wt": {
+                    "distribution": "uniform",
+                    "min": 0.1,
+                    "max": 10
+                }
+                }
   }
 
 }

@@ -72,6 +72,18 @@
         "mmd_wt": 1,
         "cond_ent_wt": 1,
         "src_cls_loss_wt":1
+    },
+    "DIRT": {
+        "Method": "DIRT",
+        "src_cls_loss_wt": 1,
+        "domain_loss_wt": 1,
+        "cond_ent_wt": 1,
+        "vat_loss_wt":1
+    },
+    "DSAN": {
+        "Method": "DSAN",
+        "domain_loss_wt": 1,
+        "src_cls_loss_wt": 1
     }
     }
 }
