@@ -75,15 +75,15 @@
     },
     "DIRT": {
         "Method": "DIRT",
-        "src_cls_loss_wt": 1,
-        "domain_loss_wt": 1,
-        "cond_ent_wt": 1,
-        "vat_loss_wt":1
+        "src_cls_loss_wt": 6.54,
+        "domain_loss_wt": 5.169,
+        "cond_ent_wt": 7.008,
+        "vat_loss_wt":3.763
     },
     "DSAN": {
         "Method": "DSAN",
-        "domain_loss_wt": 1,
-        "src_cls_loss_wt": 1
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
     }
     }
 }

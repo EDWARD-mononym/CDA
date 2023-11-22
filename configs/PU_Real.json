@@ -68,10 +68,10 @@
     },
     "MMDA": {
         "Method": "MMDA",
-        "coral_wt": 1,
-        "mmd_wt": 1,
-        "cond_ent_wt": 1,
-        "src_cls_loss_wt":1
+        "coral_wt": 2.301,
+        "mmd_wt": 3.016,
+        "cond_ent_wt": 8.48,
+        "src_cls_loss_wt": 9.717
     },
     "DIRT": {
         "Method": "DIRT",
