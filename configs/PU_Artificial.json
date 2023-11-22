@@ -38,10 +38,14 @@
         "Method": "DeepCORAL",
         "coral_wt": 8.824
     },
-      "DANN": {
+    "DANN": {
     "Method": "DANN",
     "da_wt": 0.2207
-},
+            },
+    "DANN_Memory": {
+        "Method": "DANN_Memory",
+        "da_wt": 0.2207
+                },
     "NRC": {
         "Method": "NRC",
         "epsilon": 1e-5
