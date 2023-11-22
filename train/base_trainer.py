@@ -79,8 +79,8 @@ class Abstract_train:
             os.makedirs(save_folder)
         self.evaluator.save_overall(save_folder)
 
-        with open(os.path.join(save_folder, "configs_used.json"), 'w') as file:
-            json.dump(self.configs, file)
+        # with open(os.path.join(save_folder, "configs_used.json"), 'w') as file:
+        #     json.dump(self.configs, file)
 
     def pretrain(self, source_name):
         train_loader = get_loader(self.configs.Dataset_Name, source_name, "train")
