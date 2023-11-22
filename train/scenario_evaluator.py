@@ -174,13 +174,13 @@ class DomainEvaluator:
         metrics_df = pd.DataFrame(columns = ['ACC', 'BWT', 'Adapt', 'Generalise'], index=self.acc_matrix.index)
 
         for (row, col) in self.avg_Rmatrix:
-            overall_df.at[row, col] = f"{self.avg_Rmatrix[(row, col)].average()} +/- {self.avg_Rmatrix[(row, col)].standard_deviation()}"
+            overall_df.at[row, col] = f"{self.avg_Rmatrix[(row, col)].average()* 100:.2f} ± {self.avg_Rmatrix[(row, col)].standard_deviation()* 100:.2f}"
 
         for row in self.acc_matrix.index:
-            metrics_df.at[row, 'ACC'] = f"{self.avg_ACC[row].average()} ± {self.avg_ACC[row].standard_deviation()}"
-            metrics_df.at[row, 'BWT'] = f"{self.avg_BWT[row].average()} ± {self.avg_BWT[row].standard_deviation()}"
-            metrics_df.at[row, 'Adapt'] = f"{self.avg_Adapt[row].average()} ± {self.avg_Adapt[row].standard_deviation()}"
-            metrics_df.at[row, 'Generalise'] = f"{self.avg_Generalise[row].average()} ± {self.avg_Generalise[row].standard_deviation()}"
+            metrics_df.at[row, 'ACC'] = f"{self.avg_ACC[row].average()* 100:.2f} ± {self.avg_ACC[row].standard_deviation()* 100:.2f}"
+            metrics_df.at[row, 'BWT'] = f"{self.avg_BWT[row].average()* 100:.2f} ± {self.avg_BWT[row].standard_deviation()* 100:.2f}"
+            metrics_df.at[row, 'Adapt'] = f"{self.avg_Adapt[row].average()* 100:.2f} ± {self.avg_Adapt[row].standard_deviation()* 100:.2f}"
+            metrics_df.at[row, 'Generalise'] = f"{self.avg_Generalise[row].average()* 100:.2f} ± {self.avg_Generalise[row].standard_deviation()* 100:.2f}"
 
         overall_df.to_csv(f"{folder_name}_R_matrix.csv")
         metrics_df.to_csv(f"{folder_name}_Metrics.csv")
