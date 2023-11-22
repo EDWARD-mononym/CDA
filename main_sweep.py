@@ -42,6 +42,8 @@ class FDSweep(DomainTrainer):
     def train(self):
         """Handle all scenarios for training and adaptation."""
         # writer_path = os.path.join(os.getcwd(), f"logs/{dataset}/{method}/{scenario}/{target_id}")
+        set_seed(0)
+
         run = wandb.init(config=self.configs.__dict__['_fields'], sync_tensorboard=True)
         self.configs = config_dict.ConfigDict(wandb.config)
         for scenario in self.configs.Scenarios:
@@ -103,7 +105,6 @@ def parse_arguments():
     return parser.parse_args()
 
 if __name__ == "__main__":
-    set_seed(42)
     args = parse_arguments()
     diagnostic = FDSweep(args)
     diagnostic.sweep()
