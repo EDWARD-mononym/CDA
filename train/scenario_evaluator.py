@@ -139,7 +139,7 @@ class DomainEvaluator:
             R_matrix.to_csv(f, index=True)
 
         epoch_df = pd.DataFrame(self.epoch_acc)
-        epoch_df.to_csv(os.path.join(folder_name, "Uncertainty.csv"))
+        epoch_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
         self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": []}
 
     def update_overall(self):
