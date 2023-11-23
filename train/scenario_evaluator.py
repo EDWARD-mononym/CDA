@@ -89,8 +89,8 @@ class DomainEvaluator:
                 unseen_rows) / n_unseen
             fwt_values.append(fwt_t)
         fwt_values.append(0.0)  # Add another 0 for end of domain where Generalise does not exist
-        generalise_column = pd.DataFrame(fwt_values, index=self.scenario, columns=['FWT'])
-        return generalise_column
+        fwt_column = pd.DataFrame(fwt_values, index=self.scenario, columns=['FWT'])
+        return fwt_column
 
     def get_src_risk(self, algo, domain, loss_avg_meters):
         src_loader = get_loader(self.configs.Dataset_Name, domain, "test")
