@@ -1,7 +1,7 @@
 {
     "train_params": {
         "Dataset_Name": "PU_Artificial",
-        "Scenarios": [["Normal", "Rotate", "Load", "Radial"], ["Normal", "Rotate", "Radial", "Load"], ["Normal", "Load", "Rotate", "Radial"]],
+        "Scenarios": [["A1", "A2", "A3", "A4"], ["A1", "A2", "A4", "A4"], ["A1", "A3", "A2", "A4"]],
         "num_class": 8,
         "input_channel": 1,
         "Backbone_Type": "CNN",
