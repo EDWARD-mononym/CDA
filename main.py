@@ -1,11 +1,13 @@
 import argparse
 import os
 import logging
+import torch
 
 from utils.set_seed import set_seed
 from train.scenario_trainer import DomainTrainer
 from train.scenario_evaluator import DomainEvaluator
-SEED = 42
+
+torch.backends.cudnn.deterministic = True
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Setup logging configuration
@@ -62,15 +64,6 @@ def parse_arguments():
     parser.add_argument('-j', '--workers', default=8, type=int, help='Number of data loading workers.')
     parser.add_argument('--plot', action='store_true', help="Flag to enable plotting.")
     parser.add_argument('--save', action='store_true', help="Flag to enable saving.")
-    # ======== sweep settings =====================
-    parser.add_argument("--sweep", action='store_true', help="Flag to enable sweep.")
-    parser.add_argument('--num_sweeps', default=1, type=str, help='Number of sweep runs')
-    parser.add_argument('--sweep_project_wandb', default='Test_CDA', type=str, help='Project name in Wandb')
-    parser.add_argument('--wandb_entity', type=str, help='Entity name in Wandb (can be left blank if there is a default entity)')
-    parser.add_argument('--hp_search_strategy', default="random", type=str,
-                        help='The way of selecting hyper-parameters (random-grid-bayes). in wandb see:https://docs.wandb.ai/guides/sweeps/configuration')
-    parser.add_argument('--metric_to_minimize', default="avg_loss", type=str,
-                        help='select one of: (src_risk - trg_risk - few_shot_trg_risk - dev_risk)')
 
     return parser.parse_args()
 
