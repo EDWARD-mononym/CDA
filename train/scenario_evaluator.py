@@ -123,9 +123,9 @@ class DomainEvaluator:
                 column_df = self.acc_matrix[model]
                 row_df = pd.DataFrame(column_df).T
                 # Append metrics into the row df
-                row_df["ACC"] = (self.acc.loc[model, "ACC"] * 100).round(2)
-                row_df["BWT"] = (self.bwt.loc[model, "BWT"] * 100).round(2)
-                row_df["FWT"] = (self.fwt.loc[model, "FWT"] * 100).round(2)
+                row_df["ACC"] = round(self.acc.loc[model, "ACC"] * 100, 2)
+                row_df["BWT"] = round(self.bwt.loc[model, "BWT"] * 100, 2)
+                row_df["FWT"] = round(self.fwt.loc[model, "FWT"] * 100, 2)
 
                 # Save model performance
                 f.write(f"Model {model} performance")
