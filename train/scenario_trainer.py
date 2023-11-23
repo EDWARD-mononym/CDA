@@ -61,7 +61,3 @@ class DomainTrainer(Abstract_train):
 
         # Calculate overall metrics for the entire scenario.
         self.evaluator.calc_metric()
-        # Calculates and logs overall metrics for the scenario
-        self.evaluator.calc_overall_metrics(self.loss_avg_meters)
-
-
