@@ -64,10 +64,9 @@ class Abstract_train:
     def save_run_results(self, scenario, run):
         """Save the results after training and adaptation."""
         self.evaluator.calc_metric()
-        save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}')
-        if not os.path.exists(save_folder):
-            os.makedirs(save_folder)
-        file_name = os.path.join(save_folder, f"Run_{run}")
+        file_name = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}/Run_{run}')
+        if not os.path.exists(file_name):
+            os.makedirs(file_name)
         self.evaluator.save_singlerun(file_name)
 
     def save_avg_runs(self, scenario):
