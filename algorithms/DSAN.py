@@ -39,6 +39,7 @@ class DSAN(BaseAlgo):
         # Alignment losses
         self.loss_LMMD = LMMD_loss(device=device, class_num=configs.num_class).to(device)
         self.cross_entropy = nn.CrossEntropyLoss()
+        self.taskloss = torch.nn.CrossEntropyLoss()
 
     def epoch_train(self, src_loader, trg_loader, epoch, device):
 
@@ -85,7 +86,6 @@ class DSAN(BaseAlgo):
         return loss_dict
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device, evaluator):
-
         best_acc = -1.0
         print(f"Training source model")
         for epoch in range(self.n_epoch):
@@ -108,7 +108,7 @@ class DSAN(BaseAlgo):
                 pred = self.classifier(self.feature_extractor(x))
 
                 # Loss
-                loss = self.cross_entropy(pred, y)
+                loss = self.taskloss(pred, y)
                 loss.backward()
 
                 # Step
@@ -127,11 +127,15 @@ class DSAN(BaseAlgo):
                 print(f"Average Loss: {avg_loss:.4f}")
             print("-" * 30)  # Print a separator for clarity
 
-            #* Save best model
+            # * Save best model
             epoch_acc = evaluator.test_domain(self, test_loader)
             if epoch_acc > best_acc:
+                best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
+
+            #* Log epoch acc
+            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
 
 class LMMD_loss(nn.Module):
     def __init__(self, device, class_num=3, kernel_type='rbf', kernel_mul=2.0, kernel_num=5, fix_sigma=None):

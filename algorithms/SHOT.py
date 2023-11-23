@@ -31,6 +31,8 @@ class SHOT(BaseAlgo):
                                               step_size=configs.step_size, gamma=configs.gamma)
 
         self.configs = configs
+        self.taskloss = torch.nn.CrossEntropyLoss()
+        
     def epoch_train(self, src_loader, trg_loader, epoch, device):
         # Freeze the classifier
         self.device = device
@@ -102,34 +104,32 @@ class SHOT(BaseAlgo):
             self.classifier.to(device)
             self.feature_extractor.train()
             self.classifier.train()
-
             running_loss = 0
             for step, data in enumerate(train_loader):
                 x, y = data[0], data[1]
                 x, y = x.to(device), y.to(device)
 
-                #* Zero grads
+                # Zero grads
                 self.feature_extractor_optimiser.zero_grad()
                 self.classifier_optimiser.zero_grad()
 
-                #* Forward pass
+                # Forward pass
                 pred = self.classifier(self.feature_extractor(x))
 
-                #* Loss
-                loss = self.cross_entropy_label_smooth(pred, y,self.configs.num_class, device, epsilon=0.1)
+                # Loss
+                loss = self.taskloss(pred, y)
                 loss.backward()
 
-                #* Step
+                # Step
                 self.feature_extractor_optimiser.step()
                 self.classifier_optimiser.step()
 
                 running_loss += loss.item()
 
-            #* Adjust learning rate
+            # Adjust learning rate
             self.fe_lr_scheduler.step()
             self.classifier_lr_scheduler.step()
 
-            #* Save best model
             # Print average loss every 'print_every' steps
             if (epoch + 1) % self.configs.print_every == 0:
                 avg_loss = running_loss / len(train_loader)
@@ -139,8 +139,12 @@ class SHOT(BaseAlgo):
             # * Save best model
             epoch_acc = evaluator.test_domain(self, test_loader)
             if epoch_acc > best_acc:
+                best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
+
+            #* Log epoch acc
+            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
 
 
     def obtain_pseudo_labels(self, trg_loader):

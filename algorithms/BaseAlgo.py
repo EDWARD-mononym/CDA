@@ -40,13 +40,16 @@ class BaseAlgo(torch.nn.Module):
             loss_dict = self.epoch_train(src_loader, trg_loader, epoch, device)
 
             # Test & Save best model
-
             acc_dict = evaluator.test_all_domain(self)
             if acc_dict[target_name] > best_acc:
+                best_acc = acc_dict[target_name]
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{target_name}_feature_best.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier_best.pt"))
+
+            #* Log epoch acc
+            evaluator.update_epoch_acc(epoch, target_name, acc_dict[target_name])
 
             # Log the performance of each domain for this epoch
             for domain in acc_dict:

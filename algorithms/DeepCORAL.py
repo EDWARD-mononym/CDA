@@ -117,12 +117,16 @@ class DeepCORAL(BaseAlgo):
                 print(f"Average Loss: {avg_loss:.4f}")
             print("-" * 30)  # Print a separator for clarity
 
-            #* Save best model
+            # * Save best model
             epoch_acc = evaluator.test_domain(self, test_loader)
             if epoch_acc > best_acc:
+                best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
 
+            #* Log epoch acc
+            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
+            
 def CORAL(source, target):
     d = source.data.shape[1]
 

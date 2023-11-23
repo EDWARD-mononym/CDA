@@ -251,8 +251,13 @@ class COSDA(BaseAlgo):
             #* Save best model
             epoch_acc = evaluator.test_domain(self, test_loader)
             if epoch_acc > best_acc:
+                best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
+            
+            #* Log epoch acc
+            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
+
         self.teacher_backbone.load_state_dict(self.feature_extractor.state_dict())
         self.teacher_classifier.load_state_dict(self.classifier.state_dict())
     def distill_knowledge(self, score, confidence_gate, temperature=0.07):

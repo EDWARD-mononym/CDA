@@ -69,9 +69,6 @@ class Abstract_train:
             os.makedirs(save_folder)
         file_name = os.path.join(save_folder, f"Run_{run}")
         self.evaluator.save_singlerun(file_name)
-        if self.args.plot:
-            plot_file = os.path.join(save_folder, f"{scenario}.png")
-            self.evaluator.save_plot(plot_file)
 
     def save_avg_runs(self, scenario):
         save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}')
