@@ -158,6 +158,7 @@ class DomainEvaluator:
             self.avg_epoch_acc["epoch"] = self.epoch_acc["epoch"]
             self.avg_epoch_acc["domain_name"] = self.epoch_acc["domain_name"]
         self.avg_epoch_acc["epoch_acc"][len(self.avg_epoch_acc["epoch_acc"])] = self.epoch_acc["epoch_acc"]
+        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": []}
 
     def save_overall(self, folder_name):
         #* Save overall R_matrix
@@ -183,4 +184,3 @@ class DomainEvaluator:
         self.avg_epoch_acc["epoch_acc"] = [sum(elements) / len(self.avg_epoch_acc["epoch_acc"]) for elements in zip(self.avg_epoch_acc["epoch_acc"])]
         unfamiliar_df = pd.DataFrame(self.avg_epoch_acc)
         unfamiliar_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
-
