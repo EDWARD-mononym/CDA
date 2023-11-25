@@ -76,14 +76,11 @@ class ReviewDeepCORAL(BaseAlgo):
             ###### ADDED REPLAY MEMORY #####
             if memory:
                 #* Forward pass
-                src_feat = self.feature_extractor(src_x)
-                src_pred = self.classifier(src_feat)
-                trg_feat = self.feature_extractor(trg_x)
+                mem_feat = self.feature_extractor(mem_x)
 
                 #* Compute loss
-                classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
-                coral_loss = CORAL(src_feat, trg_feat)
-                mem_loss = classification_loss + self.hparams.coral_wt * coral_loss
+                coral_loss = CORAL(src_feat, mem_feat)
+                mem_loss = self.hparams.coral_wt * coral_loss
 
                 loss += mem_loss
             ####### END OF REPLAY MEMORY SECTION #####
