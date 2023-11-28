@@ -1,7 +1,7 @@
 {
     "train_params": {
         "Dataset_Name": "PU_Real",
-        "Scenarios": [["Normal", "Rotate", "Load", "Radial"], ["Normal", "Rotate", "Radial", "Load"], ["Normal", "Load", "Rotate", "Radial"]],
+        "Scenarios": [["R1", "R2", "R3", "R4"], ["R1", "R2", "R4", "R3"], ["R1", "R3", "R2", "R4"]],
         "num_class": 5,
         "input_channel": 1,
         "Backbone_Type": "CNN",
@@ -17,7 +17,6 @@
         "Classifier_Type": "Classifier",
         "input_size": 640,
         "n_epoch": 40,
-        "lr": 0.005,
         "momentum": 0.9,
         "weight_decay": 0.0001,
         "step_size": 50,
@@ -32,15 +31,18 @@
     },
     "DeepCORAL": {
         "Method": "DeepCORAL",
-        "coral_wt": 7.503
+        "coral_wt": 5.061,
+        "lr": 0.005
     },
     "ReviewDeepCORAL": {
         "Method": "DeepCORAL",
-        "coral_wt": 7.503
+        "coral_wt": 5.061,
+        "lr": 0.005
     },
       "DANN": {
     "Method": "DANN",
-    "da_wt": 5.843
+    "da_wt": 5.843,
+    "lr": 0.0005
 },
     "NRC": {
         "Method": "NRC",
@@ -64,14 +66,16 @@
         "Method": "CDAN",
         "src_wt": 2.366,
         "domain_wt": 0.4575,
-        "cond_wt": 3.476
+        "cond_wt": 3.476,
+        "lr": 0.001
     },
     "MMDA": {
         "Method": "MMDA",
-        "coral_wt": 2.301,
-        "mmd_wt": 3.016,
-        "cond_ent_wt": 8.48,
-        "src_cls_loss_wt": 9.717
+        "coral_wt": 6.437,
+        "mmd_wt": 7.657,
+        "cond_ent_wt": 9.907,
+        "src_cls_loss_wt": 7.213,
+        "lr": 0.001
     },
     "DIRT": {
         "Method": "DIRT",
@@ -82,8 +86,9 @@
     },
     "DSAN": {
         "Method": "DSAN",
-        "domain_loss_wt": 1,
-        "src_cls_loss_wt": 1
+        "domain_loss_wt": 2.945,
+        "src_cls_loss_wt": 8.241,
+        "lr": 0.005
     }
     }
 }
