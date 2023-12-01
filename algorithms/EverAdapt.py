@@ -131,7 +131,7 @@ class EverAdapt(BaseAlgo):
         # Save target to memory
         if epoch == self.configs.n_epoch-1:
             # Get the top n most confident predictions 
-            top_preds = save_top_predictions(self.feature_extractor, self.classifier, trg_loader, self.hparams.num_class, top_n=10)
+            top_preds = save_top_predictions(self.feature_extractor, self.classifier, device, trg_loader, self.hparams.num_class, top_n=10)
             top_pred_dataset = TopPredictionsDataset(top_preds)
 
             if self.memory:
@@ -306,7 +306,7 @@ def CORAL(source, target):
 
     return loss
 
-def save_top_predictions(fe, c, dataloader, num_classes, top_n=10):
+def save_top_predictions(fe, c, device, dataloader, num_classes, top_n=10):
     fe.eval()  # Set the model to evaluation mode
     c.eval()
 
@@ -315,7 +315,7 @@ def save_top_predictions(fe, c, dataloader, num_classes, top_n=10):
 
     with torch.no_grad():
         for data in dataloader:
-            x = data[0]
+            x = data[0].to(device)
 
             # Calculate logits
             outputs = c(fe(x))
