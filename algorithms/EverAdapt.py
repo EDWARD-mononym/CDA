@@ -362,7 +362,7 @@ class TopPredictionsDataset(Dataset):
         input_data, class_id, confidence = self.data[idx]
 
         # Generate Gaussian noise
-        noise = torch.normal(0, 0.1, size=input_data.shape[0])
+        noise = torch.normal(0, 0.1, size=input_data.shape)
         # Add noise to the signal
         augmented_signal = input_data + noise
 
