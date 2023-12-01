@@ -1,7 +1,7 @@
 {
     "train_params": {
         "Dataset_Name": "PU_Artificial",
-        "Scenarios": [["A1", "A2", "A3", "A4"], ["A1", "A2", "A4", "A4"], ["A1", "A3", "A2", "A4"]],
+        "Scenarios": [["A1", "A2", "A3", "A4"], ["A1", "A2", "A4", "A3"], ["A1", "A3", "A2", "A4"]],
         "num_class": 8,
         "input_channel": 1,
         "Backbone_Type": "CNN",
@@ -16,8 +16,8 @@
         "hidden_layers": 5,
         "Classifier_Type": "Classifier",
         "input_size": 640,
-        "n_epoch": 40,
-        "lr": 0.001,
+        "n_epoch": 100,
+        "lr": 0.005,
         "momentum": 0.9,
         "weight_decay": 0.0001,
         "step_size": 50,
@@ -86,6 +86,31 @@
     },
     "DSAN": {
         "Method": "DSAN",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "DSAN_Memory": {
+        "Method": "DSAN_Memory",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "DSAN_Coral_Memory": {
+        "Method": "DSAN_Coral_Memory",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "DSAN_CORAL": {
+        "Method": "DSAN_CORAL",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "DSAN_Conditional_Memory": {
+        "Method": "DSAN_Conditional_Memory",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt": {
+        "Method": "EverAdapt",
         "domain_loss_wt": 1.776,
         "src_cls_loss_wt": 9.717
     }
