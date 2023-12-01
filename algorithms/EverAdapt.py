@@ -360,6 +360,7 @@ class TopPredictionsDataset(Dataset):
 
     def __getitem__(self, idx):
         input_data, class_id, confidence = self.data[idx]
+        input_data.to("cpu")
 
         # Generate Gaussian noise
         noise = torch.normal(0, 0.1, size=input_data.shape)
