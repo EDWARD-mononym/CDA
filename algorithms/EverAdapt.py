@@ -366,7 +366,7 @@ class TopPredictionsDataset(Dataset):
         # Add noise to the signal
         augmented_signal = input_data + noise
 
-        return augmented_signal, class_id, confidence
+        return augmented_signal, class_id
 
 class MySampler(Sampler):
     def __init__(self, data_source, batch_size):
