@@ -382,3 +382,7 @@ class MySampler(Sampler):
             if len(batch) == self.batch_size:
                 yield batch
                 batch = []
+
+    def __len__(self):
+        # Return the length of the dataset
+        return len(self.data_source) * (self.batch_size // len(self.data_source))
