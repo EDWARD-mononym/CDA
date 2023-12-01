@@ -341,6 +341,8 @@ def save_top_predictions(fe, c, device, dataloader, num_classes, top_n=10):
         if len(top_predictions[class_id]) < top_n:
             top_predictions[class_id].append(prediction)
 
+    return top_predictions
+
 class TopPredictionsDataset(Dataset):
     def __init__(self, top_predictions):
         """
