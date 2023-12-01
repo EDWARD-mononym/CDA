@@ -336,10 +336,10 @@ def save_top_predictions(fe, c, device, dataloader, num_classes, top_n=10):
     top_predictions = {class_id: [] for class_id in range(num_classes)}
 
     # Distribute predictions into class-based bins
-    for prediction in all_predictions:
-        class_id = prediction[1]
+    for tuple_data in all_predictions:
+        class_id = tuple_data[1]
         if len(top_predictions[class_id]) < top_n:
-            top_predictions[class_id].append(prediction)
+            top_predictions[class_id].append(tuple_data)
 
     return top_predictions
 
