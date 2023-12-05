@@ -171,7 +171,7 @@ class DomainEvaluator:
         metrics_df.at[0, 'ACC'] = f"{self.avg_ACC.average()* 100:.2f} +/- {self.avg_ACC.standard_deviation()* 100:.2f}"
         metrics_df.at[0, 'BWT'] = f"{self.avg_BWT.average()* 100:.2f} +/- {self.avg_BWT.standard_deviation()* 100:.2f}"
         metrics_df.at[0, 'FWT'] = f"{self.avg_FWT.average()* 100:.2f} +/- {self.avg_FWT.standard_deviation()* 100:.2f}"
-        latex_txt = f"${self.avg_ACC.average()* 100:.2f} \\pm ${self.avg_ACC.standard_deviation()* 100:.2f} & ${self.avg_BWT.average()* 100:.2f} \\pm ${self.avg_BWT.standard_deviation()* 100:.2f} & ${self.avg_FWT.average()* 100:.2f} \\pm ${self.avg_FWT.standard_deviation()* 100:.2f}"
+        latex_txt = f"{self.avg_ACC.average()* 100:.2f} $\\pm$ {self.avg_ACC.standard_deviation()* 100:.2f} & {self.avg_BWT.average()* 100:.2f} $\\pm$ {self.avg_BWT.standard_deviation()* 100:.2f} & {self.avg_FWT.average()* 100:.2f} $\\pm$ {self.avg_FWT.standard_deviation()* 100:.2f}"
 
         metrics_df.to_csv(os.path.join(folder_name, "Metrics.csv"))
         with open(os.path.join(folder_name, "Metrics_Latex.txt"), 'w') as f:
