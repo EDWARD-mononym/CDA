@@ -6,15 +6,12 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, ConcatDataset, Dataset, Sampler
+from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
 class EverAdapt(BaseAlgo):
-    """
-    DSAN: https://ieeexplore.ieee.org/document/9085896
-    """
 
     def __init__(self, configs) -> None:
         super().__init__(configs)
@@ -105,10 +102,11 @@ class EverAdapt(BaseAlgo):
                 mem_domain_loss = self.loss_LMMD.get_loss(src_feat, mem_feat, src_y, torch.nn.functional.softmax(mem_pred, dim=1))
 
                 # calculate memory coral loss
-                mem_coral_loss = CORAL(src_feat, mem_feat)
+                # mem_coral_loss = CORAL(src_feat, mem_feat)
 
 
-                loss += self.hparams.domain_loss_wt * mem_domain_loss + self.hparams.src_cls_loss_wt * mem_coral_loss
+                # loss += self.hparams.domain_loss_wt * mem_domain_loss + self.hparams.src_cls_loss_wt * mem_coral_loss
+                loss += self.hparams.domain_loss_wt * mem_domain_loss
             ####### END OF REPLAY MEMORY SECTION #####
 
             # update feature extractor
@@ -130,23 +128,26 @@ class EverAdapt(BaseAlgo):
 
         # Save target to memory
         if epoch == self.configs.n_epoch-1:
-            # Get the top n most confident predictions 
-            top_preds = save_top_predictions(self.feature_extractor, self.classifier, device, trg_loader, self.hparams.num_class, top_n=10)
-            top_pred_dataset = TopPredictionsDataset(top_preds)
+            n_save = 0.05
+            # Select a portion of the current data for the memory
+            indices = list(range(len(epoch_memory_inputs)))
+            random.shuffle(indices)
+            n_to_store = int(n_save * len(epoch_memory_inputs))
 
-            if self.memory:
-                memory_dataset = self.memory.dataset
-                combined_dataset = ConcatDataset([memory_dataset, top_pred_dataset])
+            selected_indices = indices[:n_to_store]
 
+            selected_inputs = [epoch_memory_inputs[i] for i in selected_indices]
+            
+            selected_inputs = torch.cat(selected_inputs)
+
+            new_memory = DataLoader(TensorDataset(selected_inputs), batch_size=trg_loader.batch_size, shuffle=True)
+
+            # Update memory
+            if self.memory is None:
+                self.memory = new_memory
             else:
-                combined_dataset = top_pred_dataset
-
-            # Create the dataloader
-            if len(combined_dataset) < trg_loader.batch_size:
-                sampler = MySampler(combined_dataset, trg_loader.batch_size)
-                self.memory = DataLoader(combined_dataset, batch_sampler=sampler)
-            else:
-                self.memory = DataLoader(combined_dataset, batch_size=trg_loader.batch_size, shuffle=True)
+                concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
+                self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size)
 
         return loss_dict
 
@@ -305,85 +306,3 @@ def CORAL(source, target):
     loss = loss/(4*d*d)
 
     return loss
-
-def save_top_predictions(fe, c, device, dataloader, num_classes, top_n=10):
-    fe.eval()  # Set the model to evaluation mode
-    c.eval()
-
-    # List to store predictions
-    all_predictions = []
-
-    with torch.no_grad():
-        for data in dataloader:
-            x = data[0].to(device)
-
-            # Calculate logits
-            outputs = c(fe(x))
-            # Convert outputs to probabilities
-            probabilities = torch.softmax(outputs, dim=1)
-
-            for input_data, probability in zip(x, probabilities):
-                class_id = torch.argmax(probability).item()
-                confidence = torch.max(probability).item()
-
-                # Store the data point, predicted class, and confidence
-                all_predictions.append((input_data, class_id, confidence))
-
-    # Sort all predictions by confidence
-    all_predictions.sort(key=lambda x: x[2], reverse=True)
-
-    # Initialize a dictionary to store top N predictions for each class
-    top_predictions = {class_id: [] for class_id in range(num_classes)}
-
-    # Distribute predictions into class-based bins
-    for tuple_data in all_predictions:
-        class_id = tuple_data[1]
-        if len(top_predictions[class_id]) < top_n:
-            top_predictions[class_id].append(tuple_data)
-
-    return top_predictions
-
-class TopPredictionsDataset(Dataset):
-    def __init__(self, top_predictions):
-        """
-        Args:
-            top_predictions (dict): A dictionary containing top predictions for each class.
-                                     Each entry in the dictionary is a list of tuples,
-                                     where each tuple is (input_data, class_id, confidence).
-        """
-        self.data = []
-        for class_predictions in top_predictions.values():
-            self.data.extend(class_predictions)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        input_data, class_id, confidence = self.data[idx]
-        input_data = input_data.to('cpu')
-
-        # Generate Gaussian noise
-        noise = torch.normal(0, 0.1, size=input_data.shape)
-        # Add noise to the signal
-        augmented_signal = input_data + noise
-
-        return augmented_signal, class_id
-
-class MySampler(Sampler):
-    def __init__(self, data_source, batch_size):
-        self.data_source = data_source
-        self.batch_size = batch_size
-
-    def __iter__(self):
-        # Generate lists of indices for each batch
-        batch = []
-        for i in range(self.batch_size):
-            idx = i % len(self.data_source)
-            batch.append(idx)
-            if len(batch) == self.batch_size:
-                yield batch
-                batch = []
-
-    def __len__(self):
-        # Return the length of the dataset
-        return len(self.data_source) * (self.batch_size // len(self.data_source))

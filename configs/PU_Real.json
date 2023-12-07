@@ -89,6 +89,12 @@
         "domain_loss_wt": 2.945,
         "src_cls_loss_wt": 8.241,
         "lr": 0.005
+    },
+    "EverAdapt": {
+        "Method": "EverAdapt",
+        "domain_loss_wt": 2.945,
+        "src_cls_loss_wt": 8.241,
+        "lr": 0.005
     }
     }
 }
