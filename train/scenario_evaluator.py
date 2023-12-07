@@ -196,7 +196,7 @@ class DomainEvaluator:
                 sum_of_squares += (self.avg_epoch_acc["epoch_acc"][key][i] - avg_epoch[i]) ** 2
             std_dev_epoch[i] = np.sqrt(sum_of_squares / N_runs)
         # Update the data structure
-        self.avg_epoch_acc["epoch_acc_avg"] = avg_epoch
+        self.avg_epoch_acc["epoch_acc"] = avg_epoch
         self.avg_epoch_acc["epoch_acc_std_dev"] = std_dev_epoch
         unfamiliar_df = pd.DataFrame(self.avg_epoch_acc)
         unfamiliar_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
