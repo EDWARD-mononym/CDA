@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 import os
 import pandas as pd
 from utils.avg_meter import AverageMeter
@@ -20,7 +21,7 @@ class DomainEvaluator:
         self.avg_FWT = AverageMeter()
 
         self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": []}
-        self.avg_epoch_acc = {"epoch": None, "domain_name": None, "epoch_acc": {}}
+        self.avg_epoch_acc = {"epoch": None, "domain_name": None, "epoch_acc": {}, "epoch_acc_std_dev": None}
 
     def test_domain(self, algo, test_loader):
         algo.to(self.device)
@@ -181,11 +182,21 @@ class DomainEvaluator:
         N_runs = len(self.avg_epoch_acc["epoch_acc"])
         N_points = len(self.avg_epoch_acc["epoch_acc"][0])
         avg_epoch = [0] * N_points
+        std_dev_epoch = [0] * N_points
+        # Calculate Average
         for i in range(N_points):
             sum_at_position = 0
             for key in self.avg_epoch_acc["epoch_acc"]:
                 sum_at_position += self.avg_epoch_acc["epoch_acc"][key][i]
             avg_epoch[i] = sum_at_position / N_runs
-        self.avg_epoch_acc["epoch_acc"] = avg_epoch
+        # Calculate Standard deviation
+        for i in range(N_points):
+            sum_of_squares = 0
+            for key in self.avg_epoch_acc["epoch_acc"]:
+                sum_of_squares += (self.avg_epoch_acc["epoch_acc"][key][i] - avg_epoch[i]) ** 2
+            std_dev_epoch[i] = np.sqrt(sum_of_squares / N_runs)
+        # Update the data structure
+        self.avg_epoch_acc["epoch_acc_avg"] = avg_epoch
+        self.avg_epoch_acc["epoch_acc_std_dev"] = std_dev_epoch
         unfamiliar_df = pd.DataFrame(self.avg_epoch_acc)
         unfamiliar_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
