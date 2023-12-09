@@ -49,7 +49,7 @@ class BaseAlgo(torch.nn.Module):
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{target_name}_classifier_best.pt"))
 
             #* Log epoch acc
-            evaluator.update_epoch_acc(epoch, target_name, acc_dict[target_name])
+            evaluator.update_epoch_acc(epoch, target_name, acc_dict)
 
             # Log the performance of each domain for this epoch
             for domain in acc_dict:

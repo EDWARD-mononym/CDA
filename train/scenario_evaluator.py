@@ -1,3 +1,4 @@
+from collections import defaultdict
 import torch
 import torch.nn as nn
 import numpy as np
@@ -20,7 +21,7 @@ class DomainEvaluator:
         self.avg_BWT = AverageMeter()
         self.avg_FWT = AverageMeter()
 
-        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": []}
+        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": [], "all_domain_acc": defaultdict(list)}
         self.avg_epoch_acc = {"epoch": None, "domain_name": None, "epoch_acc": {}, "epoch_acc_std_dev": None}
 
     def test_domain(self, algo, test_loader):
