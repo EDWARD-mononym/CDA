@@ -89,7 +89,7 @@ class EverAdapt(BaseAlgo):
             # calculate the total loss
             alpha = 0.9 ** epoch # Give more priority to coral loss early on and more to lmmd later on
 
-            loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.src_cls_loss_wt * coral_loss + \
+            loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.domain_loss_wt * coral_loss + \
                 self.hparams.src_cls_loss_wt * src_cls_loss 
 
             ###### ADDED REPLAY MEMORY #####
@@ -132,7 +132,8 @@ class EverAdapt(BaseAlgo):
             # Select a portion of the current data for the memory
             indices = list(range(len(epoch_memory_inputs)))
             random.shuffle(indices)
-            n_to_store = int(n_save * len(epoch_memory_inputs))
+            # n_to_store = int(n_save * len(epoch_memory_inputs))
+            n_to_store = 1
 
             selected_indices = indices[:n_to_store]
 
@@ -193,16 +194,15 @@ class EverAdapt(BaseAlgo):
                 print(f"Average Loss: {avg_loss:.4f}")
             print("-" * 30)  # Print a separator for clarity
 
-            #* Save best model
-            acc_dict = evaluator.test_all_domain(self, test_loader)
-            epoch_acc = acc_dict[source_name]
+            # * Save best model
+            epoch_acc = evaluator.test_domain(self, test_loader)
             if epoch_acc > best_acc:
                 best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
 
             #* Log epoch acc
-            evaluator.update_epoch_acc(epoch, source_name, acc_dict)
+            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
 
 class LMMD_loss(nn.Module):
     def __init__(self, device, class_num=3, kernel_type='rbf', kernel_mul=2.0, kernel_num=5, fix_sigma=None):
