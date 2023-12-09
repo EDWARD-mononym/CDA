@@ -151,7 +151,7 @@ class DANN(BaseAlgo):
             print("-" * 30)  # Print a separator for clarity
 
             #* Save best model
-            acc_dict = evaluator.test_all_domain(self, test_loader)
+            acc_dict = evaluator.test_all_domain(self)
             epoch_acc = acc_dict[source_name]
             if epoch_acc > best_acc:
                 best_acc = epoch_acc
