@@ -21,7 +21,7 @@ class DomainEvaluator:
         self.avg_BWT = AverageMeter()
         self.avg_FWT = AverageMeter()
 
-        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": [], "all_domain_acc": defaultdict(list)}
+        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": defaultdict(list)}
         self.avg_epoch_acc = {"epoch": None, "domain_name": None, "epoch_acc": {}, "epoch_acc_std_dev": None}
 
     def test_domain(self, algo, test_loader):
@@ -53,10 +53,11 @@ class DomainEvaluator:
     def update(self, model, acc_dict):
         self.acc_matrix[model] = self.acc_matrix.index.map(acc_dict)
 
-    def update_epoch_acc(self, epoch, domain_name, epoch_acc):
+    def update_epoch_acc(self, epoch, domain_name, acc_dict):
         self.epoch_acc["epoch"].append(epoch)
         self.epoch_acc["domain_name"].append(domain_name)
-        self.epoch_acc["epoch_acc"].append(epoch_acc)
+        for key in acc_dict:
+            self.epoch_acc["epoch_acc"][key].append(acc_dict[key])
 
     def calc_metric(self):  # Calculate ACC, BWT, Adapt, FWT
         self.acc = self.calc_ACC()
@@ -140,9 +141,15 @@ class DomainEvaluator:
             R_matrix = self.acc_matrix.applymap(lambda x: round(x * 100, 2))
             R_matrix.to_csv(f, index=True)
 
+
+        data = pd.DataFrame(self.epoch_acc["epoch_acc"])
+        data["epoch"] = self.epoch_acc["epoch"]
+        data["domain_name"] = self.epoch_acc["domain_name"]
+
+        epoch_df = data[["epoch", "domain_name"] + list(self.epoch_acc["epoch_acc"].keys())]
         epoch_df = pd.DataFrame(self.epoch_acc)
         epoch_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
-        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": []}
+        self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": defaultdict(list)}
 
     def update_overall(self):
         #* Update avg R matrix
@@ -182,22 +189,32 @@ class DomainEvaluator:
         #* Save overall unfamiliar
         N_runs = len(self.avg_epoch_acc["epoch_acc"])
         N_points = len(self.avg_epoch_acc["epoch_acc"][0])
-        avg_epoch = [0] * N_points
-        std_dev_epoch = [0] * N_points
-        # Calculate Average
-        for i in range(N_points):
-            sum_at_position = 0
-            for key in self.avg_epoch_acc["epoch_acc"]:
-                sum_at_position += self.avg_epoch_acc["epoch_acc"][key][i]
-            avg_epoch[i] = sum_at_position / N_runs
-        # Calculate Standard deviation
-        for i in range(N_points):
-            sum_of_squares = 0
-            for key in self.avg_epoch_acc["epoch_acc"]:
-                sum_of_squares += (self.avg_epoch_acc["epoch_acc"][key][i] - avg_epoch[i]) ** 2
-            std_dev_epoch[i] = np.sqrt(sum_of_squares / N_runs)
+
+        avg_epoch = defaultdict(lambda: [0] * N_points)
+        std_dev_epoch = defaultdict(lambda: [0] * N_points)
+
+        for domain in range(len(self.scenario)):
+            for i in range(N_points):
+                sum_at_position = 0
+                for run in self.avg_epoch_acc["epoch_acc"]:
+                    sum_at_position += self.avg_epoch_acc["epoch_acc"][run][domain][i]
+                avg_epoch[domain][i] = sum_at_position / N_runs
+
+        for domain in range(len(self.scenario)):
+            for i in range(N_points):
+                sum_of_squares = 0
+                for run in self.avg_epoch_acc["epoch_acc"]:
+                    sum_of_squares += (self.avg_epoch_acc["epoch_acc"][run][i] - avg_epoch[i]) ** 2
+                std_dev_epoch[domain][i] = np.sqrt(sum_of_squares / N_runs)
+
+
+        # Combine all the dicts into one to be saved
+        df_dict = {"epoch": self.avg_epoch_acc["epoch"], "domain_name": self.avg_epoch_acc["domain_name"]}
+        unfamiliar_df = pd.DataFrame(df_dict)
+        for domain in avg_epoch:
+            df_avg = pd.DataFrame(avg_epoch[domain], index=unfamiliar_df.index)
+            df_std = pd.DataFrame(std_dev_epoch[domain], index=unfamiliar_df.index)
+            df_epoch = unfamiliar_df.join([df_avg, df_std])
+
         # Update the data structure
-        self.avg_epoch_acc["epoch_acc"] = avg_epoch
-        self.avg_epoch_acc["epoch_acc_std_dev"] = std_dev_epoch
-        unfamiliar_df = pd.DataFrame(self.avg_epoch_acc)
         unfamiliar_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
