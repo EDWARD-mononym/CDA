@@ -187,23 +187,23 @@ class DomainEvaluator:
 
         #* Save overall unfamiliar
         N_runs = len(self.avg_epoch_acc["epoch_acc"])
-        N_points = len(self.avg_epoch_acc["epoch_acc"][0])
+        N_points = len(self.avg_epoch_acc["epoch_acc"][0][self.scenario[0]])
 
         avg_epoch = defaultdict(lambda: [0] * N_points)
         std_dev_epoch = defaultdict(lambda: [0] * N_points)
 
-        for domain in range(len(self.scenario)):
+        for domain in self.scenario:
             for i in range(N_points):
                 sum_at_position = 0
                 for run in self.avg_epoch_acc["epoch_acc"]:
                     sum_at_position += self.avg_epoch_acc["epoch_acc"][run][domain][i]
                 avg_epoch[domain][i] = sum_at_position / N_runs
 
-        for domain in range(len(self.scenario)):
+        for domain in self.scenario:
             for i in range(N_points):
                 sum_of_squares = 0
                 for run in self.avg_epoch_acc["epoch_acc"]:
-                    sum_of_squares += (self.avg_epoch_acc["epoch_acc"][run][i] - avg_epoch[i]) ** 2
+                    sum_of_squares += (self.avg_epoch_acc["epoch_acc"][run][domain][i] - avg_epoch[domain][i]) ** 2
                 std_dev_epoch[domain][i] = np.sqrt(sum_of_squares / N_runs)
 
 
@@ -213,7 +213,10 @@ class DomainEvaluator:
         for domain in avg_epoch:
             df_avg = pd.DataFrame(avg_epoch[domain], index=unfamiliar_df.index)
             df_std = pd.DataFrame(std_dev_epoch[domain], index=unfamiliar_df.index)
-            df_epoch = unfamiliar_df.join([df_avg, df_std])
-
+            # Renaming columns
+            df_avg = df_avg.rename(columns={df_avg.columns[0]: f'{domain} avg'})
+            df_std = df_std.rename(columns={df_std.columns[0]: f'{domain} std'})
+            # Concatenating instead of joining
+            unfamiliar_df = pd.concat([unfamiliar_df, df_avg, df_std], axis=1)
         # Update the data structure
         unfamiliar_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
