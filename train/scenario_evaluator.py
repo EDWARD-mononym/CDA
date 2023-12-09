@@ -147,7 +147,6 @@ class DomainEvaluator:
         data["domain_name"] = self.epoch_acc["domain_name"]
 
         epoch_df = data[["epoch", "domain_name"] + list(self.epoch_acc["epoch_acc"].keys())]
-        epoch_df = pd.DataFrame(self.epoch_acc)
         epoch_df.to_csv(os.path.join(folder_name, "Unfamiliar.csv"))
         self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": defaultdict(list)}
 
