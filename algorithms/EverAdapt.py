@@ -12,7 +12,6 @@ from torch.optim.lr_scheduler import StepLR
 from algorithms.BaseAlgo import BaseAlgo
 
 class EverAdapt(BaseAlgo):
-
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -89,7 +88,7 @@ class EverAdapt(BaseAlgo):
             # calculate the total loss
             alpha = 0.9 ** epoch # Give more priority to coral loss early on and more to lmmd later on
 
-            loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.domain_loss_wt * coral_loss + \
+            loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.src_cls_loss_wt * coral_loss + \
                 self.hparams.src_cls_loss_wt * src_cls_loss 
 
             ###### ADDED REPLAY MEMORY #####
@@ -132,8 +131,7 @@ class EverAdapt(BaseAlgo):
             # Select a portion of the current data for the memory
             indices = list(range(len(epoch_memory_inputs)))
             random.shuffle(indices)
-            # n_to_store = int(n_save * len(epoch_memory_inputs))
-            n_to_store = 1
+            n_to_store = int(n_save * len(epoch_memory_inputs))
 
             selected_indices = indices[:n_to_store]
 
@@ -204,6 +202,7 @@ class EverAdapt(BaseAlgo):
 
             #* Log epoch acc
             evaluator.update_epoch_acc(epoch, source_name, acc_dict)
+
 
 class LMMD_loss(nn.Module):
     def __init__(self, device, class_num=3, kernel_type='rbf', kernel_mul=2.0, kernel_num=5, fix_sigma=None):
