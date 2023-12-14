@@ -5,3 +5,4 @@ __pycache__/
 source_models/
 adapted_models/
 wandb/
+venv/
