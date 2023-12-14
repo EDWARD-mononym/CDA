@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt(BaseAlgo):
+class EverAdapt_NoContinualBN(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,10 +43,10 @@ class EverAdapt(BaseAlgo):
         self.memory = None
 
     def epoch_train(self, src_loader, trg_loader, epoch, device):
-        # self.feature_extractor.to(device)
-        # self.classifier.to(device)
-        # self.feature_extractor.train()
-        # self.classifier.train()
+        self.feature_extractor.to(device)
+        self.classifier.to(device)
+        self.feature_extractor.train()
+        self.classifier.train()
 
         loss_dict = defaultdict(float)
 

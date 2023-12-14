@@ -1,52 +1,47 @@
 from collections import defaultdict
 import itertools
+from itertools import cycle
 import numpy as np
 import os
 import random
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 from torch.optim.lr_scheduler import StepLR
+from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt(BaseAlgo):
+#? https://arxiv.org/abs/1607.01719
+
+class EverAdapt_NoSubdomain(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        # optimizer and scheduler
+        self.taskloss = torch.nn.CrossEntropyLoss()
+
         self.feature_extractor_optimiser = torch.optim.Adam(
             self.feature_extractor.parameters(),
             lr=configs.lr,
             weight_decay=configs.weight_decay
         )
-        # optimizer and scheduler
         self.classifier_optimiser = torch.optim.Adam(
-            self.classifier.parameters(),
-            lr=configs.lr,
-            weight_decay=configs.weight_decay
-        )
-        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, step_size=configs.step_size, gamma=configs.gamma)
-        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, step_size=configs.step_size, gamma=configs.gamma)
+                self.feature_extractor.parameters(),
+                lr=configs.lr,
+                weight_decay=configs.weight_decay
+            )
 
-        # hparams
+        self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, 
+                                      step_size=configs.step_size, gamma=configs.gamma)
+        self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, 
+                                              step_size=configs.step_size, gamma=configs.gamma)
         self.hparams = configs
 
-        # Alignment losses
         self.loss_LMMD = LMMD_loss(device=device, class_num=configs.num_class).to(device)
-        self.cross_entropy = nn.CrossEntropyLoss()
-        self.taskloss = torch.nn.CrossEntropyLoss()
 
-        # Added memory
         self.memory = None
 
     def epoch_train(self, src_loader, trg_loader, epoch, device):
-        # self.feature_extractor.to(device)
-        # self.classifier.to(device)
-        # self.feature_extractor.train()
-        # self.classifier.train()
 
         loss_dict = defaultdict(float)
 
@@ -73,26 +68,19 @@ class EverAdapt(BaseAlgo):
                 if mem_x.shape[0] != trg_x.shape[0]: # This happens towards the end where the remaining data in target is less than batchsize
                     continue
 
+            #* Zero grads
+            self.feature_extractor_optimiser.zero_grad()
+            self.classifier_optimiser.zero_grad()
+
+            #* Forward pass
             src_feat = self.feature_extractor(src_x)
             src_pred = self.classifier(src_feat)
-
-            # extract target features
             trg_feat = self.feature_extractor(trg_x)
-            trg_pred = self.classifier(trg_feat)
 
-            # calculate lmmd loss
-            domain_loss = self.loss_LMMD.get_loss(src_feat, trg_feat, src_y, torch.nn.functional.softmax(trg_pred, dim=1))
-
-            # calculate coral loss
+            #* Compute loss
+            classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
             coral_loss = CORAL(src_feat, trg_feat)
-
-            # calculate source classification loss
-            src_cls_loss = self.cross_entropy(src_pred, src_y)
-
-            # calculate the total loss
-            alpha = 0.9 ** epoch # Give more priority to coral loss early on and more to lmmd later on
-
-            loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.src_cls_loss_wt * coral_loss + self.hparams.src_cls_loss_wt * src_cls_loss 
+            loss = self.hparams.src_cls_loss_wt * coral_loss + self.hparams.src_cls_loss_wt * classification_loss 
 
             ###### ADDED REPLAY MEMORY #####
             if memory:
@@ -102,31 +90,25 @@ class EverAdapt(BaseAlgo):
 
                 # calculate memory lmmd loss
                 mem_domain_loss = self.loss_LMMD.get_loss(src_feat, mem_feat, src_y, torch.nn.functional.softmax(mem_pred, dim=1))
-
-                # calculate memory coral loss
-                # mem_coral_loss = CORAL(src_feat, mem_feat)
-
-
-                # loss += self.hparams.domain_loss_wt * mem_domain_loss + self.hparams.src_cls_loss_wt * mem_coral_loss
                 mem_loss = self.hparams.domain_loss_wt * mem_domain_loss
 
                 loss = loss + mem_loss
             ####### END OF REPLAY MEMORY SECTION #####
 
-            # update feature extractor
-            self.feature_extractor_optimiser.zero_grad()
-            self.classifier_optimiser.zero_grad()
+            #* Step
             loss.backward()
             self.feature_extractor_optimiser.step()
             self.classifier_optimiser.step()
 
             #* Log the losses
             loss_dict["avg_loss"] += loss.item() / len(src_x)
-            loss_dict["avg_src_cls_loss"] += src_cls_loss.item() / len(src_x)
+            loss_dict["avg_classification_loss"] += classification_loss.item() / len(src_x)
+            loss_dict["avg_coral_loss"] += coral_loss.item() / len(src_x)
 
             #* Save target data
             epoch_memory_inputs.append(trg_x.cpu().detach())
 
+        #* Adjust learning rate
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
 
@@ -207,7 +189,23 @@ class EverAdapt(BaseAlgo):
 
             #* Log epoch acc
             evaluator.update_epoch_acc(epoch, source_name, acc_dict)
+            
+def CORAL(source, target):
+    d = source.data.shape[1]
 
+    # source covariance
+    xm = torch.mean(source, 0, keepdim=True) - source
+    xc = xm.t() @ xm
+
+    # target covariance
+    xmt = torch.mean(target, 0, keepdim=True) - target
+    xct = xmt.t() @ xmt
+
+    # frobenius norm between source and target
+    loss = torch.mean(torch.mul((xc - xct), (xc - xct)))
+    loss = loss/(4*d*d)
+
+    return loss
 
 class LMMD_loss(nn.Module):
     def __init__(self, device, class_num=3, kernel_type='rbf', kernel_mul=2.0, kernel_num=5, fix_sigma=None):
@@ -296,19 +294,3 @@ class LMMD_loss(nn.Module):
             weight_st = np.array([0])
         return weight_ss.astype('float32'), weight_tt.astype('float32'), weight_st.astype('float32')
     
-def CORAL(source, target):
-    d = source.data.shape[1]
-
-    # source covariance
-    xm = torch.mean(source, 0, keepdim=True) - source
-    xc = xm.t() @ xm
-
-    # target covariance
-    xmt = torch.mean(target, 0, keepdim=True) - target
-    xct = xmt.t() @ xmt
-
-    # frobenius norm between source and target
-    loss = torch.mean(torch.mul((xc - xct), (xc - xct)))
-    loss = loss/(4*d*d)
-
-    return loss

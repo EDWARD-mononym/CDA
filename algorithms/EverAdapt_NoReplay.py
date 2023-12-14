@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt(BaseAlgo):
+class EverAdapt_NoReplay(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,12 +50,7 @@ class EverAdapt(BaseAlgo):
 
         loss_dict = defaultdict(float)
 
-        epoch_memory_inputs = []
-
-        if self.memory:
-            combined_loader = zip(itertools.cycle(src_loader), trg_loader, itertools.cycle(self.memory))
-        else:
-            combined_loader = zip(itertools.cycle(src_loader), trg_loader)
+        combined_loader = zip(itertools.cycle(src_loader), trg_loader)
 
         for step, (data) in enumerate(combined_loader):
             if self.memory:
@@ -94,25 +89,6 @@ class EverAdapt(BaseAlgo):
 
             loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.src_cls_loss_wt * coral_loss + self.hparams.src_cls_loss_wt * src_cls_loss 
 
-            ###### ADDED REPLAY MEMORY #####
-            if memory:
-                # extract memory features
-                mem_feat = self.feature_extractor(mem_x)
-                mem_pred = self.classifier(mem_feat)
-
-                # calculate memory lmmd loss
-                mem_domain_loss = self.loss_LMMD.get_loss(src_feat, mem_feat, src_y, torch.nn.functional.softmax(mem_pred, dim=1))
-
-                # calculate memory coral loss
-                # mem_coral_loss = CORAL(src_feat, mem_feat)
-
-
-                # loss += self.hparams.domain_loss_wt * mem_domain_loss + self.hparams.src_cls_loss_wt * mem_coral_loss
-                mem_loss = self.hparams.domain_loss_wt * mem_domain_loss
-
-                loss = loss + mem_loss
-            ####### END OF REPLAY MEMORY SECTION #####
-
             # update feature extractor
             self.feature_extractor_optimiser.zero_grad()
             self.classifier_optimiser.zero_grad()
@@ -124,34 +100,8 @@ class EverAdapt(BaseAlgo):
             loss_dict["avg_loss"] += loss.item() / len(src_x)
             loss_dict["avg_src_cls_loss"] += src_cls_loss.item() / len(src_x)
 
-            #* Save target data
-            epoch_memory_inputs.append(trg_x.cpu().detach())
-
         self.fe_lr_scheduler.step()
         self.classifier_lr_scheduler.step()
-
-        # Save target to memory
-        if epoch == self.configs.n_epoch-1:
-            n_save = 0.05
-            # Select a portion of the current data for the memory
-            indices = list(range(len(epoch_memory_inputs)))
-            random.shuffle(indices)
-            n_to_store = int(n_save * len(epoch_memory_inputs))
-
-            selected_indices = indices[:n_to_store]
-
-            selected_inputs = [epoch_memory_inputs[i] for i in selected_indices]
-            
-            selected_inputs = torch.cat(selected_inputs)
-
-            new_memory = DataLoader(TensorDataset(selected_inputs), batch_size=trg_loader.batch_size, shuffle=True)
-
-            # Update memory
-            if self.memory is None:
-                self.memory = new_memory
-            else:
-                concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
-                self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size)
 
         return loss_dict
 

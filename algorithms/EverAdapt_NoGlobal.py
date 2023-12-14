@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt(BaseAlgo):
+class EverAdapt_NoGlobal(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -92,7 +92,7 @@ class EverAdapt(BaseAlgo):
             # calculate the total loss
             alpha = 0.9 ** epoch # Give more priority to coral loss early on and more to lmmd later on
 
-            loss = (1-alpha) * self.hparams.domain_loss_wt * domain_loss + alpha * self.hparams.src_cls_loss_wt * coral_loss + self.hparams.src_cls_loss_wt * src_cls_loss 
+            loss = self.hparams.domain_loss_wt * domain_loss +  self.hparams.src_cls_loss_wt * src_cls_loss 
 
             ###### ADDED REPLAY MEMORY #####
             if memory:

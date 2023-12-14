@@ -16,7 +16,7 @@
         "hidden_layers": 5,
         "Classifier_Type": "Classifier",
         "input_size": 640,
-        "n_epoch": 100,
+        "n_epoch": 40,
         "lr": 0.005,
         "momentum": 0.9,
         "weight_decay": 0.0001,
@@ -111,6 +111,36 @@
     },
     "EverAdapt": {
         "Method": "EverAdapt",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt_GlobalLossMemory": {
+        "Method": "EverAdapt_GlobalLossMemory",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt_NoLocal": {
+        "Method": "EverAdapt_NoLocal",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt_NoDynamic": {
+        "Method": "EverAdapt_NoDynamic",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt_NoContinualBN": {
+        "Method": "EverAdapt_NoContinualBN",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt_NoReplay": {
+        "Method": "EverAdapt_NoReplay",
+        "domain_loss_wt": 1.776,
+        "src_cls_loss_wt": 9.717
+    },
+    "EverAdapt_NoGlobal": {
+        "Method": "EverAdapt_NoGlobal",
         "domain_loss_wt": 1.776,
         "src_cls_loss_wt": 9.717
     }
