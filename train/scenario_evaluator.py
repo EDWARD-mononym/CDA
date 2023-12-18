@@ -172,7 +172,7 @@ class DomainEvaluator:
         #* Update avg metrics
         self.avg_ACC.update(self.acc.iloc[-1]['ACC'])
         self.avg_BWT.update(self.bwt.iloc[-1]['BWT'])
-        self.avg_ADAPT.update(self.bwt.iloc[-1]['ADAPT'])
+        self.avg_ADAPT.update(self.adapt.iloc[-1]['ADAPT'])
         self.avg_FWT.update(self.fwt.iloc[-2]['FWT'])
 
         #* Update avg unfamiliar period
