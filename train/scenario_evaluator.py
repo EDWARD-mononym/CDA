@@ -81,6 +81,16 @@ class DomainEvaluator:
         bwt_column = pd.DataFrame(bwt_values, index=self.scenario, columns=['BWT'])
         return bwt_column
 
+    def calc_adapt(self):
+        adapt_values = [0.0] # We do not consider the source accuracy when calculating Adapt
+        for T, domain in enumerate(self.scenario[1:], start=1):   # ! Keep in mind T starts from 1
+            diagonal_sum = sum(self.acc_matrix.loc[self.scenario[i], self.scenario[i]] for i in range(T))
+            average_diagonal = diagonal_sum / T
+            adapt_values.append(average_diagonal)
+        
+        adapt_column = pd.DataFrame(adapt_values, index=self.scenario[1:], columns=['Adapt'])
+        return adapt_column
+
     def calc_FWT(self):
         fwt_values = [0.0]  # Generalise does not exist for source model so we start with 0
         for T, domain in enumerate(self.scenario[1:-1],
