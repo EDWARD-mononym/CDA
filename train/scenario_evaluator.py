@@ -19,6 +19,7 @@ class DomainEvaluator:
         self.avg_Rmatrix = {(row, col): AverageMeter() for row in self.acc_matrix.index for col in self.acc_matrix.columns}
         self.avg_ACC = AverageMeter()
         self.avg_BWT = AverageMeter()
+        self.avg_ADAPT =AverageMeter() 
         self.avg_FWT = AverageMeter()
 
         self.epoch_acc = {"epoch": [], "domain_name": [], "epoch_acc": defaultdict(list)}
@@ -62,6 +63,7 @@ class DomainEvaluator:
     def calc_metric(self):  # Calculate ACC, BWT, Adapt, FWT
         self.acc = self.calc_ACC()
         self.bwt = self.calc_BWT()
+        self.adapt = self.calc_adapt()
         self.fwt = self.calc_FWT()
 
     def calc_ACC(self):
@@ -88,7 +90,7 @@ class DomainEvaluator:
             average_diagonal = diagonal_sum / T
             adapt_values.append(average_diagonal)
         
-        adapt_column = pd.DataFrame(adapt_values, index=self.scenario[1:], columns=['Adapt'])
+        adapt_column = pd.DataFrame(adapt_values, index=self.scenario[1:], columns=['ADAPT'])
         return adapt_column
 
     def calc_FWT(self):
@@ -138,6 +140,7 @@ class DomainEvaluator:
                 # Append metrics into the row df
                 row_df["ACC"] = round(self.acc.loc[model, "ACC"] * 100, 2)
                 row_df["BWT"] = round(self.bwt.loc[model, "BWT"] * 100, 2)
+                row_df["ADAPT"] = round(self.adapt.loc[model, "ADAPT"] * 100, 2)
                 row_df["FWT"] = round(self.fwt.loc[model, "FWT"] * 100, 2)
 
                 # Save model performance
@@ -169,6 +172,7 @@ class DomainEvaluator:
         #* Update avg metrics
         self.avg_ACC.update(self.acc.iloc[-1]['ACC'])
         self.avg_BWT.update(self.bwt.iloc[-1]['BWT'])
+        self.avg_ADAPT.update(self.bwt.iloc[-1]['ADAPT'])
         self.avg_FWT.update(self.fwt.iloc[-2]['FWT'])
 
         #* Update avg unfamiliar period
@@ -185,11 +189,12 @@ class DomainEvaluator:
         overall_df.to_csv(os.path.join(folder_name, "R_matrix.csv"))
 
         #* Save overall metric csv & latex.txt
-        metrics_df = pd.DataFrame(columns = ['ACC', 'BWT', 'FWT'])
+        metrics_df = pd.DataFrame(columns = ['ACC', 'BWT', 'ADAPT', 'FWT'])
         metrics_df.at[0, 'ACC'] = f"{self.avg_ACC.average()* 100:.2f} +/- {self.avg_ACC.standard_deviation()* 100:.2f}"
         metrics_df.at[0, 'BWT'] = f"{self.avg_BWT.average()* 100:.2f} +/- {self.avg_BWT.standard_deviation()* 100:.2f}"
+        metrics_df.at[0, 'ADAPT'] = f"{self.avg_ADAPT.average()* 100:.2f} +/- {self.avg_ADAPT.standard_deviation()* 100:.2f}"
         metrics_df.at[0, 'FWT'] = f"{self.avg_FWT.average()* 100:.2f} +/- {self.avg_FWT.standard_deviation()* 100:.2f}"
-        latex_txt = f"{self.avg_ACC.average()* 100:.2f} $\\pm$ {self.avg_ACC.standard_deviation()* 100:.2f} & {self.avg_BWT.average()* 100:.2f} $\\pm$ {self.avg_BWT.standard_deviation()* 100:.2f} & {self.avg_FWT.average()* 100:.2f} $\\pm$ {self.avg_FWT.standard_deviation()* 100:.2f}"
+        latex_txt = f"{self.avg_ACC.average()* 100:.2f} $\\pm$ {self.avg_ACC.standard_deviation()* 100:.2f} & {self.avg_BWT.average()* 100:.2f} $\\pm$ {self.avg_BWT.standard_deviation()* 100:.2f} & {self.avg_ADAPT.average()* 100:.2f} $\\pm$ {self.avg_ADAPT.standard_deviation()* 100:.2f}"
 
         metrics_df.to_csv(os.path.join(folder_name, "Metrics.csv"))
         with open(os.path.join(folder_name, "Metrics_Latex.txt"), 'w') as f:
