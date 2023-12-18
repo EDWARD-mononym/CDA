@@ -90,7 +90,7 @@ class DomainEvaluator:
             average_diagonal = diagonal_sum / T
             adapt_values.append(average_diagonal)
         
-        adapt_column = pd.DataFrame(adapt_values, index=self.scenario[1:], columns=['ADAPT'])
+        adapt_column = pd.DataFrame(adapt_values, index=self.scenario, columns=['ADAPT'])
         return adapt_column
 
     def calc_FWT(self):
