@@ -13,7 +13,7 @@ from algorithms.BaseAlgo import BaseAlgo
 
 #? https://arxiv.org/abs/1607.01719
 
-class EverAdapt_NoSubdomain(BaseAlgo):
+class EverAdapt_NoLocal(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,11 +86,10 @@ class EverAdapt_NoSubdomain(BaseAlgo):
             if memory:
                 # extract memory features
                 mem_feat = self.feature_extractor(mem_x)
-                mem_pred = self.classifier(mem_feat)
 
                 # calculate memory lmmd loss
-                mem_domain_loss = self.loss_LMMD.get_loss(src_feat, mem_feat, src_y, torch.nn.functional.softmax(mem_pred, dim=1))
-                mem_loss = self.hparams.domain_loss_wt * mem_domain_loss
+                mem_coral_loss = CORAL(src_feat, mem_feat)
+                mem_loss = self.hparams.src_cls_loss_wt * mem_coral_loss
 
                 loss = loss + mem_loss
             ####### END OF REPLAY MEMORY SECTION #####
