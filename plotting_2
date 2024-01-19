@@ -1,0 +1,50 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Define the names of the methods and the metrics
+methods = ['CDAN', 'DANN', 'Deep Coral', 'MCD', 'COSDA']
+metrics = ['ACC', 'BWT', 'Adapt']
+
+# Assuming 'data' is organized with each method's metrics in a list of lists
+# Replace 'your_data_here' with the actual data
+data = [
+    [85.07, 86.40, 87.28],  # CDAN Accuracy, BWT, Adapt
+    [90.50, 84.98, 89.45],  # DANN Accuracy, BWT, Adapt
+    [93.05, 87.98, 91.87],  # Deep Coral Accuracy, BWT, Adapt
+    [95.56, 87.38, 90.12],  # MCD Accuracy, BWT, Adapt
+    [99.42, 86.73, 95.59]   # COSDA Accuracy, BWT, Adapt
+]
+
+# Convert the data to percentages
+# data = [[value * 100 for value in method] for method in data]
+
+# Transpose the data so that each metric's values are in its own list
+data = list(map(list, zip(*data)))
+
+num_methods = len(methods)
+x = np.arange(num_methods)  # the label locations
+width = 0.2  # the width of the bars
+
+fig, ax = plt.subplots(figsize=(15, 8))
+
+# Create a bar group for each metric
+for i in range(len(metrics)):
+    bars = ax.bar(x + i*width, data[i], width, label=metrics[i])
+
+    # Optionally, add the data values on top of the bars
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 1), ha='center', va='bottom')
+
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_ylabel('Scores (%)')
+ax.set_title('Scores by method and metric')
+ax.set_xticks(x + width)
+ax.set_xticklabels(methods)
+ax.legend()
+
+# Add a legend and grid
+ax.legend()
+ax.grid(True)
+
+plt.show()

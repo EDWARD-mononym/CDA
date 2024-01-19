@@ -15,6 +15,7 @@ class DomainTrainer(Abstract_train):
         super(DomainTrainer, self).__init__(args)
         # Load configurations and algorithm-specific parameters.
         self.configs, self.sweep_parameters = self.load_configs()
+        # self.configs.alpha = args.alpha #! MODIFIED
 
 
     def train_and_log_source_model(self, source_name, scenario):

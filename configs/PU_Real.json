@@ -20,7 +20,8 @@
         "momentum": 0.9,
         "weight_decay": 0.0001,
         "step_size": 50,
-        "gamma": 0.5
+        "gamma": 0.5,
+        "lr": 0.001
     },
     "algo_params": {
     "SHOT": {
@@ -95,6 +96,20 @@
         "domain_loss_wt": 2.945,
         "src_cls_loss_wt": 8.241,
         "lr": 0.005
+    },
+    "EverAdapt_Entropy": {
+        "Method": "EverAdapt_Entropy",
+        "alpha": 0.7,
+        "local_loss_wt": 0.9136,
+        "entropy_loss_wt": 0.7894,
+        "lr": 0.001
+    },
+    "EverAdapt_Ablation_Local": {
+        "Method": "EverAdapt_Ablation_Local",
+        "alpha": 0.7,
+        "local_loss_wt": 0.9136,
+        "entropy_loss_wt": 0.7894,
+        "lr": 0.001
     }
     }
 }

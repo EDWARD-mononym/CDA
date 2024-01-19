@@ -98,7 +98,6 @@ class MMDA(BaseAlgo):
         return loss_dict
 
     def pretrain(self, train_loader, test_loader, source_name, save_path, device, evaluator):
-
         best_acc = -1.0
         print(f"Training source model")
         for epoch in range(self.n_epoch):
@@ -141,14 +140,15 @@ class MMDA(BaseAlgo):
             print("-" * 30)  # Print a separator for clarity
 
             #* Save best model
-            epoch_acc = evaluator.test_domain(self, test_loader)
+            acc_dict = evaluator.test_all_domain(self)
+            epoch_acc = acc_dict[source_name]
             if epoch_acc > best_acc:
                 best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
 
             #* Log epoch acc
-            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
+            evaluator.update_epoch_acc(epoch, source_name, acc_dict)
 
 
 class MMD_loss(nn.Module):

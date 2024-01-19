@@ -56,7 +56,7 @@ def parse_arguments():
     parser.add_argument("--dataset", default="PU_Artificial", help="Name of the dataset.")
     parser.add_argument('--start-domain', default=0, type=int, help='Manual domain start.')
     # ========= Select the algoritm ==============
-    parser.add_argument("--algo", default="EverAdapt", help="Algorithm to use: DeepCORAL, DANN, ")
+    parser.add_argument("--algo", default="EverAdapt_ReplayStudy_Pseudo06", help="Algorithm to use: DeepCORAL, DANN, ")
     # ========= Experiment settings ===============
     parser.add_argument("--writer", default="tensorboard", choices=["tensorboard", "wandb"], help="Logging tool to use.")
     parser.add_argument('-lp', '--log-path', default="./logs", help="Path for logging.")

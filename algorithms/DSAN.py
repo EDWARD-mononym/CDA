@@ -42,6 +42,10 @@ class DSAN(BaseAlgo):
         self.taskloss = torch.nn.CrossEntropyLoss()
 
     def epoch_train(self, src_loader, trg_loader, epoch, device):
+        self.feature_extractor.to(device)
+        self.classifier.to(device)
+        self.feature_extractor.train()
+        self.classifier.train()
 
         # Construct Joint Loaders 
         combined_loader = zip(src_loader, itertools.cycle(trg_loader))

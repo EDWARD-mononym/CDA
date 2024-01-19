@@ -55,22 +55,24 @@ class Abstract_train:
         algo_class = getattr(algo_module, self.args.algo)
         return algo_class(configs)
 
-    def calc_overall_metrics(self):
+    def calc_overall_metrics(self): #! NeedToChange
         self.loss_avg_meters["avg_acc"].update(self.evaluator.acc.iloc[1:]['ACC'].mean())
         self.loss_avg_meters["avg_bwt"].update(self.evaluator.bwt.iloc[2:]['BWT'].mean())
         self.loss_avg_meters["avg_adapt"].update(self.evaluator.adapt.iloc[1:]["Adapt"].mean())
-        self.loss_avg_meters["avg_generalise"].update(self.evaluator.generalise.iloc[1:-1]["Generalise"].mean())
+        # self.loss_avg_meters["avg_generalise"].update(self.evaluator.generalise.iloc[1:-1]["Generalise"].mean())
 
     def save_run_results(self, scenario, run):
         """Save the results after training and adaptation."""
         self.evaluator.calc_metric()
         file_name = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}/Run_{run}')
+        # file_name = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{str(self.args.alpha)}/{scenario}/Run_{run}') #! MODIFIED
         if not os.path.exists(file_name):
             os.makedirs(file_name)
         self.evaluator.save_singlerun(file_name)
 
     def save_avg_runs(self, scenario):
         save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{scenario}')
+        # save_folder = os.path.join(os.getcwd(), f'results/{self.configs.Dataset_Name}/{self.args.algo}/{str(self.args.alpha)}/{scenario}') #! MODIFIED
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
         self.evaluator.save_overall(save_folder)
