@@ -6,7 +6,8 @@ from torch.optim.lr_scheduler import StepLR
 from algorithms.BaseAlgo import BaseAlgo
 from architecture.Discriminator import Discriminator, ReverseLayerF
 import numpy as np
-#? https://github.com/fungtion/DANN/tree/master
+
+#? https://www.jmlr.org/papers/volume17/15-239/15-239.pdf
 
 
 class DANN(BaseAlgo):
