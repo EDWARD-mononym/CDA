@@ -3,7 +3,7 @@ Implementation of our work EverAdapt: Continuous Adaptation for Machine Fault Di
 To ensure fair comparison, we use the same feature extractor and classifier as shown in architecture folder.
 
 # Data preparation
-Create a folder named PU_raw in the data_preproc folder, download the [PU dataset](http://groups.uni-paderborn.de/kat/BearingDataCenter/) files, extract and save them in data_preproc/PU_raw.
+Create a folder named `PU_raw` in the `data_preproc` folder, download the [PU dataset](http://groups.uni-paderborn.de/kat/BearingDataCenter/) files, extract and save them in data_preproc/PU_raw.
 ```code block
 ├── data_preproc
 │ ├── PU_raw
@@ -11,6 +11,8 @@ Create a folder named PU_raw in the data_preproc folder, download the [PU datase
 │ ├── K002
 │ ├── K003
 │ └── ...
+│
+└── Paderborn_preproc.ipynb
 ```
 Run Paderborn_preproc.ipny to preprocess the raw data file.
 
