@@ -224,42 +224,52 @@ class COSDA(BaseAlgo):
             self.classifier.to(device)
             self.feature_extractor.train()
             self.classifier.train()
-
+            running_loss = 0
             for step, data in enumerate(train_loader):
                 x, y = data[0], data[1]
                 x, y = x.to(device), y.to(device)
 
-                #* Zero grads
+                # Zero grads
                 self.feature_extractor_optimiser.zero_grad()
                 self.classifier_optimiser.zero_grad()
 
-                #* Forward pass
+                # Forward pass
                 pred = self.classifier(self.feature_extractor(x))
 
-                #* Loss
+                # Loss
                 loss = self.cross_entropy_label_smooth(pred, y, self.configs.num_class, device, epsilon=0.1)
                 loss.backward()
 
-                #* Step
+                # Step
                 self.feature_extractor_optimiser.step()
                 self.classifier_optimiser.step()
 
-            #* Adjust learning rate
+                running_loss += loss.item()
+
+            # Adjust learning rate
             self.fe_lr_scheduler.step()
             self.classifier_lr_scheduler.step()
 
+            # Print average loss every 'print_every' steps
+            if (epoch + 1) % self.configs.print_every == 0:
+                avg_loss = running_loss / len(train_loader)
+                print(f"Average Loss: {avg_loss:.4f}")
+            print("-" * 30)  # Print a separator for clarity
+
             #* Save best model
-            epoch_acc = evaluator.test_domain(self, test_loader)
+            acc_dict = evaluator.test_all_domain(self)
+            epoch_acc = acc_dict[source_name]
             if epoch_acc > best_acc:
                 best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
-            
+
             #* Log epoch acc
-            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
+            evaluator.update_epoch_acc(epoch, source_name, acc_dict)
 
         self.teacher_backbone.load_state_dict(self.feature_extractor.state_dict())
         self.teacher_classifier.load_state_dict(self.classifier.state_dict())
+
     def distill_knowledge(self, score, confidence_gate, temperature=0.07):
         predict = torch.softmax(score, dim=1)
         # get the knowledge with weight and mask
