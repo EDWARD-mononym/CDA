@@ -16,6 +16,11 @@ Create a folder named `PU_raw` in the `data_preproc` folder, download the [PU da
 ```
 Run Paderborn_preproc.ipny to preprocess the raw data file.
 
+# Supported models
+Along with EverAdapt, we've also implemented the following methods as a comparison
+
+* CDAN - Conditional Adversarial Domain Adaptation. ([Long, M., Cao, Z., Wang, J., & Jordan, M. I. (2018)]https://proceedings.neurips.cc/paper_files/paper/2018/file/ab88b15733f543179858600245108dd8-Paper.pdf)
+
 # Baseline comparison
 To evaluate the performance of a model, run
  ```bash
