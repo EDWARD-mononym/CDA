@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt_CFPM_Pseudo5(BaseAlgo):
+class EverAdapt(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -88,10 +88,11 @@ class EverAdapt_CFPM_Pseudo5(BaseAlgo):
             # Calculate weights
             adaptive_wt = self.configs.alpha ** epoch # Give more priority to coral loss early on and more to lmmd later on
             local_wt = (1-adaptive_wt) * self.configs.local_loss_wt
-            entropy_wt = adaptive_wt * self.configs.global_loss_wt
+            entropy_wt = adaptive_wt * self.configs.entropy_loss_wt
+            # global_wt = entropy_wt
 
             # calculate conditional entropy loss
-            cond_ent_loss = self.cond_ent(trg_pred)
+            cond_ent_loss = self.cond_ent(trg_feat)
             # calculate lmmd loss
             domain_loss = self.loss_LMMD.get_loss(src_feat, trg_feat, src_y, torch.nn.functional.softmax(trg_pred, dim=1))
             # calculate source classification loss
@@ -139,15 +140,17 @@ class EverAdapt_CFPM_Pseudo5(BaseAlgo):
 
         # Save target to memory
         if epoch == self.configs.n_epoch-1:
-            subsampled_dataset = random_sample(trg_loader, self.feature_extractor, self.classifier, device, n = 0.05)
-            new_memory = DataLoader(subsampled_dataset, batch_size=trg_loader.batch_size, shuffle=True)
+            subsampled_dataset = random_sample(trg_loader, self.feature_extractor, self.classifier, device, n = 0.01)
+            repeated_sampler = RepeatSampler(subsampled_dataset)
+            new_memory = DataLoader(subsampled_dataset, batch_size=trg_loader.batch_size, sampler=repeated_sampler, drop_last=False)
 
             # Update memory
             if self.memory is None:
                 self.memory = new_memory
             else:
                 concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
-                self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size)
+                repeated_sampler = RepeatSampler(concatenated_dataset)
+                self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size, sampler=repeated_sampler, drop_last=False)
 
         return loss_dict
 
@@ -356,5 +359,16 @@ def random_sample(dataloader, fe, classifier, device, n):
     subsample_dataset = TensorDataset(x_tensor, pred_tensor, confidences_tensor)
 
     return subsample_dataset
+
+class RepeatSampler(torch.utils.data.Sampler):
+    """ Sampler that repeats elements from a dataset. """
+    def __init__(self, data_source):
+        self.data_source = data_source
+
+    def __iter__(self):
+        return itertools.cycle(range(len(self.data_source)))
+
+    def __len__(self):
+        return len(self.data_source)
 
 
