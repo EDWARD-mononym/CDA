@@ -11,106 +11,101 @@
     },
     "algo_params":
     {
-      "SHOT": {
-          "lr": {
-              "values": [0.01, 0.005, 0.001, 0.0005]
-          },
-          "ent_loss_wt": {
-              "distribution": "uniform",
-              "min": 0.01,
-              "max": 1
-          },
-          "im": {
-              "distribution": "uniform",
-              "min": 0.01,
-              "max": 1
-          },
-          "target_cls_wt": {
-              "distribution": "uniform",
-              "min": 0.01,
-              "max": 1
-          }
-      },
-      "DeepCORAL": {
-          "lr": {
-              "values": [
-                  0.01,
-                  0.005,
-                  0.001,
-                  0.0005
-              ]
-          },
-          "coral_wt": {
-              "distribution": "uniform",
-              "min": 0.01,
-              "max": 10
-          }
-      },
-      "DANN": {
-          "lr": {
-              "values": [0.01, 0.005, 0.001, 0.0005]
-          },
-          "da_wt": {
-              "distribution": "uniform",
-              "min": 0.1,
-              "max": 10
-          }
-      },
-      "NRC": {
-          "lr": {
-              "values": [0.01, 0.005, 0.001, 0.0005]
-          },
-          "epsilon": {
-              "values": [0.01, 0.001, 0.0001, 0.00001]
-          }
-      },
-      "COSDA": {
-          "lr": {
-            "values": [0.01, 0.005, 0.001, 0.0005]
-           },
-          "beta": {"values": [1,2,3,4]},
-          "reg_alpha": {"values": [0.1,0.2,0.3,0.4]},
-          "temp": {
-            "distribution": "uniform",
-            "min": 0.01,
-            "max": 0.2
+        "SHOT": {
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "ent_loss_wt": {
+                "distribution": "uniform",
+                "min": 0.01,
+                "max": 1
+            },
+            "im": {
+                "distribution": "uniform",
+                "min": 0.01,
+                "max": 1
+            },
+            "target_cls_wt": {
+                "distribution": "uniform",
+                "min": 0.01,
+                "max": 1
+            }
         },
-          "conf_gate": {
-            "distribution": "uniform",
-            "min": 0.4,
-            "max": 0.7
+        "DeepCORAL": {
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "coral_wt": {
+                "distribution": "uniform",
+                "min": 0.01,
+                "max": 10
+            }
         },
-          "only_mi": {"values":[false]}
-      },
-      "MCD": {
-        "lr": {
-            "values": [0.01, 0.005, 0.001, 0.0005]
+        "DANN": {
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "da_wt": {
+                "distribution": "uniform",
+                "min": 0.1,
+                "max": 10
+            }
         },
-        "domain_loss_wt": {
-            "distribution": "uniform",
-            "min": 0.1,
-            "max": 10
-        }
+        "NRC": {
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "epsilon": {
+                "values": [0.01, 0.001, 0.0001, 0.00001]
+            }
+        },
+        "COSDA": {
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "beta": {"values": [1,2,3,4]},
+            "reg_alpha": {"values": [0.1,0.2,0.3,0.4]},
+            "temp": {
+                "distribution": "uniform",
+                "min": 0.01,
+                "max": 0.2
+            },
+            "conf_gate": {
+                "distribution": "uniform",
+                "min": 0.4,
+                "max": 0.7
+            },
+            "only_mi": {"values":[false]}
+        },
+        "MCD": {
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "domain_loss_wt": {
+                "distribution": "uniform",
+                "min": 0.1,
+                "max": 10
+            }
         },
         "CDAN": {
-        "lr": {
-            "values": [0.01, 0.005, 0.001, 0.0005]
-        },
-        "src_wt": {
-            "distribution": "uniform",
-            "min": 0.1,
-            "max": 10
-        },
-        "domain_wt": {
-            "distribution": "uniform",
-            "min": 0.1,
-            "max": 10
-        },
-        "cond_wt": {
-            "distribution": "uniform",
-            "min": 0.1,
-            "max": 10
-        }
+            "lr": {
+                "values": [0.01, 0.005, 0.001, 0.0005]
+            },
+            "src_wt": {
+                "distribution": "uniform",
+                "min": 0.1,
+                "max": 10
+            },
+            "domain_wt": {
+                "distribution": "uniform",
+                "min": 0.1,
+                "max": 10
+            },
+            "cond_wt": {
+                "distribution": "uniform",
+                "min": 0.1,
+                "max": 10
+            }
         },
         "MMDA": {
             "lr": {
@@ -136,7 +131,7 @@
                 "min": 0.1,
                 "max": 10
             }
-            },
+        },
         "DIRT": {
             "lr": {
                 "values": [0.01, 0.005, 0.001, 0.0005]
@@ -161,7 +156,7 @@
                 "min": 0.1,
                 "max": 10
             }
-            },
+        },
         "DSAN": {
             "lr": {
                 "values": [0.01, 0.005, 0.001, 0.0005]
@@ -176,8 +171,8 @@
                 "min": 0.1,
                 "max": 10
             }
-            },
-        "EverAdapt_Entropy": {
+        },
+        "EverAdapt": {
             "lr": {
                 "values": [0.01, 0.005, 0.001, 0.0005]
             },
@@ -194,44 +189,5 @@
                 "min": 0.01,
                 "max": 1.5
             }
-            },
-        "EverAdapt_30Dec_Sweep": {
-            "lr": {
-                "values": [0.01, 0.005, 0.001, 0.0005]
-            },
-            "local_loss_wt": {
-                "distribution": "uniform",
-                "min": 0.01,
-                "max": 2.0
-            },
-            "entropy_loss_wt": {
-                "distribution": "uniform",
-                "min": 0.01,
-                "max": 2.0
-            }
-  },
-  "EverAdapt_1Jan_Sweep": {
-    "lr": {
-        "values": [0.01, 0.005, 0.001, 0.0005]
-    },
-    "alpha": {
-        "values": [0.6, 0.7, 0.8, 0.9]
-    },
-    "local_loss_wt": {
-        "distribution": "uniform",
-        "min": 0.01,
-        "max": 2.0
-    },
-    "global_loss_wt": {
-        "distribution": "uniform",
-        "min": 0.01,
-        "max": 2.0
-    },
-    "entropy_loss_wt": {
-        "distribution": "uniform",
-        "min": 0.01,
-        "max": 2.0
-    }
-}
-
+        }
 }}

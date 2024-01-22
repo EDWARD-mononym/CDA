@@ -23,7 +23,7 @@
         "gamma": 0.5,
         "lr": 0.001
     },
-    "algo_params": {
+"algo_params": {
     "SHOT": {
         "Method": "SHOT",
         "ent_loss_wt": 0.7229,
@@ -40,24 +40,24 @@
         "coral_wt": 5.061,
         "lr": 0.005
     },
-      "DANN": {
-    "Method": "DANN",
-    "da_wt": 5.843,
-    "lr": 0.0005
-},
+    "DANN": {
+        "Method": "DANN",
+        "da_wt": 5.843,
+        "lr": 0.0005
+    },
     "NRC": {
         "Method": "NRC",
         "epsilon": 1e-5
     },
    "COSDA": {
-            "Method": "COSDA",
-            "beta": 1,
-            "reg_alpha": 0.3,
-            "temp": 0.1213,
-            "temperature_end": 0.07,
-            "conf_gate": 0.5084,
-            "confidence_gate_end": 0.7,
-            "only_mi": false
+        "Method": "COSDA",
+        "beta": 1,
+        "reg_alpha": 0.3,
+        "temp": 0.1213,
+        "temperature_end": 0.07,
+        "conf_gate": 0.5084,
+        "confidence_gate_end": 0.7,
+        "only_mi": false
         }, 
     "MCD": {
         "Method": "MCD",
@@ -93,23 +93,9 @@
     },
     "EverAdapt": {
         "Method": "EverAdapt",
-        "domain_loss_wt": 2.945,
-        "src_cls_loss_wt": 8.241,
-        "lr": 0.005
-    },
-    "EverAdapt_Entropy": {
-        "Method": "EverAdapt_Entropy",
         "alpha": 0.7,
         "local_loss_wt": 0.9136,
-        "entropy_loss_wt": 0.7894,
-        "lr": 0.001
-    },
-    "EverAdapt_Ablation_Local": {
-        "Method": "EverAdapt_Ablation_Local",
-        "alpha": 0.7,
-        "local_loss_wt": 0.9136,
-        "entropy_loss_wt": 0.7894,
-        "lr": 0.001
+        "entropy_loss_wt": 0.7894
     }
     }
 }

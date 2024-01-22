@@ -1,5 +1,5 @@
 {
-    "train_params": {
+"train_params": {
         "Dataset_Name": "PU_Artificial",
         "Scenarios": [["A1", "A2", "A3", "A4"], ["A1", "A3", "A2", "A4"], ["A1", "A2", "A4", "A3"]],
         "num_class": 8,
@@ -23,7 +23,7 @@
         "step_size": 50,
         "gamma": 0.5
     },
-    "algo_params": {
+"algo_params": {
     "SHOT": {
         "Method": "SHOT",
         "ent_loss_wt": 0.9697,
@@ -85,7 +85,6 @@
         "Method": "EverAdapt",
         "alpha": 0.7,
         "local_loss_wt": 1.044,
-        "entropy_loss_wt": 1.19,
-        "lr": 0.001
+        "entropy_loss_wt": 1.19
     }
 }}
