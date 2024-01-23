@@ -1,0 +1,188 @@
+{
+    "train_params": {
+        "feature_length": {
+          "values": [32, 64]},
+        "hidden_channels":  {"values": [32, 64]},
+        "kernel_size":  {"values": [3, 5, 7]},
+        "dropout": {"values": [0.5, 0.7]},
+        "output_channels":  {"values": [64, 128]},
+        "hidden_layers": 5,
+        "n_epoch": {"values": [40, 60, 100]}
+    },
+    "algo_params":
+    {
+    "EverAdapt": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_Ablation_Local": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_Ablation_NoCBN": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN01": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN02": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN03": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN04": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN05": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN06": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN07": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN08": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN09": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN1": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN5": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_NoCBN10": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo01": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo02": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo03": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo04": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo05": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo06": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo07": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo08": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo09": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo1": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo5": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_ReplayStudy_Pseudo10": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_StablilityStudy_NoCBN": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    },
+    "EverAdapt_StabilityStudy_NoEntropy": {
+        "lr": {"values": [0.01, 0.005, 0.001, 0.0005]},
+        "alpha": {"values": [0.6, 0.7, 0.8, 0.9]},
+        "local_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5},
+        "global_cls_loss_wt": {"distribution": "uniform", "min": 0.01, "max": 1.5}
+    }
+}}
