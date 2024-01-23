@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt_StableStudy_NoEntropy(BaseAlgo):
+class EverAdapt_StabilityStudy_NoEntropy(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

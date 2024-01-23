@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt_Ablation_NoReplay(BaseAlgo):
+class EverAdapt(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -101,25 +101,25 @@ class EverAdapt_Ablation_NoReplay(BaseAlgo):
             # calculate the total loss
             loss = local_wt * domain_loss + entropy_wt * cond_ent_loss + src_cls_loss
 
-            # ###### ADDED REPLAY MEMORY #####
-            # if memory:
-            #     # extract memory features
-            #     mem_feat = self.feature_extractor(mem_x)
-            #     mem_pred = self.classifier(mem_feat)
+            ###### ADDED REPLAY MEMORY #####
+            if memory:
+                # extract memory features
+                mem_feat = self.feature_extractor(mem_x)
+                mem_pred = self.classifier(mem_feat)
 
-            #     # calculate memory lmmd loss
-            #     # mem_domain_loss = self.loss_LMMD.get_loss(src_feat, mem_feat, src_y, torch.nn.functional.softmax(mem_pred, dim=1))
-            #     # calculate memory coral loss
-            #     # mem_coral_loss = CORAL(src_feat, mem_feat)
-            #     # calculate memory entropy loss
-            #     mem_cls_loss = self.cross_entropy(mem_pred, mem_y)
+                # calculate memory lmmd loss
+                # mem_domain_loss = self.loss_LMMD.get_loss(src_feat, mem_feat, src_y, torch.nn.functional.softmax(mem_pred, dim=1))
+                # calculate memory coral loss
+                # mem_coral_loss = CORAL(src_feat, mem_feat)
+                # calculate memory entropy loss
+                mem_cls_loss = self.cross_entropy(mem_pred, mem_y)
 
-            #     # loss += self.hparams.domain_loss_wt * mem_domain_loss + self.hparams.src_cls_loss_wt * mem_coral_loss
-            #     # mem_loss = self.hparams.domain_loss_wt * mem_domain_loss
-            #     mem_loss = self.configs.local_loss_wt * mem_cls_loss
+                # loss += self.hparams.domain_loss_wt * mem_domain_loss + self.hparams.src_cls_loss_wt * mem_coral_loss
+                # mem_loss = self.hparams.domain_loss_wt * mem_domain_loss
+                mem_loss = self.configs.local_loss_wt * mem_cls_loss
 
-            #     loss = loss + mem_loss
-            # ####### END OF REPLAY MEMORY SECTION #####
+                loss = loss + mem_loss
+            ####### END OF REPLAY MEMORY SECTION #####
 
             # update feature extractor
             self.feature_extractor_optimiser.zero_grad()
@@ -139,16 +139,18 @@ class EverAdapt_Ablation_NoReplay(BaseAlgo):
         self.classifier_lr_scheduler.step()
 
         # Save target to memory
-        # if epoch == self.configs.n_epoch-1:
-        #     subsampled_dataset = random_sample(trg_loader, self.feature_extractor, self.classifier, device, n = 0.01)
-        #     new_memory = DataLoader(subsampled_dataset, batch_size=trg_loader.batch_size, shuffle=True)
+        if epoch == self.configs.n_epoch-1:
+            subsampled_dataset = random_sample(trg_loader, self.feature_extractor, self.classifier, device, n = 0.01)
+            repeated_sampler = RepeatSampler(subsampled_dataset)
+            new_memory = DataLoader(subsampled_dataset, batch_size=trg_loader.batch_size, sampler=repeated_sampler, drop_last=False)
 
-        #     # Update memory
-        #     if self.memory is None:
-        #         self.memory = new_memory
-        #     else:
-        #         concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
-        #         self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size)
+            # Update memory
+            if self.memory is None:
+                self.memory = new_memory
+            else:
+                concatenated_dataset = ConcatDataset([self.memory.dataset, new_memory.dataset])
+                repeated_sampler = RepeatSampler(concatenated_dataset)
+                self.memory = DataLoader(concatenated_dataset, batch_size=trg_loader.batch_size, sampler=repeated_sampler, drop_last=False)
 
         return loss_dict
 
@@ -357,3 +359,16 @@ def random_sample(dataloader, fe, classifier, device, n):
     subsample_dataset = TensorDataset(x_tensor, pred_tensor, confidences_tensor)
 
     return subsample_dataset
+
+class RepeatSampler(torch.utils.data.Sampler):
+    """ Sampler that repeats elements from a dataset. """
+    def __init__(self, data_source):
+        self.data_source = data_source
+
+    def __iter__(self):
+        return itertools.cycle(range(len(self.data_source)))
+
+    def __len__(self):
+        return len(self.data_source)
+
+

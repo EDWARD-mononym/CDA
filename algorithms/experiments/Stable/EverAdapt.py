@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from algorithms.BaseAlgo import BaseAlgo
 
-class EverAdapt_ReplayStudy_NoCBN75(BaseAlgo):
+class EverAdapt(BaseAlgo):
     def __init__(self, configs) -> None:
         super().__init__(configs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,9 +50,9 @@ class EverAdapt_ReplayStudy_NoCBN75(BaseAlgo):
         self.classifier.train()
 
         # Freeze the batchnorm layer:
-        # for module in self.feature_extractor.modules():
-        #     if isinstance(module, torch.nn.modules.batchnorm._BatchNorm):
-        #         module.eval()
+        for module in self.feature_extractor.modules():
+            if isinstance(module, torch.nn.modules.batchnorm._BatchNorm):
+                module.eval()
 
         loss_dict = defaultdict(float)
 
@@ -86,20 +86,20 @@ class EverAdapt_ReplayStudy_NoCBN75(BaseAlgo):
             trg_pred = self.classifier(trg_feat)
 
             # Calculate weights
-            # adaptive_wt = self.configs.alpha ** epoch # Give more priority to coral loss early on and more to lmmd later on
-            local_wt = self.configs.local_loss_wt
-            # entropy_wt = adaptive_wt * self.configs.entropy_loss_wt
+            adaptive_wt = self.configs.alpha ** epoch # Give more priority to coral loss early on and more to lmmd later on
+            local_wt = (1-adaptive_wt) * self.configs.local_loss_wt
+            entropy_wt = adaptive_wt * self.configs.entropy_loss_wt
             # global_wt = entropy_wt
 
             # calculate conditional entropy loss
-            # cond_ent_loss = self.cond_ent(trg_feat)
+            cond_ent_loss = self.cond_ent(trg_feat)
             # calculate lmmd loss
             domain_loss = self.loss_LMMD.get_loss(src_feat, trg_feat, src_y, torch.nn.functional.softmax(trg_pred, dim=1))
             # calculate source classification loss
             src_cls_loss = self.cross_entropy(src_pred, src_y)
 
             # calculate the total loss
-            loss = local_wt * domain_loss + src_cls_loss
+            loss = local_wt * domain_loss + entropy_wt * cond_ent_loss + src_cls_loss
 
             ###### ADDED REPLAY MEMORY #####
             if memory:
@@ -140,7 +140,7 @@ class EverAdapt_ReplayStudy_NoCBN75(BaseAlgo):
 
         # Save target to memory
         if epoch == self.configs.n_epoch-1:
-            subsampled_dataset = random_sample(trg_loader, self.feature_extractor, self.classifier, device, n = 0.75)
+            subsampled_dataset = random_sample(trg_loader, self.feature_extractor, self.classifier, device, n = 0.01)
             repeated_sampler = RepeatSampler(subsampled_dataset)
             new_memory = DataLoader(subsampled_dataset, batch_size=trg_loader.batch_size, sampler=repeated_sampler, drop_last=False)
 

@@ -1,0 +1,202 @@
+{
+    "train_params": {
+            "Dataset_Name": "PU_Artificial",
+            "Scenarios": [["A1", "A2", "A3", "A4"], ["A1", "A3", "A2", "A4"], ["A1", "A2", "A4", "A3"]],
+            "num_class": 8,
+            "input_channel": 1,
+            "Backbone_Type": "CNN",
+            "chkpoint_type": "last",
+            "print_every": 1,
+            "feature_length": 5,
+            "hidden_channels": 64,
+            "kernel_size": 5,
+            "stride": 1,
+            "dropout": 0.5,
+            "output_channels": 128,
+            "hidden_layers": 5,
+            "Classifier_Type": "Classifier",
+            "input_size": 640,
+            "n_epoch": 40,
+            "lr": 0.001,
+            "momentum": 0.9,
+            "weight_decay": 0.0001,
+            "step_size": 50,
+            "gamma": 0.5
+        },
+    "algo_params": {
+        "EverAdapt": {
+            "Method": "EverAdapt",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_Ablation_Local": {
+            "Method": "EverAdapt_Ablation_Local",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_Ablation_NoCBN": {
+            "Method": "EverAdapt_Ablation_NoCBN",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN01": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN01",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN02": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN02",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN03": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN03",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN04": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN04",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN05": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN05",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN06": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN06",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN07": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN07",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN08": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN08",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN09": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN09",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN1": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN1",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN5": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN5",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_NoCBN10": {
+            "Method": "EverAdapt_ReplayStudy_NoCBN10",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo01": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo01",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo02": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo02",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo03": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo03",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo04": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo04",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo05": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo05",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo06": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo06",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo07": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo07",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo08": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo08",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo09": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo09",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo1": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo1",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo5": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo5",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_ReplayStudy_Pseudo10": {
+            "Method": "EverAdapt_ReplayStudy_Pseudo10",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_StablilityStudy_NoCBN": {
+            "Method": "EverAdapt_StablilityStudy_NoCBN",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        },
+        "EverAdapt_StabilityStudy_NoEntropy": {
+            "Method": "EverAdapt_StabilityStudy_NoEntropy",
+            "alpha": 0.7,
+            "local_loss_wt": 1.044,
+            "entropy_loss_wt": 1.19
+        }
+    }}
+    
