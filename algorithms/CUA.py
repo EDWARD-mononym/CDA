@@ -85,7 +85,7 @@ class CUA(BaseAlgo):
             #* Compute loss
             classification_loss = torch.nn.functional.cross_entropy(src_pred, src_y)
             coral_loss = CORAL(src_feat, trg_feat)
-            loss = classification_loss + self.hparams.coral_wt * coral_loss + self.hparams.mem_wt * mem_loss
+            loss = classification_loss + self.hparams.coral_wt * coral_loss
 
             if memory:
                 # extract memory features

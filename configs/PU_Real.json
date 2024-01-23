@@ -59,6 +59,11 @@
         "confidence_gate_end": 0.7,
         "only_mi": false
         }, 
+    "CUA": {
+        "Method": "CUA",
+        "coral_wt": 5.061,
+        "mem_wt": 5.061
+    }, 
     "MCD": {
         "Method": "MCD",
         "domain_loss_wt": 6.752
