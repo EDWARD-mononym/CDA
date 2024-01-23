@@ -16,6 +16,24 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 # Setup logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
+class experiment():
+    def __init__(self, args):
+        self.args = args
+        self.algo_list = self.list_algos()
+        if args.experiment == "Stability":
+            self.args.Nruns = 10
+
+    def list_algos(self):
+        path = os.path.join(os.getcwd(), "algorithms", "experiments", self.args.experiment)
+        return [f[:-3] for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith('.py')]
+
+    def experiment(self):
+        for algo in self.algo_list:
+            self.args.algo = algo
+            diagnostic = FDTrain(self.args)
+            diagnostic.train()
+
 class FDTrain(DomainTrainer):
     def __init__(self, args):
         super(FDTrain, self).__init__(args)
@@ -48,43 +66,35 @@ class FDTrain(DomainTrainer):
             os.makedirs(file_name)
         self.evaluator.save_singlerun(file_name)
 
-    def list_algos(self):
-        path = os.path.join(os.getcwd(), "algorithms", "experiments", self.args.experiment)
-        return [f[:-3] for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith('.py')]
-
     def train(self):
-        #? Get all the algorithm
-        algolist = self.list_algos()
-        for algo in algolist:
-            self.args.algo = algo
-            """Handle all scenarios for training and adaptation."""
-            for scenario in self.configs.Scenarios:
-                source_name = scenario[0]
+        """Handle all scenarios for training and adaptation."""
+        for scenario in self.configs.Scenarios:
+            source_name = scenario[0]
 
-                # Initialize evaluator matrix
-                self.evaluator = DomainEvaluator(self.device, scenario, self.configs)
+            # Initialize evaluator matrix
+            self.evaluator = DomainEvaluator(self.device, scenario, self.configs)
 
-                print("===============================================")
-                print("                   CONFIG INFO                  ")
-                print("===============================================")
-                print(f"Method: {self.configs.Method}")
-                print(f"Dataset: {self.configs.Dataset_Name}")
-                print(f"Scenario: {' → '.join(scenario)}")
-                print("===============================================")
+            print("===============================================")
+            print("                   CONFIG INFO                  ")
+            print("===============================================")
+            print(f"Method: {self.configs.Method}")
+            print(f"Dataset: {self.configs.Dataset_Name}")
+            print(f"Scenario: {' → '.join(scenario)}")
+            print("===============================================")
 
-                for run in range(args.Nruns):
-                    set_seed(run)
+            for run in range(args.Nruns):
+                set_seed(run)
 
-                    # Train source model and log performance
-                    self.train_and_log_source_model(source_name, scenario)
+                # Train source model and log performance
+                self.train_and_log_source_model(source_name, scenario)
 
-                    # Adapt to all target domains
-                    self.adapt_to_target_domains(scenario)
+                # Adapt to all target domains
+                self.adapt_to_target_domains(scenario)
 
-                    # Calculate metrics and save results
-                    self.save_run_results(scenario, run)
+                # Calculate metrics and save results
+                self.save_run_results(scenario, run)
 
-                self.save_avg_runs(scenario)
+            self.save_avg_runs(scenario)
 
 
 def parse_arguments():
@@ -110,5 +120,5 @@ if __name__ == "__main__":
     args = parse_arguments()
     if args.experiment == "Stability":
         args.Nruns = 10
-    diagnostic = FDTrain(args)
-    diagnostic.train()
+    diagnostic = experiment(args)
+    diagnostic.experiment()
