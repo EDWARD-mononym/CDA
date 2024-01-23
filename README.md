@@ -21,13 +21,14 @@ To evaluate the performance of a model, run
  ```bash
  python main.py --dataset [dataset] --algo [algorithm] 
  ```
- The results will be be saved in a result folder in the same directory as main.py. Dataset can be either `PU_Artificial` or `PU_Real`. Algorithm can be any of the methods listed in `Supported models`
+ The results will be be saved in a result folder in the same directory as main.py. Dataset can be either `PU_Artificial` or `PU_Real`. Algorithm can be any of the methods listed in `Supported models`.
 
 # Running a sweep
 To run a sweep with wandB, run
  ```bash
  python main_sweep.py --dataset [dataset] --algo [algorithm] 
   ```
+Dataset can be either `PU_Artificial` or `PU_Real`. Algorithm can be any of the methods listed in `Supported models`
 
 # Supported models
 Along with EverAdapt, we've also implemented the following methods as a comparison
@@ -39,6 +40,4 @@ Along with EverAdapt, we've also implemented the following methods as a comparis
 * DSAN - Deep Subdomain Adaptation Network for Image Classification. [Zhu, Y., Zhuang, F., Wang, J., Ke, G., Chen, J., Bian, J., ... & He, Q. (2020)](https://ieeexplore.ieee.org/document/9085896)
 * MMDA - On Minimum Discrepancy Estimation for Deep Domain Adaptation. [Rahman, M. M., Fookes, C., Baktashmotlagh, M., & Sridharan, S. (2020)](https://link.springer.com/chapter/10.1007/978-3-030-30671-7_6)
 
-
- # Adding an algorithm
 
