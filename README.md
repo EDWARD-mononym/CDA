@@ -23,8 +23,12 @@ To evaluate the performance of a model, run
  ```
  The results will be be saved in a result folder in the same directory as main.py. Dataset can be either `PU_Artificial` or `PU_Real`. Algorithm can be any of the methods listed in `Supported models`.
 
-# Ablation, Replay & Stable study
-To replicate our experiments,  
+# Ablation, Replay & Stability study
+To replicate our experiments, run
+ ```bash
+ python experiments.py --experiment [experiment]
+ ```
+ The results will be be saved in a result folder in the same directory as main.py. Available experiments can be either of `Ablation`, `Replay` or `Stability`
 
 # Running a sweep
 To run a sweep with wandB, run
