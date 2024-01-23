@@ -14,7 +14,7 @@ Create a folder named `PU_raw` in the `data_preproc` folder, download the [PU da
 │
 └── Paderborn_preproc.ipynb
 ```
-Run Paderborn_preproc.ipny to preprocess the raw data file.
+Run Paderborn_preproc.ipny to preprocess the raw data file into suitable datasets.
 
 # Baseline comparison
 To evaluate the performance of a model, run
