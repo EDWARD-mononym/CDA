@@ -61,8 +61,8 @@
         }, 
     "CUA": {
         "Method": "CUA",
-        "coral_wt": 5.061,
-        "mem_wt": 5.061
+        "coral_wt": 3.474,
+        "mem_wt": 2.754
     }, 
     "MCD": {
         "Method": "MCD",
