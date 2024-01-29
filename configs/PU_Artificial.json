@@ -45,10 +45,10 @@
    "COSDA": {
         "Method": "COSDA",
         "beta": 1,
-        "reg_alpha": 0.4,
-        "temp": 0.1453,
+        "reg_alpha": 0.3,
+        "temp": 0.1006,
         "temperature_end": 0.07,
-        "conf_gate": 0.4446,
+        "conf_gate": 0.4813,
         "confidence_gate_end": 0.7,
         "only_mi": false
     }, 
