@@ -53,11 +53,12 @@
         "Method": "COSDA",
         "beta": 1,
         "reg_alpha": 0.3,
-        "temp": 0.1213,
+        "temp": 0.1471,
         "temperature_end": 0.07,
-        "conf_gate": 0.5084,
+        "conf_gate": 0.6364,
         "confidence_gate_end": 0.7,
-        "only_mi": false
+        "only_mi": false,
+        "lr": 0.0005
         }, 
     "CUA": {
         "Method": "CUA",
