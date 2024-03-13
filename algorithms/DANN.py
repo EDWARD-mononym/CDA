@@ -90,7 +90,7 @@ class DANN(BaseAlgo):
             trg_domain_pred = self.discriminator(trg_feat_reversed)
             trg_domain_loss = self.taskloss(trg_domain_pred, trg_domain_labels)
 
-            domain_loss = src_domain_loss + self.hparams.da_wt * trg_domain_loss
+            domain_loss = src_domain_loss + trg_domain_loss
             loss = src_cls_loss + domain_loss
             loss.backward()
 
