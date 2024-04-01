@@ -24,11 +24,11 @@
         "gamma": 0.5
     },
 "algo_params": {
-    "DeepCORAL": {
+    "HDDA": {
         "Method": "HDDA",
         "coral_wt": 8.824
     },
-    "DANN": {
+    "IDANN": {
         "Method": "IDANN",
         "da_wt": 0.2207
     },
@@ -37,7 +37,7 @@
         "coral_wt": 8.213,
         "mem_wt": 2.917
     }, 
-    "CDAN": {
+    "CADA-DE": {
         "Method": "CADA-DE",
         "src_wt": 4.373,
         "domain_wt": 6.108,
@@ -50,7 +50,7 @@
         "cond_ent_wt": 4.759,
         "src_cls_loss_wt": 3.436
     },
-    "DSAN": {
+    "SATLN": {
         "Method": "SATLN",
         "domain_loss_wt": 1.776,
         "src_cls_loss_wt": 9.717

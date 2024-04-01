@@ -1,0 +1,79 @@
+{
+    "train_params": {
+            "Dataset_Name": "UO",
+            "Scenarios": [["A", "B", "C", "D"], ["B", "A", "C", "D"], ["D", "A", "B", "C"]],
+            "num_class": 3,
+            "input_channel": 2,
+            "Backbone_Type": "CNN",
+            "chkpoint_type": "last",
+            "print_every": 1,
+            "feature_length": 5,
+            "hidden_channels": 64,
+            "kernel_size": 5,
+            "stride": 1,
+            "dropout": 0.5,
+            "output_channels": 128,
+            "hidden_layers": 5,
+            "Classifier_Type": "Classifier",
+            "input_size": 640,
+            "n_epoch": 40,
+            "lr": 0.001,
+            "momentum": 0.9,
+            "weight_decay": 0.0001,
+            "step_size": 50,
+            "gamma": 0.5
+        },
+    "algo_params": {
+        "ConDA": {
+            "Method": "ConDA",
+            "src_cls_loss_wt": 2,
+            "mixup_loss_wt": 0.5,
+            "ent_loss_wt": 1,
+            "eq_div_loss_wt": 1
+        },
+        "HDDA": {
+            "Method": "HDDA",
+            "coral_wt": 8.824
+        },
+        "IDANN": {
+            "Method": "IDANN",
+            "da_wt": 0.2207
+        },
+        "CUA": {
+            "Method": "CUA",
+            "coral_wt": 8.213,
+            "mem_wt": 2.917
+        }, 
+        "CADA-DE": {
+            "Method": "CADA-DE",
+            "src_wt": 4.373,
+            "domain_wt": 6.108,
+            "cond_wt": 0.4118
+        },
+        "MMDA": {
+            "Method": "MMDA",
+            "coral_wt": 7.647,
+            "mmd_wt": 3.725,
+            "cond_ent_wt": 6.37,
+            "src_cls_loss_wt": 5.487
+        },
+        "SATLN": {
+            "Method": "SATLN",
+            "domain_loss_wt": 1.776,
+            "src_cls_loss_wt": 9.717
+        },
+        "EverAdapt": {
+            "Method": "EverAdapt",
+            "alpha": 0.9,
+            "local_loss_wt": 4.974,
+            "entropy_loss_wt": 4.974,
+            "src_cls_loss_wt": 1.297
+        },
+        "DCTLN_DWA":{
+            "Method": "DCTLN_DWA",
+            "src_wt": 1,
+            "da_wt": 0.1847,
+            "rk_wt": 7.573
+        }
+    }}
+    
