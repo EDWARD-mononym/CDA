@@ -47,7 +47,7 @@ class SHOT(BaseAlgo):
         combined_loader = zip(cycle(src_loader), trg_loader)
 
         # obtain pseudo labels for each epoch
-        pseudo_labels = self.obtain_pseudo_labels(trg_loader)
+        pseudo_labels = self.obtain_label(trg_loader)
 
         loss_dict = defaultdict(float)
 
@@ -64,7 +64,8 @@ class SHOT(BaseAlgo):
             trg_pred = self.classifier(trg_feat)
 
             # pseudo labeling loss
-            pseudo_label = pseudo_labels[trg_idx.long()].to(self.device)
+            # pseudo_label = pseudo_labels[trg_idx.long()].to(self.device)
+            pseudo_label = torch.from_numpy(pseudo_labels[trg_idx.long()]).to(self.device)
             target_loss = F.cross_entropy(trg_pred.squeeze(), pseudo_label.long())
 
             softmax_out = nn.Softmax(dim=1)(trg_pred)
@@ -75,7 +76,6 @@ class SHOT(BaseAlgo):
 
             # Total loss
             loss = entropy_loss + self.configs.target_cls_wt * target_loss
-
 
             #* Compute loss
             loss.backward()
@@ -130,62 +130,78 @@ class SHOT(BaseAlgo):
             self.fe_lr_scheduler.step()
             self.classifier_lr_scheduler.step()
 
-            # Print average loss every 'print_every' steps
-            if (epoch + 1) % self.configs.print_every == 0:
-                avg_loss = running_loss / len(train_loader)
-                print(f"Average Loss: {avg_loss:.4f}")
-            print("-" * 30)  # Print a separator for clarity
-
-            # * Save best model
-            epoch_acc = evaluator.test_domain(self, test_loader)
+            #* Save best model
+            acc_dict = evaluator.test_all_domain(self)
+            epoch_acc = acc_dict[source_name]
             if epoch_acc > best_acc:
                 best_acc = epoch_acc
                 torch.save(self.feature_extractor.state_dict(), os.path.join(save_path, f"{source_name}_feature.pt"))
                 torch.save(self.classifier.state_dict(), os.path.join(save_path, f"{source_name}_classifier.pt"))
 
+            # Print average loss every 'print_every' steps
+            if (epoch + 1) % self.configs.print_every == 0:
+                avg_loss = running_loss / len(train_loader)
+                print(f"Average Loss: {avg_loss:.4f}")
+                print(f"Epoch ACC: {acc_dict[source_name]}")
+            print("-" * 30)  # Print a separator for clarity
+
             #* Log epoch acc
-            evaluator.update_epoch_acc(epoch, source_name, epoch_acc)
+            evaluator.update_epoch_acc(epoch, source_name, acc_dict)
 
 
-    def obtain_pseudo_labels(self, trg_loader):
-            self.feature_extractor.eval()
-            self.classifier.eval()
-            preds, feas = [], []
-            with torch.no_grad():
-                for inputs, labels, _ in trg_loader:
-                    inputs = inputs.float().to(self.device)
+    def obtain_label(self, loader):
+        self.feature_extractor.eval()
+        self.classifier.eval()
+        start_test = True
+        with torch.no_grad():   
+            for data in loader:
+                inputs = data[0]
+                inputs = inputs.cuda()
+                labels = data[1]
+                feas = self.feature_extractor(inputs)
+                outputs = self.classifier(feas)
+                if start_test:
+                    all_fea = feas.float().cpu()
+                    all_output = outputs.float().cpu()
+                    all_label = labels.float()
+                    start_test = False
+                else:
+                    all_fea = torch.cat((all_fea, feas.float().cpu()), 0)
+                    all_output = torch.cat((all_output, outputs.float().cpu()), 0)
+                    all_label = torch.cat((all_label, labels.float()), 0)
 
-                    features = self.feature_extractor(inputs)
-                    predictions = self.classifier(features)
-                    preds.append(predictions)
-                    feas.append(features)
+        all_output = nn.Softmax(dim=1)(all_output)
+        ent = torch.sum(-all_output * torch.log(all_output + 1e-8), dim=1)
+        # unknown_weight = 1 - ent / np.log(args.class_num)
+        _, predict = torch.max(all_output, 1)
 
-            preds = torch.cat((preds))
-            feas = torch.cat((feas))
+        accuracy = torch.sum(torch.squeeze(predict).float() == all_label).item() / float(all_label.size()[0])
+        all_fea = torch.cat((all_fea, torch.ones(all_fea.size(0), 1)), 1)
+        all_fea = (all_fea.t() / torch.norm(all_fea, p=2, dim=1)).t()
 
-            preds = nn.Softmax(dim=1)(preds)
-            _, predict = torch.max(preds, 1)
+        all_fea = all_fea.float().cpu().numpy()
+        K = all_output.size(1)
+        aff = all_output.float().cpu().numpy()
 
-            all_features = torch.cat((feas, torch.ones(feas.size(0), 1).to(self.device)), 1)
-            all_features = (all_features.t() / torch.norm(all_features, p=2, dim=1)).t()
-            all_features = all_features.float().cpu().numpy()
+        for _ in range(2):
+            initc = aff.transpose().dot(all_fea)
+            initc = initc / (1e-8 + aff.sum(axis=0)[:,None])
+            cls_count = np.eye(K)[predict].sum(axis=0)
+            labelset = np.where(cls_count>0)
+            labelset = labelset[0]
 
-            K = preds.size(1)
-            aff = preds.float().cpu().numpy()
-            initc = aff.transpose().dot(all_features)
-            initc = initc / (1e-8 + aff.sum(axis=0)[:, None])
-            dd = cdist(all_features, initc, 'cosine')
+            dd = cdist(all_fea, initc[labelset], 'cosine')
             pred_label = dd.argmin(axis=1)
-            pred_label = torch.from_numpy(pred_label)
+            predict = labelset[pred_label]
 
-            for round in range(1):
-                aff = np.eye(K)[pred_label]
-                initc = aff.transpose().dot(all_features)
-                initc = initc / (1e-8 + aff.sum(axis=0)[:, None])
-                dd = cdist(all_features, initc, 'cosine')
-                pred_label = dd.argmin(axis=1)
-                pred_label = torch.from_numpy(pred_label)
-            return pred_label
+            aff = np.eye(K)[predict]
+
+        acc = np.sum(predict == all_label.float().numpy()) / len(all_fea)
+        log_str = 'Accuracy = {:.2f}% -> {:.2f}%'.format(accuracy * 100, acc * 100)
+        print(log_str)
+
+        self.feature_extractor.train()
+        return predict.astype('int')
 
     def cross_entropy_label_smooth(self, inputs, targets, num_classes, device, epsilon=0.1):
         logsoftmax = nn.LogSoftmax(dim=1)

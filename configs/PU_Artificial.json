@@ -26,9 +26,9 @@
 "algo_params": {
     "SHOT": {
         "Method": "SHOT",
-        "ent_loss_wt": 0.9697,
-        "im": 9.04,
-        "target_cls_wt": 4.288
+        "ent_loss_wt": 1.0,
+        "im": 1.0,
+        "target_cls_wt": 0.3
     },
     "DeepCORAL": {
         "Method": "DeepCORAL",

@@ -40,6 +40,8 @@ class BaseAlgo(torch.nn.Module):
         self.fe_lr_scheduler = StepLR(self.feature_extractor_optimiser, step_size=configs.step_size, gamma=configs.gamma)
         self.classifier_lr_scheduler = StepLR(self.classifier_optimiser, step_size=configs.step_size, gamma=configs.gamma)
 
+        self.taskloss = torch.nn.CrossEntropyLoss()
+
         self.n_epoch = configs.n_epoch
 
         self.configs = configs
@@ -71,6 +73,7 @@ class BaseAlgo(torch.nn.Module):
             # Log the performance of each domain for this epoch
             for domain in acc_dict:
                 writer.add_scalar(f'Acc/{domain}', acc_dict[domain], epoch)
+            loss_dict["target_acc"] = acc_dict[target_name]
 
             # Log the losses
             for loss_name in loss_dict:
