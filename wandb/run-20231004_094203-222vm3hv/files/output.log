@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "D:\Continual_DA\main_sweep_wandb.py", line 160, in <module>
-  File "D:\Continual_DA\main_sweep_wandb.py", line 117, in run
-    def run(self):
-  File "D:\Continual_DA\main_sweep_wandb.py", line 93, in handle_scenarios
-    # self.configs should not contain any sweep paramters, it should normal paramters that has starting point
-KeyboardInterrupt

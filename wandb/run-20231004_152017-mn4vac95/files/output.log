@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "D:\Continual_DA\main_sweep_wandb2.py", line 178, in <module>
-    diagnostic.run()
-  File "D:\Continual_DA\main_sweep_wandb2.py", line 134, in run
-    self.handle_scenarios()
-  File "D:\Continual_DA\main_sweep_wandb2.py", line 109, in handle_scenarios
-    self.configs = wandb.config
-KeyboardInterrupt
