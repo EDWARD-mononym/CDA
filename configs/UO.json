@@ -1,7 +1,7 @@
 {
     "train_params": {
             "Dataset_Name": "UO",
-            "Scenarios": [["A", "B", "C", "D"], ["B", "A", "C", "D"], ["D", "A", "B", "C"]],
+            "Scenarios": [["U1", "U2", "U3", "U4"], ["U2", "U1", "U3", "U4"], ["U4", "U1", "U2", "U3"]],
             "num_class": 3,
             "input_channel": 2,
             "Backbone_Type": "CNN",

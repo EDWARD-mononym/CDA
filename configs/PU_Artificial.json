@@ -24,6 +24,13 @@
         "gamma": 0.5
     },
 "algo_params": {
+    "ConDA": {
+        "Method": "ConDA",
+        "src_cls_loss_wt": 1,
+        "mixup_loss_wt": 1.271,
+        "ent_loss_wt": 3.808,
+        "eq_div_loss_wt": 6.791
+    },
     "HDDA": {
         "Method": "HDDA",
         "coral_wt": 8.824
