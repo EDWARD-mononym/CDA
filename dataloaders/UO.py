@@ -3,7 +3,7 @@ import os
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-datasetpath = os.path.join(os.getcwd(), "data_preproc/UO")
+datasetpath = os.path.join(os.getcwd(), "dataset/UO")
 
 class CustomDataset(Dataset):
     def __init__(self, file_name, dtype):
