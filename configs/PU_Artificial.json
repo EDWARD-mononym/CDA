@@ -24,45 +24,21 @@
         "gamma": 0.5
     },
 "algo_params": {
-    "SHOT": {
-        "Method": "SHOT",
-        "ent_loss_wt": 1.0,
-        "im": 1.0,
-        "target_cls_wt": 0.3
-    },
     "DeepCORAL": {
-        "Method": "DeepCORAL",
+        "Method": "HDDA",
         "coral_wt": 8.824
     },
     "DANN": {
-        "Method": "DANN",
+        "Method": "IDANN",
         "da_wt": 0.2207
     },
-    "NRC": {
-        "Method": "NRC",
-        "epsilon": 1e-5
-    },
-   "COSDA": {
-        "Method": "COSDA",
-        "beta": 1,
-        "reg_alpha": 0.3,
-        "temp": 0.1006,
-        "temperature_end": 0.07,
-        "conf_gate": 0.4813,
-        "confidence_gate_end": 0.7,
-        "only_mi": false
-    }, 
     "CUA": {
         "Method": "CUA",
         "coral_wt": 8.213,
         "mem_wt": 2.917
     }, 
-    "MCD": {
-        "Method": "MCD",
-        "domain_loss_wt": 0.5394
-    },
     "CDAN": {
-        "Method": "CDAN",
+        "Method": "CADA-DE",
         "src_wt": 4.373,
         "domain_wt": 6.108,
         "cond_wt": 0.4118
@@ -74,15 +50,8 @@
         "cond_ent_wt": 4.759,
         "src_cls_loss_wt": 3.436
     },
-    "DIRT": {
-        "Method": "DIRT",
-        "src_cls_loss_wt": 6.54,
-        "domain_loss_wt": 5.169,
-        "cond_ent_wt": 7.008,
-        "vat_loss_wt":3.763
-    },
     "DSAN": {
-        "Method": "DSAN",
+        "Method": "SATLN",
         "domain_loss_wt": 1.776,
         "src_cls_loss_wt": 9.717
     },
