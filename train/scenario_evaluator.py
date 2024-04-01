@@ -86,7 +86,7 @@ class DomainEvaluator:
     def calc_adapt(self):
         adapt_values = [0.0] # We do not consider the source accuracy when calculating Adapt
         for T, domain in enumerate(self.scenario[1:], start=1):   # ! Keep in mind T starts from 1
-            diagonal_sum = sum(self.acc_matrix.loc[self.scenario[i], self.scenario[i]] for i in range(T))
+            diagonal_sum = sum(self.acc_matrix.loc[self.scenario[i], self.scenario[i]] for i in range(1, T + 1))
             average_diagonal = diagonal_sum / T
             adapt_values.append(average_diagonal)
         
@@ -118,7 +118,8 @@ class DomainEvaluator:
         total_samples = 0
 
         with torch.no_grad():
-            for inputs, labels, _ in src_loader:
+            for data in src_loader:
+                inputs, labels = data[0], data[1]
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
 
                 logits = algo.classifier(algo.feature_extractor(inputs))
